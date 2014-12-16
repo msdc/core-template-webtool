@@ -64,13 +64,13 @@
         	<groupId>com.isoftstone.crawl.template.impl</groupId>
         	<artifactId>crawl-template</artifactId>
         	<scope>system</scope>
-        	<systemPath>/home/linux/workspace/crawl-template.jar</systemPath>
+        	<systemPath>${basedir}/libs/crawl-template.jar</systemPath>
         </dependency>
         <dependency>
         	<groupId>myutil</groupId>
         	<artifactId>myutil</artifactId>
         	<scope>system</scope>
-        	<systemPath>/home/linux/workspace/myutil.jar</systemPath>
+        	<systemPath>${basedir}/libs/myutil.jar</systemPath>
         </dependency>
     </dependencies>
     <properties>
