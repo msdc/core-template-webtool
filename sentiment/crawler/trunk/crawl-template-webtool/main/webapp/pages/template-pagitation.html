@@ -1,0 +1,111 @@
+<!--标题-->
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-5">
+        <h3 id="title_config"></h3>
+    </div>
+    <div class="col-md-3"></div>
+</div>
+
+<!--基本属性-->
+<div class="row">
+    <div class="col-md-12">
+        <h3>基本信息</h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="addDivBorder addRowTopMargin">
+            <form role="form">
+                <div class="form-group">
+                    <label for="txt_url">Url:</label>
+                    <input type="text" class="form-control" id="txt_url" placeholder="页面url">
+                </div>
+                <div class="form-group">
+                    <label for="txt_webName">名称:</label>
+                    <input type="text" class="form-control" id="txt_webName" placeholder="页面描述">
+                </div>
+                <div class="form-group">
+                    <label for="select_tag">行业:</label>
+                    <select class="form-control" id="select_tag"></select>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>分页配置</h3>
+    </div>
+</div>
+
+<!--内容页的固定属性-->
+<!--分页属性-->
+<div class="row">
+    <div class="col-md-12">
+        <h5>标题</h5>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="addDivBorder addRowTopMargin">
+            <form role="form">
+                <!--解析器选择-->
+                <div class=row>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>解析器</label>
+                            <select class="form-control"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-9"></div>
+                </div>
+
+                <!--Jsoup选择器内容-->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>选择器</label>
+                            <input type="text" class="form-control" placeholder="选择器">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>选择器属性</label>
+                            <select class="form-control"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <!--过滤器内容 格式化器内容-->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>过滤器</label>
+                            <input type="text" class="form-control" placeholder="过滤器">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>格式化器</label>
+                            <input type="text" class="form-control" placeholder="格式化器">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--按钮区域-->
+<div class="row addRowTopMargin">
+    <div class="col-md-2"></div>
+    <div class="col-md-7"></div>
+    <div class="col-md-3">
+        <button type="button" class="btn btn-primary" data-bind="click: getAllItems">测试模板配置</button>
+        <button type="button" class="btn btn-primary">保存模板配置</button>
+    </div>
+</div>

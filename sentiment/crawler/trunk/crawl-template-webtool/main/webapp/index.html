@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.css" type="text/css"/>
+    <link rel="stylesheet" href="css/main.css" type="text/css"/>
+    <script src="js/jQuery.js" type="text/javascript"></script>
+    <script src="js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="js/knockout.js" type="text/javascript"></script>
+    <script src="js/index.js" type="text/javascript"></script>
+    <title>Crawl-Tool</title>
+</head>
+<body>
+
+<!--添加爬虫页面-->
+<div class="modal fade" id="modal-addNew" tabindex="-1" role="dialog" aria-labelledby="modal-add-webpage" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="modal-add-webpage">添加爬取页面</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <div class="form-group">
+                        <label for="pageDes" class="control-label">页面描述:</label>
+                        <input type="text" class="form-control" id="pageDes">
+                    </div>
+                    <div class="form-group">
+                        <label for="pageUrl" class="control-label">Url地址:</label>
+                        <input type="text" class="form-control" id="pageUrl">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="btn_modalAddNew_sure">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+            <h3>Crawl-Tool</h3>
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+    <div class="row addRowTopMargin">
+        <div class="col-md-12">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-addNew" data-optiontype="addNew" data-rowid="">添加爬取页面</button>
+        </div>
+    </div>
+    <div class="row addRowTopMargin">
+        <div class="col-md-12">
+            <table class="table table-bordered" id="table_urlList">
+                <thead>
+                <tr>
+                    <td>序号</td>
+                    <td>页面描述</td>
+                    <td>页面地址</td>
+                    <td>爬虫模板</td>
+                    <td>操作</td>
+                </tr>
+                </thead>
+                <tbody data-bind="foreach: urls">
+                <tr>
+                    <td data-bind="text: listIndex"></td>
+                    <td data-bind="text: pageDes"></td>
+                    <td data-bind="text: pageUrl"></td>
+                    <td>
+                        <button type="button" class="btn btn-primary" data-bind="click: clickTemplateConfig">配置模板</button>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-primary" data-bind="attr: {'data-listindex': listIndex}" data-optiontype="update" data-toggle="modal" data-target="#modal-addNew">修改</button>
+                        <button type="button" class="btn btn-primary" data-bind="click: clickDelete">删除</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
