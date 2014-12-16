@@ -1,0 +1,8 @@
+.addRowTopMargin {
+    margin-top: 8px;
+}
+
+.addDivBorder{
+    border:solid 1px grey;
+    padding: 12px;
+}
