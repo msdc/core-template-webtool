@@ -4,10 +4,12 @@
 $(function(){
     //默认加载列表模板
     loadTemplate('列表模板','list','template-list.html');
-    //注册页签事件
-    registerTabPanelEvent();
+    ////注册页签事件
+    //registerTabPanelEvent();
+    //注册模板类型下拉事件
+    registerTemplateTypeEvent();
 
-    //解决viewmodel的嵌套问题
+    //解决多个View-Model的嵌套问题
     ko.bindingHandlers.stopBinding = {
         init: function() {
             return { controlsDescendantBindings: true };
@@ -15,11 +17,33 @@ $(function(){
     };
 
     ko.virtualElements.allowedBindings.stopBinding = true;
-
-//    var pageDes=getUrlParameter('pagedes');
-//    var id=getUrlParameter('id');
-//    //$('#title_config').text(decodeURIComponent(pageDes)+"--爬虫模板配置");
 });
+
+/**
+ *
+ * 注册模板类型切换事件
+ * */
+function registerTemplateTypeEvent(){
+    $('#select_template_type').change(function(){
+        var self=this;
+        if(self.value=="list"){
+            loadTemplate('列表模板','list','template-list.html');
+        }else if(self.value=="news"){
+            loadTemplate('内容模板','news','template-news.html');
+        }else if(self.value=="pagitation"){
+            loadTemplate('分页模板','pagitation','template-pagitation.html');
+        }
+
+//        //old.页签事件
+//        if(e.target.hash=="#list"){
+//            loadTemplate('列表模板','list','template-list.html');
+//        }else if(e.target.hash=="#news"){
+//            loadTemplate('内容模板','news','template-news.html');
+//        }else if(e.target.hash=="#pagitation"){
+//            loadTemplate('分页模板','pagitation','template-pagitation.html');
+//        }
+    });
+}
 
 /**
  *
