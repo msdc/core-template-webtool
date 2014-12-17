@@ -17,7 +17,7 @@
         <div class="addDivBorder addRowTopMargin">
             <!--索引器选择-->
             <div class=row>
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label>索引器</label>
                         <select class="form-control">
@@ -26,7 +26,17 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-9"></div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>选择器功能</label>
+                        <select class="form-control">
+                            <option value="field">field</option>
+                            <option value="label">label</option>
+                            <option value="content">content</option>
+                            <option value="pagination">pagination</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <!--Jsoup选择器内容-->
@@ -50,7 +60,7 @@
                 </div>
             </div>
 
-            <!--过滤器内容 格式化器内容-->
+            <!--过滤器内容-->
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -60,11 +70,34 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
+                        <label>过滤器类别</label>
+                        <select class="form-control">
+                            <option value="remove">移除</option>
+                            <option value="match">匹配</option>
+                            <option value="replace">替换</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!--格式化器内容-->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
                         <label>格式化器</label>
                         <input type="text" class="form-control" placeholder="格式化器">
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>格式化器类别</label>
+                        <select class="form-control">
+                            <option value="date">时间</option>
+                        </select>
+                    </div>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -81,7 +114,7 @@
         <div class="addDivBorder addRowTopMargin">
             <!--索引器选择-->
             <div class=row>
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label>索引器</label>
                         <select class="form-control">
@@ -90,7 +123,17 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-9"></div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>选择器功能</label>
+                        <select class="form-control">
+                            <option value="field">field</option>
+                            <option value="label">label</option>
+                            <option value="content">content</option>
+                            <option value="pagination">pagination</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <!--Jsoup选择器内容-->
@@ -114,7 +157,7 @@
                 </div>
             </div>
 
-            <!--过滤器内容 格式化器内容-->
+            <!--过滤器内容-->
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -124,11 +167,34 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
+                        <label>过滤器类别</label>
+                        <select class="form-control">
+                            <option value="remove">移除</option>
+                            <option value="match">匹配</option>
+                            <option value="replace">替换</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!--格式化器内容-->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
                         <label>格式化器</label>
                         <input type="text" class="form-control" placeholder="格式化器">
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>格式化器类别</label>
+                        <select class="form-control">
+                            <option value="date">时间</option>
+                        </select>
+                    </div>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -145,7 +211,7 @@
         <div class="addDivBorder addRowTopMargin">
             <!--索引器选择-->
             <div class=row>
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label>索引器</label>
                         <select class="form-control">
@@ -154,7 +220,17 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-9"></div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>选择器功能</label>
+                        <select class="form-control">
+                            <option value="field">field</option>
+                            <option value="label">label</option>
+                            <option value="content">content</option>
+                            <option value="pagination">pagination</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <!--分页类型和分页的Url-->
@@ -276,13 +352,23 @@
 
                     <!--索引器选择-->
                     <div class=row>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>索引器</label>
                                 <select class="form-control" data-bind="options: $parent.parseEngines"></select>
                             </div>
                         </div>
-                        <div class="col-md-9"></div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>选择器功能</label>
+                                <select class="form-control">
+                                    <option value="field">field</option>
+                                    <option value="label">label</option>
+                                    <option value="content">content</option>
+                                    <option value="pagination">pagination</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
 
@@ -304,7 +390,7 @@
                         </div>
                     </div>
 
-                    <!--过滤器内容 格式化器内容-->
+                    <!--过滤器内容-->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -314,11 +400,34 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>格式化器</label>
-                                <input type="text" class="form-control" data-bind="value: formater" placeholder="格式化器">
+                                <label>过滤器类别</label>
+                                <select class="form-control">
+                                    <option value="remove">移除</option>
+                                    <option value="match">匹配</option>
+                                    <option value="replace">替换</option>
+                                </select>
                             </div>
                         </div>
                     </div>
+
+                    <!--格式化器内容-->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>格式化器</label>
+                                <input type="text" class="form-control" placeholder="格式化器">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>格式化器类别</label>
+                                <select class="form-control">
+                                    <option value="date">时间</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
