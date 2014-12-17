@@ -7,39 +7,18 @@ $(function(){
     //注册页签事件
     registerTabPanelEvent();
 
-    var pageDes=getUrlParameter('pagedes');
-    var id=getUrlParameter('id');
-    //$('#title_config').text(decodeURIComponent(pageDes)+"--爬虫模板配置");
-
-    //单个区域model
-    var regionModel=function(id,target,selector,attr,filter,formater){
-        this.id=id;
-        this.target=target;
-        this.selector=selector;
-        this.attr=attr;
-        this.filter=filter;
-        this.formater=formater;
-    };
-
-    //所有的域列表
-    var regions=[];
-    //解析器列表
-    var parseEngine=['jsoup','xpath'];
-
-    var templateViewModel={
-        regions:ko.observableArray(regions),
-        parseEngines:ko.observableArray(parseEngine),
-        /*添加解析域*/
-        addItem:function(){
-            this.regions.push(new regionModel('','','','','',''));
-        },
-        getAllItems:function(){
-            //console.dir(this.regions());
+    //解决viewmodel的嵌套问题
+    ko.bindingHandlers.stopBinding = {
+        init: function() {
+            return { controlsDescendantBindings: true };
         }
     };
 
-    //绑定到UI显示
-    ko.applyBindings(templateViewModel);
+    ko.virtualElements.allowedBindings.stopBinding = true;
+
+//    var pageDes=getUrlParameter('pagedes');
+//    var id=getUrlParameter('id');
+//    //$('#title_config').text(decodeURIComponent(pageDes)+"--爬虫模板配置");
 });
 
 /**
@@ -53,7 +32,38 @@ function loadTemplate(title,templateFile){
     main_content.html('');
     main_content.load(templateFile,function(){
         $('#title_config').text(title);
+
+        //自定义属性model
+        var customerAttrModel=function(id,target,selector,attr,filter,formater){
+            this.id=id;
+            this.target=target;
+            this.selector=selector;
+            this.attr=attr;
+            this.filter=filter;
+            this.formater=formater;
+        };
+
+        //自定义属性model集合
+        var customerAttrModelArray=[];
+        //索引器集合
+        var parseEngine=['jsoup','xpath'];
+
+        var customerAttrViewModel={
+            regions:ko.observableArray(customerAttrModelArray),
+            parseEngines:ko.observableArray(parseEngine),
+            /*添加解析域*/
+            addItem:function(){
+                this.regions.push(new customerAttrModel('','','','','',''));
+            },
+            getAllItems:function(){
+                //console.dir(this.regions());
+            }
+        };
+
+        //绑定到UI显示
+        ko.applyBindings(customerAttrViewModel,document.getElementById('customer_attr'));
     });
+
 }
 
 /**
