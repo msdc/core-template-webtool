@@ -30,8 +30,8 @@ function registerTemplateTypeEvent(){
             loadTemplate('列表模板','list','template-list.html');
         }else if(self.value=="news"){
             loadTemplate('内容模板','news','template-news.html');
-        }else if(self.value=="pagitation"){
-            loadTemplate('分页模板','pagitation','template-pagitation.html');
+        }else if(self.value=="pagination"){
+            loadTemplate('分页模板','pagination','template-pagination.html');
         }
 
 //        //old.页签事件
@@ -40,7 +40,7 @@ function registerTemplateTypeEvent(){
 //        }else if(e.target.hash=="#news"){
 //            loadTemplate('内容模板','news','template-news.html');
 //        }else if(e.target.hash=="#pagitation"){
-//            loadTemplate('分页模板','pagitation','template-pagitation.html');
+//            loadTemplate('分页模板','pagination','template-pagination.html');
 //        }
     });
 }
@@ -116,7 +116,7 @@ function registerTabPanelEvent(){
         }else if(e.target.hash=="#news"){
             loadTemplate('内容模板','news','template-news.html');
         }else if(e.target.hash=="#pagitation"){
-            loadTemplate('分页模板','pagitation','template-pagitation.html');
+            loadTemplate('分页模板','pagination','template-pagination.html');
         }
     });
 }
