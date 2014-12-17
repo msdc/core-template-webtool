@@ -39,7 +39,7 @@ function registerTemplateTypeEvent(){
 //            loadTemplate('列表模板','list','template-list.html');
 //        }else if(e.target.hash=="#news"){
 //            loadTemplate('内容模板','news','template-news.html');
-//        }else if(e.target.hash=="#pagitation"){
+//        }else if(e.target.hash=="#pagination"){
 //            loadTemplate('分页模板','pagination','template-pagination.html');
 //        }
     });
@@ -94,7 +94,7 @@ function loadTemplate(title,contentType,templateFile){
             });
         }
             break;
-        case "pagitation":
+        case "pagination":
         {
             main_content.load(templateFile,function(){
                 $('#title_config').text(title);
@@ -115,7 +115,7 @@ function registerTabPanelEvent(){
             loadTemplate('列表模板','list','template-list.html');
         }else if(e.target.hash=="#news"){
             loadTemplate('内容模板','news','template-news.html');
-        }else if(e.target.hash=="#pagitation"){
+        }else if(e.target.hash=="#pagination"){
             loadTemplate('分页模板','pagination','template-pagination.html');
         }
     });
