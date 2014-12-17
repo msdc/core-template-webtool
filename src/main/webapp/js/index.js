@@ -54,7 +54,27 @@ $(function(){
 
     //初始化[添加]模式对话框
     initModalAdd(listViewModel);
+
+    //加载分页
+    loadPaginationComponent(listViewModel);
 });
+
+/**
+ *
+ * 加载分页组件
+ * @param {Object} result
+ * */
+function loadPaginationComponent(listViewModel) {
+    var totalCount = listViewModel.urls().length;
+    $('#data_pagination').pagination({
+        items: totalCount,
+        itemsOnPage: 8,
+        cssStyle: 'light-theme',
+        prevText: '上一页',
+        nextText: '下一页',
+        onPageClick: function (pageNumber, eTarget) {}
+    });
+}
 
 /**
  *
