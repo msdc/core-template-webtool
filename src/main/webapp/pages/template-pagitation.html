@@ -58,7 +58,10 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>解析器</label>
-                            <select class="form-control"></select>
+                            <select class="form-control">
+                                <option value="jsoup">jsoup</option>
+                                <option value="xpath">xpath</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-9"></div>
@@ -74,8 +77,12 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>列表类型</label>
-                            <select class="form-control"></select>
+                            <label>类型</label>
+                            <select class="form-control">
+                                <option value="PAGINATION_TYPE_PAGE">PAGINATION_TYPE_PAGE</option>
+                                <option value="PAGINATION_TYPE_PAGENUMBER">PAGINATION_TYPE_PAGENUMBER</option>
+                                <option value="PAGINATION_TYPE_PAGENUMBER_INTERVAL">PAGINATION_TYPE_PAGENUMBER_INTERVAL</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -121,7 +128,12 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>选择器属性</label>
-                            <select class="form-control"></select>
+                            <select class="form-control">
+                                <option value="text">text</option>
+                                <option value="html">html</option>
+                                <option value="href">href</option>
+                                <option value="src">src</option>
+                            </select>
                         </div>
                     </div>
                 </div>
