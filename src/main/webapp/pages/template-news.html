@@ -181,81 +181,86 @@
 </div>
 
 <!--内容页的自定义属性-->
-<div class="row" data-bind="foreach: regions">
+<div class="row" id="customer_attr">
     <div class="col-md-12">
-        <div class="addDivBorder addRowTopMargin">
-            <form role="form">
-                <!--目标类型-->
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>类型</label>
-                            <input type="text" class="form-control" data-bind="value: target"
-                                   placeholder="类型,如:标题 内容 时间....">
+        <div class="row" data-bind="foreach: regions">
+            <div class="col-md-12">
+                <div class="addDivBorder addRowTopMargin">
+                    <form role="form">
+                        <!--目标类型-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>类型</label>
+                                    <input type="text" class="form-control" data-bind="value: target"
+                                           placeholder="类型,如:标题 内容 时间....">
+                                </div>
+                                <hr/>
+                            </div>
+                            <div class="col-md-6"></div>
                         </div>
-                        <hr/>
-                    </div>
-                    <div class="col-md-6"></div>
-                </div>
 
-                <!--索引器选择-->
-                <div class=row>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label>索引器</label>
-                            <select class="form-control" data-bind="options: $parent.parseEngines"></select>
+                        <!--索引器选择-->
+                        <div class=row>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>索引器</label>
+                                    <select class="form-control" data-bind="options: $parent.parseEngines"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-9"></div>
                         </div>
-                    </div>
-                    <div class="col-md-9"></div>
-                </div>
 
 
-                <!--Jsoup选择器内容-->
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>选择器</label>
-                            <input type="text" class="form-control" data-bind="value: selector"
-                                   placeholder="选择器">
+                        <!--Jsoup选择器内容-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>选择器</label>
+                                    <input type="text" class="form-control" data-bind="value: selector"
+                                           placeholder="选择器">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>选择器属性</label>
+                                    <select class="form-control"></select>
+                                    <!--<input type="text" class="form-control" data-bind="value: attr" placeholder="选择器属性">-->
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>选择器属性</label>
-                            <select class="form-control"></select>
-                            <!--<input type="text" class="form-control" data-bind="value: attr" placeholder="选择器属性">-->
-                        </div>
-                    </div>
-                </div>
 
-                <!--过滤器内容 格式化器内容-->
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>过滤器</label>
-                            <input type="text" class="form-control" data-bind="value: filter" placeholder="过滤器">
+                        <!--过滤器内容 格式化器内容-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>过滤器</label>
+                                    <input type="text" class="form-control" data-bind="value: filter" placeholder="过滤器">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>格式化器</label>
+                                    <input type="text" class="form-control" data-bind="value: formater" placeholder="格式化器">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>格式化器</label>
-                            <input type="text" class="form-control" data-bind="value: formater" placeholder="格式化器">
-                        </div>
-                    </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
-
-<!--按钮区域-->
-<div class="row addRowTopMargin">
-    <div class="col-md-2">
-        <button type="button" class="btn btn-primary" data-bind="click: addItem">添加属性</button>
-    </div>
-    <div class="col-md-7"></div>
-    <div class="col-md-3">
-        <button type="button" class="btn btn-primary" data-bind="click: getAllItems">测试模板配置</button>
-        <button type="button" class="btn btn-primary">保存模板配置</button>
+    <div class="col-md-12">
+        <!--按钮区域-->
+        <div class="row addRowTopMargin">
+            <div class="col-md-2">
+                <button type="button" class="btn btn-primary" data-bind="click: addItem">添加属性</button>
+            </div>
+            <div class="col-md-7"></div>
+            <div class="col-md-3">
+                <button type="button" class="btn btn-primary" data-bind="click: getAllItems">测试模板配置</button>
+                <button type="button" class="btn btn-primary">保存模板配置</button>
+            </div>
+        </div>
     </div>
 </div>
