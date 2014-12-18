@@ -24,6 +24,21 @@ function initTemplateContent(){
     loadTemplateBySelector('#news_tab','template-news.html');
 };
 
+//列表页中model集合
+var listAttrModelArray=[];
+//内容页中model集合
+var newsAttrModelArray=[];
+
+//自定义属性model
+var customerAttrModel=function(id,target,selector,attr,filter,formater){
+    this.id=id;
+    this.target=target;
+    this.selector=selector;
+    this.attr=attr;
+    this.filter=filter;
+    this.formater=formater;
+};
+
 /**
  *
  * 加载模板
@@ -31,38 +46,45 @@ function initTemplateContent(){
 function loadTemplateBySelector(jquerySelector,templateFile){
     switch (jquerySelector){
         case "#list_tab":
-        case "#news_tab":
         {
             $(jquerySelector).load(templateFile,function(){
-                //自定义属性model
-                var customerAttrModel=function(id,target,selector,attr,filter,formater){
-                    this.id=id;
-                    this.target=target;
-                    this.selector=selector;
-                    this.attr=attr;
-                    this.filter=filter;
-                    this.formater=formater;
-                };
-
-                //自定义属性model集合
-                var customerAttrModelArray=[];
                 //索引器集合
-                var parseEngine=['jsoup','xpath'];
-
-                var customerAttrViewModel={
-                    regions:ko.observableArray(customerAttrModelArray),
-                    parseEngines:ko.observableArray(parseEngine),
+                var listParseEngine=['jsoup','xpath'];
+                var listAttrViewModel={
+                    listRegions:ko.observableArray(listAttrModelArray),
+                    listParseEngines:ko.observableArray(listParseEngine),
                     /*添加解析域*/
-                    addItem:function(){
-                        this.regions.push(new customerAttrModel('','','','','',''));
+                    listAddItem:function(){
+                        this.listRegions.push(new customerAttrModel('','','','','',''));
                     },
-                    getAllItems:function(){
+                    listGetAllItems:function(){
                         //console.dir(this.regions());
                     }
                 };
 
                 //绑定到UI显示
-                ko.applyBindings(customerAttrViewModel,document.getElementById('customer_attr'));
+                ko.applyBindings(listAttrViewModel,document.getElementById('list_tab'));
+            });
+        }
+        case "#news_tab":
+        {
+            $(jquerySelector).load(templateFile,function(){
+                //索引器集合
+                var newsParseEngine=['jsoup','xpath'];
+                var newsAttrViewModel={
+                    newsRegions:ko.observableArray(newsAttrModelArray),
+                    newsParseEngines:ko.observableArray(newsParseEngine),
+                    /*添加解析域*/
+                    newsAddItem:function(){
+                        this.newsRegions.push(new customerAttrModel('','','','','',''));
+                    },
+                    newsGetAllItems:function(){
+                        //console.dir(this.regions());
+                    }
+                };
+
+                //绑定到UI显示
+                ko.applyBindings(newsAttrViewModel,document.getElementById('news_tab'));
             });
         }
             break;
