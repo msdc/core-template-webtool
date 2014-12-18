@@ -3,7 +3,7 @@
  */
 $(function(){
     //默认加载列表模板
-    loadTemplate('列表模板','list','template-list.html');
+    loadTemplate('模板配置','list','template-list.html');
     //注册页签事件
     registerTabPanelEvent();
 
@@ -52,6 +52,7 @@ function loadTemplate(title,contentType,templateFile){
         case "news":
         {
             main_content.load(templateFile,function(){
+                //old 不需要设置标题
                 $('#title_config').text(title);
 
                 //自定义属性model
