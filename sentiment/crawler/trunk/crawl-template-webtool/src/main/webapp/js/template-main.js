@@ -2,8 +2,12 @@
  * Created by wang on 2014/12/9.
  */
 $(function(){
-    //默认加载列表模板
-    loadTemplate('模板配置','list','template-list.html');
+    //old 通过类型参数加载指定模板内容
+    //loadTemplateByType('列表解析','list','template-list.html');
+
+    //初始化模板内容
+    initTemplateContent();
+
     //注册页签事件
     registerTabPanelEvent();
 
@@ -22,17 +26,71 @@ $(function(){
 
 /**
  *
+ * 初始化页面内容
+ * */
+function initTemplateContent(){
+    loadTemplateBySelector('#list_tab','template-list.html');
+    loadTemplateBySelector('#news_tab','template-news.html');
+};
+
+/**
+ *
+ * 加载模板
+ * */
+function loadTemplateBySelector(jquerySelector,templateFile){
+    switch (jquerySelector){
+        case "#list_tab":
+        case "#news_tab":
+        {
+            $(jquerySelector).load(templateFile,function(){
+                //自定义属性model
+                var customerAttrModel=function(id,target,selector,attr,filter,formater){
+                    this.id=id;
+                    this.target=target;
+                    this.selector=selector;
+                    this.attr=attr;
+                    this.filter=filter;
+                    this.formater=formater;
+                };
+
+                //自定义属性model集合
+                var customerAttrModelArray=[];
+                //索引器集合
+                var parseEngine=['jsoup','xpath'];
+
+                var customerAttrViewModel={
+                    regions:ko.observableArray(customerAttrModelArray),
+                    parseEngines:ko.observableArray(parseEngine),
+                    /*添加解析域*/
+                    addItem:function(){
+                        this.regions.push(new customerAttrModel('','','','','',''));
+                    },
+                    getAllItems:function(){
+                        //console.dir(this.regions());
+                    }
+                };
+
+                //绑定到UI显示
+                ko.applyBindings(customerAttrViewModel,document.getElementById('customer_attr'));
+            });
+        }
+            break;
+    }
+}
+
+/**
+ *
  * old 注册模板类型切换事件
  * */
 //function registerTemplateTypeEvent(){
 //    $('#select_template_type').change(function(){
 //        var self=this;
 //        if(self.value=="list"){
-//            loadTemplate('列表模板','list','template-list.html');
+//            loadTemplateByType('列表模板','list','template-list.html');
 //        }else if(self.value=="news"){
-//            loadTemplate('内容模板','news','template-news.html');
+//            loadTemplateByType('内容模板','news','template-news.html');
 //        }else if(self.value=="pagination"){
-//            loadTemplate('分页模板','pagination','template-pagination.html');
+//            loadTemplateByType('分页模板','pagination','template-pagination.html');
 //        }
 //    });
 //}
@@ -44,7 +102,7 @@ $(function(){
  * @param {String} contentType 内容类型
  * @param {String} templateFile 模板文件相对路径
  * */
-function loadTemplate(title,contentType,templateFile){
+function loadTemplateByType(title,contentType,templateFile){
     var main_content=$('#main_content');
     main_content.html('');
     switch (contentType){
@@ -105,11 +163,11 @@ function loadTemplate(title,contentType,templateFile){
 function registerTabPanelEvent(){
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         if(e.target.hash=="#list"){
-            loadTemplate('列表模板','list','template-list.html');
+            loadTemplateByType('列表模板','list','template-list.html');
         }else if(e.target.hash=="#news"){
-            loadTemplate('内容模板','news','template-news.html');
+            loadTemplateByType('内容模板','news','template-news.html');
         }else if(e.target.hash=="#pagination"){
-            loadTemplate('分页模板','pagination','template-pagination.html');
+            loadTemplateByType('分页模板','pagination','template-pagination.html');
         }
     });
 }

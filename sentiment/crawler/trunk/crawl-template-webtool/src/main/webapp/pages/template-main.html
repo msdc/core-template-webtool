@@ -77,43 +77,50 @@
     </div>
 
     <div class="row">
-        <!--old 模板类型 页签-->
-        <!--<div class="col-md-2">-->
-            <!--<div class="row">-->
-                <!--<div class="col-md-12">-->
-                    <!--<div class="panel panel-default">-->
-                        <!--<div class="panel-heading">-->
-                            <!--<h3 class="panel-title">模板类型</h3>-->
-                        <!--</div>-->
-                        <!--<div class="panel-body"></div>-->
-                        <!--&lt;!&ndash;模板类型&ndash;&gt;-->
-                        <!--<div role="tabpanel">-->
-                            <!--&lt;!&ndash; Nav tabs &ndash;&gt; &lt;!&ndash;nav nav-tabs nav-stacked&ndash;&gt;-->
-                            <!--<ul class="nav nav-pills nav-stacked" role="tablist">-->
-                                <!--<li role="presentation" class="active"><a href="#list" aria-controls="list"-->
-                                                                          <!--role="tab"-->
-                                                                          <!--data-toggle="tab">列表</a></li>-->
-                                <!--<li role="presentation"><a href="#news" aria-controls="news" role="tab"-->
-                                                           <!--data-toggle="tab">内容</a>-->
-                                <!--</li>-->
-                                <!--<li role="presentation"><a href="#pagination" aria-controls="pagination" role="tab"-->
-                                                           <!--data-toggle="tab">分页</a></li>-->
-                            <!--</ul>-->
+        <!--解析区域-->
+        <div class="col-md-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">解析区域</h3>
+                </div>
+                <div class="panel-body"></div>
+                <div role="tabpanel">
+                    <!-- Nav tabs --> <!--nav nav-tabs nav-stacked-->
+                    <ul class="nav nav-pills nav-stacked" role="tablist">
+                        <li role="presentation" class="active"><a href="#news_tab" aria-controls="news_tab" role="tab"
+                                                   data-toggle="tab">内容页</a>
+                        </li>
+                        <li role="presentation"><a href="#list_tab" aria-controls="list_tab"
+                                                                  role="tab"
+                                                                  data-toggle="tab">列表页</a></li>
 
-                            <!--&lt;!&ndash; Tab panes &ndash;&gt;-->
-                            <!--<div class="tab-content">-->
-                                <!--<div role="tabpanel" class="tab-pane active" id="list"></div>-->
-                                <!--<div role="tabpanel" class="tab-pane" id="news"></div>-->
-                                <!--<div role="tabpanel" class="tab-pane" id="pagination"></div>-->
-                            <!--</div>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</div>-->
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-10">
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="news_tab"></div>
+                <div role="tabpanel" class="tab-pane" id="list_tab"></div>
+            </div>
+        </div>
         <div class="col-md-12">
             <!--页面主体-->
             <div id="main_content"></div>
+        </div>
+
+        <!--按钮区域-->
+        <div class="col-md-12">
+            <!--测试和保存按钮-->
+            <div class="row">
+                <div class="col-md-2"></div>
+                <div class="col-md-5">
+                    <button type="button" class="btn btn-primary">测试模板配置</button>
+                    <button type="button" class="btn btn-primary">保存模板配置</button>
+                </div>
+                <div class="col-md-5"></div>
+            </div>
         </div>
     </div>
 
