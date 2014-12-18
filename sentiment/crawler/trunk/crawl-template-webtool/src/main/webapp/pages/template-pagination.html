@@ -1,137 +1,144 @@
 <div class="row">
     <div class="col-md-12">
-        <h3>分页配置</h3>
-    </div>
-</div>
-
-<!--内容页的固定属性-->
-<!--分页属性-->
-<div class="row">
-    <div class="col-md-12">
-        <h5>标题</h5>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="addDivBorder addRowTopMargin">
-            <!--索引器选择-->
-            <div class=row>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>索引器</label>
-                        <select class="form-control">
-                            <option value="jsoup">jsoup</option>
-                            <option value="xpath">xpath</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-6"></div>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">分页配置</h3>
             </div>
-
-            <!--列表类型和分页的Url-->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>分页Url</label>
-                        <input type="text" class="form-control" placeholder="分页Url">
+            <div class="panel-body">
+                <!--内容页的固定属性-->
+                <!--分页属性-->
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5>标题</h5>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>类型</label>
-                        <select class="form-control">
-                            <option value="PAGINATION_TYPE_PAGE">PAGINATION_TYPE_PAGE</option>
-                            <option value="PAGINATION_TYPE_PAGENUMBER">PAGINATION_TYPE_PAGENUMBER</option>
-                            <option value="PAGINATION_TYPE_PAGENUMBER_INTERVAL">PAGINATION_TYPE_PAGENUMBER_INTERVAL
-                            </option>
-                        </select>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="addDivBorder addRowTopMargin">
+                            <!--索引器选择-->
+                            <div class=row>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>索引器</label>
+                                        <select class="form-control">
+                                            <option value="jsoup">jsoup</option>
+                                            <option value="xpath">xpath</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6"></div>
+                            </div>
+
+                            <!--列表类型和分页的Url-->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>分页Url</label>
+                                        <input type="text" class="form-control" placeholder="分页Url">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>类型</label>
+                                        <select class="form-control">
+                                            <option value="PAGINATION_TYPE_PAGE">PAGINATION_TYPE_PAGE</option>
+                                            <option value="PAGINATION_TYPE_PAGENUMBER">PAGINATION_TYPE_PAGENUMBER
+                                            </option>
+                                            <option value="PAGINATION_TYPE_PAGENUMBER_INTERVAL">
+                                                PAGINATION_TYPE_PAGENUMBER_INTERVAL
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>当前分页Url字符串</label>
+                                        <input type="text" class="form-control" placeholder="当前分页字符串">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>分页Url替换字符内容</label>
+                                        <input type="text" class="form-control" placeholder="分页Url替换字符内容">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>分页开始编号</label>
+                                        <input type="text" class="form-control" placeholder="分页开始编号">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>页面中新闻数量</label>
+                                        <input type="text" class="form-control" placeholder="页面中新闻数量">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--Jsoup选择器内容-->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>选择器</label>
+                                        <input type="text" class="form-control" placeholder="选择器">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>选择器属性</label>
+                                        <select class="form-control">
+                                            <option value="text">text</option>
+                                            <option value="html">html</option>
+                                            <option value="href">href</option>
+                                            <option value="src">src</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--过滤器内容 格式化器内容-->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>过滤器</label>
+                                        <input type="text" class="form-control" placeholder="过滤器">
+                                    </div>
+                                </div>
+                                <div class="col-md-6"></div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>格式化器</label>
+                                        <input type="text" class="form-control" placeholder="格式化器">
+                                    </div>
+                                </div>
+                                <div class="col-md-6"></div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!--按钮区域-->
+                <div class="row addRowTopMargin">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-7"></div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-primary">测试模板配置</button>
+                        <button type="button" class="btn btn-primary">保存模板配置</button>
                     </div>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>当前分页Url字符串</label>
-                        <input type="text" class="form-control" placeholder="当前分页字符串">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>分页Url替换字符内容</label>
-                        <input type="text" class="form-control" placeholder="分页Url替换字符内容">
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>分页开始编号</label>
-                        <input type="text" class="form-control" placeholder="分页开始编号">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>页面中新闻数量</label>
-                        <input type="text" class="form-control" placeholder="页面中新闻数量">
-                    </div>
-                </div>
-            </div>
-
-            <!--Jsoup选择器内容-->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>选择器</label>
-                        <input type="text" class="form-control" placeholder="选择器">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>选择器属性</label>
-                        <select class="form-control">
-                            <option value="text">text</option>
-                            <option value="html">html</option>
-                            <option value="href">href</option>
-                            <option value="src">src</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!--过滤器内容 格式化器内容-->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>过滤器</label>
-                        <input type="text" class="form-control" placeholder="过滤器">
-                    </div>
-                </div>
-                <div class="col-md-6"></div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>格式化器</label>
-                        <input type="text" class="form-control" placeholder="格式化器">
-                    </div>
-                </div>
-                <div class="col-md-6"></div>
-            </div>
-
         </div>
-    </div>
-</div>
-
-<!--按钮区域-->
-<div class="row addRowTopMargin">
-    <div class="col-md-2"></div>
-    <div class="col-md-7"></div>
-    <div class="col-md-3">
-        <button type="button" class="btn btn-primary">测试模板配置</button>
-        <button type="button" class="btn btn-primary">保存模板配置</button>
     </div>
 </div>
