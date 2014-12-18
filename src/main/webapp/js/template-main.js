@@ -4,10 +4,11 @@
 $(function(){
     //默认加载列表模板
     loadTemplate('列表模板','list','template-list.html');
-    ////注册页签事件
-    //registerTabPanelEvent();
-    //注册模板类型下拉事件
-    registerTemplateTypeEvent();
+    //注册页签事件
+    registerTabPanelEvent();
+
+    //old 注册模板类型下拉事件
+    //registerTemplateTypeEvent();
 
     //解决多个View-Model的嵌套问题
     ko.bindingHandlers.stopBinding = {
@@ -21,7 +22,7 @@ $(function(){
 
 /**
  *
- * 注册模板类型切换事件
+ * old 注册模板类型切换事件
  * */
 function registerTemplateTypeEvent(){
     $('#select_template_type').change(function(){
@@ -33,15 +34,6 @@ function registerTemplateTypeEvent(){
         }else if(self.value=="pagination"){
             loadTemplate('分页模板','pagination','template-pagination.html');
         }
-
-//        //old.页签事件
-//        if(e.target.hash=="#list"){
-//            loadTemplate('列表模板','list','template-list.html');
-//        }else if(e.target.hash=="#news"){
-//            loadTemplate('内容模板','news','template-news.html');
-//        }else if(e.target.hash=="#pagination"){
-//            loadTemplate('分页模板','pagination','template-pagination.html');
-//        }
     });
 }
 
