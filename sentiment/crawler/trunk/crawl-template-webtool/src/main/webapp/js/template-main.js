@@ -24,18 +24,18 @@ $(function(){
  *
  * old 注册模板类型切换事件
  * */
-function registerTemplateTypeEvent(){
-    $('#select_template_type').change(function(){
-        var self=this;
-        if(self.value=="list"){
-            loadTemplate('列表模板','list','template-list.html');
-        }else if(self.value=="news"){
-            loadTemplate('内容模板','news','template-news.html');
-        }else if(self.value=="pagination"){
-            loadTemplate('分页模板','pagination','template-pagination.html');
-        }
-    });
-}
+//function registerTemplateTypeEvent(){
+//    $('#select_template_type').change(function(){
+//        var self=this;
+//        if(self.value=="list"){
+//            loadTemplate('列表模板','list','template-list.html');
+//        }else if(self.value=="news"){
+//            loadTemplate('内容模板','news','template-news.html');
+//        }else if(self.value=="pagination"){
+//            loadTemplate('分页模板','pagination','template-pagination.html');
+//        }
+//    });
+//}
 
 /**
  *

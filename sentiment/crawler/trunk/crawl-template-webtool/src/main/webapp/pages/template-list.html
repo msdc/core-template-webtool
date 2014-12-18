@@ -1,87 +1,85 @@
 <div class="row">
 <div class="col-md-12">
 <div class="panel panel-primary">
-<div class="panel-heading">
-    <h3 class="panel-title">列表配置</h3>
-</div>
+<div class="panel-heading">列表配置</div>
 <div class="panel-body">
 <!--内容页的固定属性-->
 <!--链接-->
 <div class="row">
     <div class="col-md-12">
-        <h5>链接</h5>
-    </div>
-</div>
+        <div class="panel panel-default">
+            <div class="panel-heading">链接</div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!--索引器选择-->
+                        <div class=row>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>索引器</label>
+                                    <select class="form-control">
+                                        <option value="jsoup">jsoup</option>
+                                        <option value="xpath">xpath</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6"></div>
+                        </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="addDivBorder addRowTopMargin">
-            <!--索引器选择-->
-            <div class=row>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>索引器</label>
-                        <select class="form-control">
-                            <option value="jsoup">jsoup</option>
-                            <option value="xpath">xpath</option>
-                        </select>
+                        <!--Jsoup选择器内容-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>选择器</label>
+                                    <input type="text" class="form-control" placeholder="选择器">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>选择器属性</label>
+                                    <select class="form-control">
+                                        <option value="text">text</option>
+                                        <option value="html">html</option>
+                                        <option value="href">href</option>
+                                        <option value="src">src</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--过滤器内容-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>过滤器</label>
+                                    <input type="text" class="form-control" placeholder="过滤器">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>过滤器类别</label>
+                                    <select class="form-control">
+                                        <option value="remove">移除</option>
+                                        <option value="match">匹配</option>
+                                        <option value="replace">替换</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--格式化器内容-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>格式化器</label>
+                                    <input type="text" class="form-control" placeholder="格式化器">
+                                </div>
+                            </div>
+                            <div class="col-md-6"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-6"></div>
             </div>
-
-            <!--Jsoup选择器内容-->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>选择器</label>
-                        <input type="text" class="form-control" placeholder="选择器">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>选择器属性</label>
-                        <select class="form-control">
-                            <option value="text">text</option>
-                            <option value="html">html</option>
-                            <option value="href">href</option>
-                            <option value="src">src</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!--过滤器内容-->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>过滤器</label>
-                        <input type="text" class="form-control" placeholder="过滤器">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>过滤器类别</label>
-                        <select class="form-control">
-                            <option value="remove">移除</option>
-                            <option value="match">匹配</option>
-                            <option value="replace">替换</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!--格式化器内容-->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>格式化器</label>
-                        <input type="text" class="form-control" placeholder="格式化器">
-                    </div>
-                </div>
-                <div class="col-md-6"></div>
-            </div>
-
         </div>
     </div>
 </div>
@@ -89,79 +87,79 @@
 <!--时间-->
 <div class="row">
     <div class="col-md-12">
-        <h5>时间</h5>
-    </div>
-</div>
+        <div class="panel panel-default">
+            <div class="panel-heading">时间</div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!--索引器选择-->
+                        <div class=row>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>索引器</label>
+                                    <select class="form-control">
+                                        <option value="jsoup">jsoup</option>
+                                        <option value="xpath">xpath</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6"></div>
+                        </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="addDivBorder addRowTopMargin">
-            <!--索引器选择-->
-            <div class=row>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>索引器</label>
-                        <select class="form-control">
-                            <option value="jsoup">jsoup</option>
-                            <option value="xpath">xpath</option>
-                        </select>
+                        <!--Jsoup选择器内容-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>选择器</label>
+                                    <input type="text" class="form-control" placeholder="选择器">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>选择器属性</label>
+                                    <select class="form-control">
+                                        <option value="text">text</option>
+                                        <option value="html">html</option>
+                                        <option value="href">href</option>
+                                        <option value="src">src</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--过滤器内容-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>过滤器</label>
+                                    <input type="text" class="form-control" placeholder="过滤器">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>过滤器类别</label>
+                                    <select class="form-control">
+                                        <option value="remove">移除</option>
+                                        <option value="match">匹配</option>
+                                        <option value="replace">替换</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--格式化器内容-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>格式化器</label>
+                                    <input type="text" class="form-control" placeholder="格式化器">
+                                </div>
+                            </div>
+                            <div class="col-md-6"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-6"></div>
             </div>
-
-            <!--Jsoup选择器内容-->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>选择器</label>
-                        <input type="text" class="form-control" placeholder="选择器">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>选择器属性</label>
-                        <select class="form-control">
-                            <option value="text">text</option>
-                            <option value="html">html</option>
-                            <option value="href">href</option>
-                            <option value="src">src</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!--过滤器内容-->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>过滤器</label>
-                        <input type="text" class="form-control" placeholder="过滤器">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>过滤器类别</label>
-                        <select class="form-control">
-                            <option value="remove">移除</option>
-                            <option value="match">匹配</option>
-                            <option value="replace">替换</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!--格式化器内容-->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>格式化器</label>
-                        <input type="text" class="form-control" placeholder="格式化器">
-                    </div>
-                </div>
-                <div class="col-md-6"></div>
-            </div>
-
         </div>
     </div>
 </div>
@@ -169,112 +167,239 @@
 <!--分页-->
 <div class="row">
     <div class="col-md-12">
-        <h5>分页</h5>
+        <div class="panel panel-default">
+            <div class="panel-heading">分页</div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!--索引器选择-->
+                        <div class=row>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>索引器</label>
+                                    <select class="form-control">
+                                        <option value="jsoup">jsoup</option>
+                                        <option value="xpath">xpath</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6"></div>
+                        </div>
+
+                        <!--分页类型和分页的Url-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>分页Url</label>
+                                    <input type="text" class="form-control" placeholder="分页Url">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>类型</label>
+                                    <select class="form-control">
+                                        <option value="PAGINATION_TYPE_PAGE">PAGINATION_TYPE_PAGE</option>
+                                        <option value="PAGINATION_TYPE_PAGENUMBER">PAGINATION_TYPE_PAGENUMBER</option>
+                                        <option value="PAGINATION_TYPE_PAGENUMBER_INTERVAL">
+                                            PAGINATION_TYPE_PAGENUMBER_INTERVAL
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>当前分页Url字符串</label>
+                                    <input type="text" class="form-control" placeholder="当前分页字符串">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>分页Url替换字符内容</label>
+                                    <input type="text" class="form-control" placeholder="分页Url替换字符内容">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>分页开始编号</label>
+                                    <input type="text" class="form-control" placeholder="分页开始编号">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>页面中新闻数量</label>
+                                    <input type="text" class="form-control" placeholder="页面中新闻数量">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Jsoup选择器内容-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>选择器</label>
+                                    <input type="text" class="form-control" placeholder="选择器">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>选择器属性</label>
+                                    <select class="form-control">
+                                        <option value="text">text</option>
+                                        <option value="html">html</option>
+                                        <option value="href">href</option>
+                                        <option value="src">src</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--过滤器内容 格式化器内容-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>过滤器</label>
+                                    <input type="text" class="form-control" placeholder="过滤器">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>格式化器</label>
+                                    <input type="text" class="form-control" placeholder="格式化器">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+<!--自定义属性-->
 <div class="row">
     <div class="col-md-12">
-        <div class="addDivBorder addRowTopMargin">
-            <!--索引器选择-->
-            <div class=row>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>索引器</label>
-                        <select class="form-control">
-                            <option value="jsoup">jsoup</option>
-                            <option value="xpath">xpath</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-6"></div>
-            </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">自定义属性</div>
+            <div class="panel-body">
+                <!--内容页的自定义属性-->
+                <div class="row" id="customer_attr">
+                    <div class="col-md-12">
+                        <div class="row" data-bind="foreach: regions">
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">自定义属性</div>
+                                    <div class="panel-body"><div class="col-md-12">
+                                        <!--目标名称-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>名称</label>
+                                                    <input type="text" class="form-control" data-bind="value: target"
+                                                           placeholder="名称,如:标题 内容 时间....">
+                                                </div>
+                                                <hr/>
+                                            </div>
+                                            <div class="col-md-6"></div>
+                                        </div>
 
-            <!--分页类型和分页的Url-->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>分页Url</label>
-                        <input type="text" class="form-control" placeholder="分页Url">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>类型</label>
-                        <select class="form-control">
-                            <option value="PAGINATION_TYPE_PAGE">PAGINATION_TYPE_PAGE</option>
-                            <option value="PAGINATION_TYPE_PAGENUMBER">PAGINATION_TYPE_PAGENUMBER</option>
-                            <option value="PAGINATION_TYPE_PAGENUMBER_INTERVAL">
-                                PAGINATION_TYPE_PAGENUMBER_INTERVAL
-                            </option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+                                        <!--索引器选择-->
+                                        <div class=row>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>索引器</label>
+                                                    <select class="form-control"
+                                                            data-bind="options: $parent.parseEngines"></select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>选择器功能</label>
+                                                    <select class="form-control">
+                                                        <option value="field">field</option>
+                                                        <option value="label">label</option>
+                                                        <option value="content">content</option>
+                                                        <option value="pagination">pagination</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>当前分页Url字符串</label>
-                        <input type="text" class="form-control" placeholder="当前分页字符串">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>分页Url替换字符内容</label>
-                        <input type="text" class="form-control" placeholder="分页Url替换字符内容">
-                    </div>
-                </div>
-            </div>
+                                        <!--Jsoup选择器内容-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>选择器</label>
+                                                    <input type="text" class="form-control" data-bind="value: selector"
+                                                           placeholder="选择器">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>选择器属性</label>
+                                                    <select class="form-control"></select>
+                                                    <!--<input type="text" class="form-control" data-bind="value: attr" placeholder="选择器属性">-->
+                                                </div>
+                                            </div>
+                                        </div>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>分页开始编号</label>
-                        <input type="text" class="form-control" placeholder="分页开始编号">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>页面中新闻数量</label>
-                        <input type="text" class="form-control" placeholder="页面中新闻数量">
-                    </div>
-                </div>
-            </div>
+                                        <!--过滤器内容-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>过滤器</label>
+                                                    <input type="text" class="form-control" data-bind="value: filter"
+                                                           placeholder="过滤器">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>过滤器类别</label>
+                                                    <select class="form-control">
+                                                        <option value="remove">移除</option>
+                                                        <option value="match">匹配</option>
+                                                        <option value="replace">替换</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
 
-            <!--Jsoup选择器内容-->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>选择器</label>
-                        <input type="text" class="form-control" placeholder="选择器">
+                                        <!--格式化器内容-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>格式化器</label>
+                                                    <input type="text" class="form-control" placeholder="格式化器">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>格式化器类别</label>
+                                                    <select class="form-control">
+                                                        <option value="date">时间</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>选择器属性</label>
-                        <select class="form-control">
-                            <option value="text">text</option>
-                            <option value="html">html</option>
-                            <option value="href">href</option>
-                            <option value="src">src</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
 
-            <!--过滤器内容 格式化器内容-->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>过滤器</label>
-                        <input type="text" class="form-control" placeholder="过滤器">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>格式化器</label>
-                        <input type="text" class="form-control" placeholder="格式化器">
+                    <div class="col-md-12">
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-primary" data-bind="click: addItem">添加属性</button>
+                            </div>
+                            <div class="col-md-5"></div>
+                            <div class="col-md-5">
+
+                            </div>
                     </div>
                 </div>
             </div>
@@ -282,127 +407,16 @@
     </div>
 </div>
 
+<!--测试和保存按钮-->
 <div class="row">
-    <div class="col-md-12">
-        <h3>自定义属性</h3>
+    <div class="col-md-2"></div>
+    <div class="col-md-5"></div>
+    <div class="col-md-5">
+        <button type="button" class="btn btn-primary">测试模板配置</button>
+        <button type="button" class="btn btn-primary">保存模板配置</button>
     </div>
 </div>
 
-<!--内容页的自定义属性-->
-<div class="row" id="customer_attr">
-    <div class="col-md-12">
-        <div class="row" data-bind="foreach: regions">
-            <div class="col-md-12">
-                <div class="addDivBorder addRowTopMargin">
-                    <!--目标名称-->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>名称</label>
-                                <input type="text" class="form-control" data-bind="value: target"
-                                       placeholder="名称,如:标题 内容 时间....">
-                            </div>
-                            <hr/>
-                        </div>
-                        <div class="col-md-6"></div>
-                    </div>
-
-                    <!--索引器选择-->
-                    <div class=row>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>索引器</label>
-                                <select class="form-control" data-bind="options: $parent.parseEngines"></select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>选择器功能</label>
-                                <select class="form-control">
-                                    <option value="field">field</option>
-                                    <option value="label">label</option>
-                                    <option value="content">content</option>
-                                    <option value="pagination">pagination</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <!--Jsoup选择器内容-->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>选择器</label>
-                                <input type="text" class="form-control" data-bind="value: selector"
-                                       placeholder="选择器">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>选择器属性</label>
-                                <select class="form-control"></select>
-                                <!--<input type="text" class="form-control" data-bind="value: attr" placeholder="选择器属性">-->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!--过滤器内容-->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>过滤器</label>
-                                <input type="text" class="form-control" data-bind="value: filter" placeholder="过滤器">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>过滤器类别</label>
-                                <select class="form-control">
-                                    <option value="remove">移除</option>
-                                    <option value="match">匹配</option>
-                                    <option value="replace">替换</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!--格式化器内容-->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>格式化器</label>
-                                <input type="text" class="form-control" placeholder="格式化器">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>格式化器类别</label>
-                                <select class="form-control">
-                                    <option value="date">时间</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-12">
-        <!--按钮区域-->
-        <div class="row addRowTopMargin">
-            <div class="col-md-2">
-                <button type="button" class="btn btn-primary" data-bind="click: addItem">添加属性</button>
-            </div>
-            <div class="col-md-7"></div>
-            <div class="col-md-3">
-                <button type="button" class="btn btn-primary" data-bind="click: getAllItems">测试模板配置</button>
-                <button type="button" class="btn btn-primary">保存模板配置</button>
-            </div>
-        </div>
-    </div>
-</div>
 </div>
 </div>
 </div>
