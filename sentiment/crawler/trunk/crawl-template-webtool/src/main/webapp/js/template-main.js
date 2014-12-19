@@ -13,39 +13,45 @@ var parseEngine=['jsoup','xpath'];
  *
  * 自定义属性的model
  * */
-var customerAttrModel=function(id,target,selector,attr,filter,formater){
+function customerAttrModel(id,target,selector,attr,filter,formater){
     this.id=id;
     this.target=target;
     this.selector=selector;
     this.attr=attr;
     this.filter=filter;
     this.formater=formater;
-};
+}
 
 /**
  *
  * 模板基本信息属性对象
  * */
-var templateBasicInfoModel=function(id,url,name){
+function templateBasicInfoModel(id,url,name){
     this.id = id;
     this.url=url;
     this.name=name;
     this.tags=['财经','体育','经济'];
-};
+}
 
 /**
  *
  * 列表页和内容页中的单个属性实体 ,例如:标题
+ * @param {String} selector
+ * @param {Array} selectorAttr
+ * @param {String} filter
+ * @param {Array} filterCategory
+ * @param {String} formater
+ * @param {Array} formatCategory
  * */
-var commonPanelModel=function(id,selector,selectorAttr,filter,filterCategory,formater,formatCategory){
-    this.id = id;
+function commonPanelModel(selector,selectorAttr,filter,filterCategory,formater,formatCategory){
+    this.parseEngine=['jsoup','xpath'];
     this.selector=selector;
     this.selectorAttr=selectorAttr;
     this.filter=filter;
     this.filterCategory=filterCategory;
     this.formater=formater;
     this.formatCategory=formatCategory;
-};
+}
 
 /**
  *
@@ -55,18 +61,26 @@ var commonPanelModel=function(id,selector,selectorAttr,filter,filterCategory,for
 
 /********************************************View-Models*********************************/
 
-//整个页面视图View-Model
-var templateViewModel=function(basicInfo){
+//配置页面整个视图View-Model
+function templateViewModel(basicInfo){
     this.basicInfo=ko.observable(basicInfo);
-};
+    //测试模板方法
+    this.testTemplate=function(){
+        alert('testTemplate');
+    };
+    //保存模板方法
+    this.saveTemplate=function(){
+        alert('saveTemplate');
+    };
+}
 
 /**
- * 局部视图的View-Model
+ * 通过load方式加载的局部视图View-Model
  * 自定义属性视图中的view-model
  * @param {Array} modelArray
  * @param {Array} parseEngine
  * */
-var customerAttrViewModel=function(modelArray,parseEngine){
+function customerAttrViewModel(modelArray,parseEngine){
     this.regions=ko.observableArray(modelArray);
     this.parseEngines=ko.observableArray(parseEngine);
     /*添加解析域*/
@@ -78,16 +92,29 @@ var customerAttrViewModel=function(modelArray,parseEngine){
         this.regions.remove(item);
     }.bind(this);
     this.getAllItems=function(){}.bind(this);
-};
+}
 
+/**
+ *
+ * 内容页局部View-Model
+ * */
+function newsPartialViewModel(title,content){
+    this.title=ko.observable(title);
+    this.content=ko.observable(content);
+}
 
+/**
+ *
+ * 列表页局部View-Model
+ * */
+function listPartialViewModel(outlink,pagination){
+    this.outlink=outlink;
+    this.pagination=pagination;
+}
 /********************************************View-Models*********************************/
 
 /*********************************************Functions**********************************/
 $(function(){
-    //初始化模板内容
-    initTemplateContent();
-
     //解决多个View-Model的嵌套问题
     ko.bindingHandlers.stopBinding = {
         init: function() {
@@ -95,7 +122,8 @@ $(function(){
         }
     };
 
-    ko.virtualElements.allowedBindings.stopBinding = true;
+    //初始化模板内容
+    initTemplateContent();
 });
 
 /**
@@ -140,17 +168,33 @@ function loadTemplateBySelector(jquerySelector,templateFile){
         case "#list_tab":
         {
             //列表页中model集合
-            var listAttrModelArray=[];
-            var listAttrViewModel=new customerAttrViewModel(listAttrModelArray,parseEngine);
-            customerViewModelBinding(jquerySelector,templateFile,listAttrViewModel,document.getElementById('list_tab'))
+            var listCustomerArray=[];
+            var listCustomerViewModel=new customerAttrViewModel(listCustomerArray,parseEngine);
+
+            var listOutLink=new commonPanelModel('body>tbody>',['href','text','src','html'],'',['移除','匹配','替换'],'YYYY-MM-DD',['时间','日期']);
+            var listPagination=new commonPanelModel('body>tbody>',['href','text','src','html'],'',['移除','匹配','替换'],'YYYY-MM-DD',['时间','日期']);
+            var listPartial=new listPartialViewModel(listOutLink,listPagination);
+
+            $(jquerySelector).load(templateFile,function(){
+                ko.applyBindings(listPartial,document.getElementById('list_tab'));
+                ko.applyBindings(listCustomerViewModel,document.getElementById('list_customer_attr'));
+            });
         }
             break;
         case "#news_tab":
         {
-            //内容页中model集合
-            var newsAttrModelArray=[];
-            var newsAttrViewModel=new customerAttrViewModel(newsAttrModelArray,parseEngine);
-            customerViewModelBinding(jquerySelector,templateFile,newsAttrViewModel,document.getElementById('news_tab'));
+            //内容页中自定义属性集合
+            var newsCustomerArray=[];
+            var newsCustomerViewModel=new customerAttrViewModel(newsCustomerArray,parseEngine);
+
+            var newsTitle=new commonPanelModel('body>tbody>',['href','text','src','html'],'',['移除','匹配','替换'],'YYYY-MM-DD',['时间','日期']);
+            var newsContent=new commonPanelModel('body>tbody>',['href','text','src','html'],'',['移除','匹配','替换'],'YYYY-MM-DD',['时间','日期']);
+            var newsPartial=new newsPartialViewModel(newsTitle,newsContent);
+
+            $(jquerySelector).load(templateFile,function(){
+                ko.applyBindings(newsPartial,document.getElementById('news_tab'));
+                ko.applyBindings(newsCustomerViewModel,document.getElementById('news_customer_attr'));
+            });
         }
             break;
     }
