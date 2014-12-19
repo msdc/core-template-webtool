@@ -29,6 +29,9 @@ var listAttrModelArray=[];
 //内容页中model集合
 var newsAttrModelArray=[];
 
+//索引器集合
+var parseEngine=['jsoup','xpath'];
+
 //自定义属性model
 var customerAttrModel=function(id,target,selector,attr,filter,formater){
     this.id=id;
@@ -48,11 +51,9 @@ function loadTemplateBySelector(jquerySelector,templateFile){
         case "#list_tab":
         {
             $(jquerySelector).load(templateFile,function(){
-                //索引器集合
-                var listParseEngine=['jsoup','xpath'];
                 var listAttrViewModel={
                     listRegions:ko.observableArray(listAttrModelArray),
-                    listParseEngines:ko.observableArray(listParseEngine),
+                    listParseEngines:ko.observableArray(parseEngine),
                     /*添加解析域*/
                     listAddItem:function(){
                         this.listRegions.push(new customerAttrModel('','','','','',''));
@@ -66,14 +67,13 @@ function loadTemplateBySelector(jquerySelector,templateFile){
                 ko.applyBindings(listAttrViewModel,document.getElementById('list_tab'));
             });
         }
+            break;
         case "#news_tab":
         {
             $(jquerySelector).load(templateFile,function(){
-                //索引器集合
-                var newsParseEngine=['jsoup','xpath'];
                 var newsAttrViewModel={
                     newsRegions:ko.observableArray(newsAttrModelArray),
-                    newsParseEngines:ko.observableArray(newsParseEngine),
+                    newsParseEngines:ko.observableArray(parseEngine),
                     /*添加解析域*/
                     newsAddItem:function(){
                         this.newsRegions.push(new customerAttrModel('','','','','',''));
