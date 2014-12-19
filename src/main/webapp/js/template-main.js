@@ -52,8 +52,12 @@ var customerAttrViewModel=function(modelArray,parseEngine){
     /*添加解析域*/
     this.addItem=function(){
         this.regions.push(new customerAttrModel('','','','','',''));
-    };
-    this.getAllItems=function(){};
+    }.bind(this);
+    //删除元素 .bind(this)改变作用域,始终绑定当前对象
+    this.removeItem=function(item){
+        this.regions.remove(item);
+    }.bind(this);
+    this.getAllItems=function(){}.bind(this);
 };
 
 /**
