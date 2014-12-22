@@ -113,4 +113,13 @@ public class CrawlToolResource {
 		String JSONString=JSONUtils.getTemplateResultJSON(template);
 	    return JSONString;
     }
+    
+    /* 查看html内容按钮 */
+    @POST @Path("/viewHtmlContent")
+    @Produces("text/plain")
+    public String viewHtmlContent(@DefaultValue("") @FormParam("webUrl") String webUrl){
+    	String htmlContent = DownloadHtml.getHtml(webUrl,"UTF-8");
+    	return htmlContent;
+    }
+    
 }
