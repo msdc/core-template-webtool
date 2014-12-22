@@ -13,13 +13,17 @@ var parseEngine=['jsoup','xpath'];
  *
  * 自定义属性的model
  * */
-function customerAttrModel(id,target,selector,attr,filter,formater){
+function customerAttrModel(id,target,selectorFunction,selector,attr,filter,filterCategory,formater,formatCategory){
+    this.parseEngine=['jsoup','xpath'];
     this.id=id;
     this.target=target;
+    this.selectorFunction=selectorFunction;
     this.selector=selector;
     this.attr=attr;
     this.filter=filter;
+    this.filterCategory=filterCategory;
     this.formater=formater;
+    this.formatCategory=formatCategory;
 }
 
 /**
@@ -74,8 +78,20 @@ function commonPanelModel(selector,selectorAttr,filter,filterCategory,formater,f
  *
  * 分页属性model实体
  * */
-function paginationModel(selector,paginationUrl,paginationType,selectorAttr,filter,filterCategory,formater,formatCategory){
-
+function paginationModel(selector,selectorAttr,filter,filterCategory,formater,formatCategory,paginationUrl,currentString,replaceTo,start,records){
+    this.parseEngine=['jsoup','xpath'];
+    this.selector=selector;
+    this.selectorAttr=selectorAttr;
+    this.filter=filter;
+    this.filterCategory=filterCategory;
+    this.formater=formater;
+    this.formatCategory=formatCategory;
+    this.paginationType=['PAGINATION_TYPE_PAGE','PAGINATION_TYPE_PAGENUMBER','PAGINATION_TYPE_PAGENUMBER_INTERVAL'];
+    this.paginationUrl=paginationUrl;
+    this.currentString=currentString;
+    this.replaceTo=replaceTo;
+    this.start=start;
+    this.records=records;
 }
  /*********************************************Models*************************************/
 
@@ -105,7 +121,7 @@ function customerAttrViewModel(modelArray,parseEngine){
     this.parseEngines=ko.observableArray(parseEngine);
     /*添加解析域*/
     this.addItem=function(){
-        this.regions.push(new customerAttrModel('','','','','',''));
+        this.regions.push(new customerAttrModel('','',['field','label','content','pagination'],'',['href','text','src','html'],'',['移除','匹配','替换'],'',['时间','日期']));
     }.bind(this);
     //删除元素 .bind(this)改变作用域,始终绑定当前对象
     this.removeItem=function(item){
@@ -207,7 +223,7 @@ function loadTemplateBySelector(jquerySelector,templateFile){
             var listCustomerViewModel=new customerAttrViewModel(listCustomerArray,parseEngine);
 
             var listOutLink=new commonPanelModel('body>tbody>',['href','text','src','html'],'',['移除','匹配','替换'],'YYYY-MM-DD',['时间','日期']);
-            var listPagination=new commonPanelModel('body>tbody>',['href','text','src','html'],'',['移除','匹配','替换'],'YYYY-MM-DD',['时间','日期']);
+            var listPagination=new paginationModel('body>tbody>',['href','text','src','html'],'',['移除','匹配','替换'],'YYYY-MM-DD',['时间','日期'],'http://www.ccgp-fujian.gov.cn/secpag.cfm?PageNum=##&&caidan=采购公告&caidan2=公开招标&level=province&yqgg=0','##','',2,'');
             var listPartial=new listPartialViewModel(listOutLink,listPagination);
 
             $(jquerySelector).load(templateFile,function(){
