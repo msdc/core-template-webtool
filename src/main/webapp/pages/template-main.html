@@ -45,7 +45,7 @@
     </div>
 
     <!--基本属性-->
-    <div class="row" data-bind="with: basicInfo">
+    <div class="row" data-bind="with: basicInfoViewModel">
         <div class="col-md-12">
             <div class="panel panel-primary">
                 <div class="panel-heading">
@@ -63,7 +63,7 @@
                                         <input type="text" class="form-control" data-bind="value: url" id="txt_url" placeholder="页面url">
                                     </div>
                                     <div class="col-md-6">
-                                        <button type="button" data-bind="click: viewHtmlContent" class="btn btn-primary">查看</button>
+                                        <button type="button" class="btn btn-primary">查看</button>
                                     </div>
                                 </div>
                             </div>
@@ -124,8 +124,8 @@
         <!--保存按钮-->
         <div class="col-md-12">
             <div class="row text-right">
-                <button type="button" data-bind="click: testTemplate" class="btn btn-primary">测试模板</button>
-                <button type="button" data-bind="click: saveTemplate" class="btn btn-primary">保存模板</button>
+                <button type="button" class="btn btn-primary">测试模板</button>
+                <button type="button" class="btn btn-primary">保存模板</button>
             </div>
         </div>
     </div>
