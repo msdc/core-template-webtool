@@ -31,6 +31,23 @@ function templateBasicInfoModel(id,url,name){
     this.url=url;
     this.name=name;
     this.tags=['财经','体育','经济'];
+    this.viewHtmlContent=function(){
+        var url=this.url;
+        $('#modal-viewHtml').modal('show');
+        $.ajax({
+            url:'/webapi/crawlToolResource/viewHtmlContent',
+            type:'POST',
+            data:{
+                webUrl:url
+            },
+            success:function(result){
+                var modalBody=$('#modal-viewHtml-body');
+                modalBody.text('');//清空
+                modalBody.text(result);
+            },
+            error:function(){}
+        });
+    }.bind(this);
 }
 
 /**
@@ -124,7 +141,22 @@ $(function(){
 
     //初始化模板内容
     initTemplateContent();
+
+    //模态对话框事件
+    registerModalViewContentEvent();
 });
+
+/**
+ *
+ * 给模态对话框注册事件
+ * */
+function registerModalViewContentEvent(){
+    $('#modal-viewHtml').on('hidden.bs.modal', function (e) {
+        var modalBody=$('#modal-viewHtml-body');
+        modalBody.text('');//清空
+        modalBody.text('<div class=\"text-center\"><img src=\"../image/load.gif\"></div>');
+    })
+}
 
 /**
  *
