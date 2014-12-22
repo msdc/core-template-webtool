@@ -153,8 +153,8 @@ $(function(){
 function registerModalViewContentEvent(){
     $('#modal-viewHtml').on('hidden.bs.modal', function (e) {
         var modalBody=$('#modal-viewHtml-body');
-        modalBody.text('');//清空
-        modalBody.text('<div class=\"text-center\"><img src=\"../image/load.gif\"></div>');
+        modalBody.html('');//清空
+        modalBody.html('<div class=\"text-center\"><img src=\"../image/load.gif\"></div>');
     })
 }
 
