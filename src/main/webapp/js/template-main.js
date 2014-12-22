@@ -74,7 +74,10 @@ function commonPanelModel(selector,selectorAttr,filter,filterCategory,formater,f
  *
  * 分页属性model实体
  * */
-/*********************************************Models*************************************/
+function paginationModel(selector,paginationUrl,paginationType,selectorAttr,filter,filterCategory,formater,formatCategory){
+
+}
+ /*********************************************Models*************************************/
 
 /********************************************View-Models*********************************/
 
