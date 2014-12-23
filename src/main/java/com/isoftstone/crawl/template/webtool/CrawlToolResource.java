@@ -1,5 +1,6 @@
 package com.isoftstone.crawl.template.webtool;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+
 import com.isoftstone.crawl.template.global.Constants;
 import com.isoftstone.crawl.template.impl.ParseResult;
 import com.isoftstone.crawl.template.impl.Selector;
@@ -31,6 +37,48 @@ import com.lj.util.http.DownloadHtml;
 
 @Path("crawlToolResource")
 public class CrawlToolResource {
+	@POST
+	@Path("/getJSONString")
+	@Produces(MediaType.TEXT_PLAIN)	
+	public String GetJSONString(@DefaultValue("") @FormParam("data") String data) {
+		PageModel pageModel = null;
+		try {
+			ObjectMapper objectmapper = new ObjectMapper();
+			pageModel = objectmapper.readValue(data, PageModel.class);
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		String jsonString=convertToJSONString(pageModel);		
+		return jsonString;
+	}
+	
+	private String convertToJSONString(PageModel pageModel) {
+		String json = null;
+		ObjectMapper objectmapper = new ObjectMapper();
+		try {
+			json = objectmapper.writeValueAsString(pageModel);
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return json;
+	}
+
 	/*根据生成的JSON模板，得到相关的页面内容*/
 	@POST @Path("/testTemplateJsonString")    
     @Produces("application/json")    

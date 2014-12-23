@@ -2,17 +2,17 @@
  * Created by wang on 2014/12/9.
  */
 /**************Models****************/
-function customerAttrModel(id,target,selectorFunction,selector,attr,filter,filterCategory,formater,formatCategory){
+function customerAttrModel(selector,attr,filter,filterCategory){
     //this.parseEngine=['jsoup','xpath'];
-    this.id=id;
-    this.target=target;
-    this.selectorFunction=selectorFunction;
+    //this.id=id;
+    //this.target=target;
+    //this.selectorFunction=selectorFunction;
     this.selector=selector;
     this.attr=attr;
     this.filter=filter;
     this.filterCategory=filterCategory;
-    this.formater=formater;
-    this.formatCategory=formatCategory;
+    //this.formater=formater;
+    //this.formatCategory=formatCategory;
 }
 /**************Models****************/
 
@@ -156,7 +156,7 @@ $(function(){
                     for(var i=0;i<modelArray.length;i++){
                         var model=modelArray[i];
                         var temp=new customerAttrModel(
-                            model.id(),model.target(),model.selectorFunctionSelected(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.formater(),model.formatCategorySelected()
+                            model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected()
                         );
                         attrModels.push(temp);
                     }
@@ -169,7 +169,7 @@ $(function(){
                     for(var i=0;i<modelArray.length;i++){
                         var model=modelArray[i];
                         var temp=new customerAttrModel(
-                            model.id(),model.target(),model.selectorFunctionSelected(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.formater(),model.formatCategorySelected()
+                           model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected()
                         );
                         attrModels.push(temp);
                     }
@@ -205,52 +205,46 @@ $(function(){
  * */
 function getJSONString(obj){
     var jsonString=JSON.stringify({
-        pageModel: {
-            basicInfoViewModel:{
-                url:obj.basicInfoViewModel.url(),
-                name:obj.basicInfoViewModel.name(),
-                tagsSelected:obj.basicInfoViewModel.tagsSelected()
-            },
-            newsCustomerAttrViewModel:{
-                newsCustomerModels:obj.newsAttrModels()
-            },
-            newsTitleViewModel:{
-                selector:obj.newsTitleViewModel.selector(),
-                selectorAttr:obj.newsTitleViewModel.selectorAttrSelected()
-            },
-            newsPublishTimeViewModel:{
-                selector:obj.newsPublishTimeViewModel.selector(),
-                selectorAttr:obj.newsPublishTimeViewModel.selectorAttrSelected()
-            },
-            newsSourceViewModel:{
-                selector:obj.newsSourceViewModel.selector(),
-                selectorAttr:obj.newsSourceViewModel.selectorAttrSelected()
-            },
-            newsContentViewModel:{
-                selector:obj.newsContentViewModel.selector(),
-                selectorAttr:obj.newsContentViewModel.selectorAttrSelected()
-            },
-            listCustomerAttrViewModel:{
-                listCustomerModels:obj.listAttrModels()
-            },
-            listOutLinkViewModel:{
-                selector:obj.listOutLinkViewModel.selector(),
-                selectorAttr:obj.listOutLinkViewModel.selectorAttrSelected()
-            },
-            listPaginationViewModel:{
-                selector:obj.listPaginationViewModel.selector(),
-                selectorAttr:obj.listPaginationViewModel.selectorAttrSelected(),
-                filterCategory:obj.listPaginationViewModel.filterCategorySelected(),
-                filter:obj.listPaginationViewModel.filter(),
-                paginationType:obj.listPaginationViewModel.paginationTypeSelected(),
-                paginationUrl:obj.listPaginationViewModel.paginationUrl(),
-                currentString:obj.listPaginationViewModel.currentString(),
-                replaceTo:obj.listPaginationViewModel.replaceTo(),
-                start:obj.listPaginationViewModel.start(),
-                records:obj.listPaginationViewModel.records()
-            }
+        basicInfoViewModel:{
+            url:obj.basicInfoViewModel.url(),
+            name:obj.basicInfoViewModel.name(),
+            tag:obj.basicInfoViewModel.tagsSelected()
+        },
+        newsCustomerAttrViewModel:obj.newsAttrModels(),
+        newsTitleViewModel:{
+            selector:obj.newsTitleViewModel.selector(),
+            selectorAttr:obj.newsTitleViewModel.selectorAttrSelected()
+        },
+        newsPublishTimeViewModel:{
+            selector:obj.newsPublishTimeViewModel.selector(),
+            selectorAttr:obj.newsPublishTimeViewModel.selectorAttrSelected()
+        },
+        newsSourceViewModel:{
+            selector:obj.newsSourceViewModel.selector(),
+            selectorAttr:obj.newsSourceViewModel.selectorAttrSelected()
+        },
+        newsContentViewModel:{
+            selector:obj.newsContentViewModel.selector(),
+            selectorAttr:obj.newsContentViewModel.selectorAttrSelected()
+        },
+        listCustomerAttrViewModel:obj.listAttrModels(),
+        listOutLinkViewModel:{
+            selector:obj.listOutLinkViewModel.selector(),
+            selectorAttr:obj.listOutLinkViewModel.selectorAttrSelected()
+        },
+        listPaginationViewModel:{
+            selector:obj.listPaginationViewModel.selector(),
+            selectorAttr:obj.listPaginationViewModel.selectorAttrSelected(),
+            filterCategory:obj.listPaginationViewModel.filterCategorySelected(),
+            filter:obj.listPaginationViewModel.filter(),
+            paginationType:obj.listPaginationViewModel.paginationTypeSelected(),
+            paginationUrl:obj.listPaginationViewModel.paginationUrl(),
+            currentString:obj.listPaginationViewModel.currentString(),
+            replaceTo:obj.listPaginationViewModel.replaceTo(),
+            start:obj.listPaginationViewModel.start(),
+            records:obj.listPaginationViewModel.records()
         }
-    })
+    });
     return jsonString;
 }
 
