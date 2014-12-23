@@ -120,11 +120,30 @@ $(function(){
 
                 this.newsCustomerAttrViewModel=new customerAttrViewModel();
                 this.newsTitleViewModel=new commonAttrViewMode();
+                this.newsPublishTimeViewModel=new commonAttrViewMode();
+                this.newsSourceViewModel=new commonAttrViewMode();
                 this.newsContentViewModel=new commonAttrViewMode();
 
                 this.listCustomerAttrViewModel=new customerAttrViewModel();
                 this.listOutLinkViewModel=new commonAttrViewMode();
                 this.listPaginationViewModel=new paginationViewModel();
+                this.templateTest=function(){
+                    $.ajax({
+                        url: '/webapi/crawlToolResource/getJSONString',
+                        contentType: "application/json",
+                        type: 'POST',
+                        data: {
+                            "pageModel": {
+                                "test":"1"
+                            }
+                        },
+                        success: function (result) {
+                            alert(result);
+                        },
+                        error: function () {
+                        }
+                    });
+                }.bind(this);
             })();
             ko.applyBindings(masterVM);
         })
