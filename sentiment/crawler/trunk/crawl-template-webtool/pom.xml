@@ -44,6 +44,16 @@
             	<artifactId>myutil</artifactId>
             	<version>1.0.0</version>
             </dependency>
+            <dependency>
+            	<groupId>org.codehaus.jackson</groupId>
+            	<artifactId>jackson-core-asl</artifactId>
+            	<version>1.9.11</version>
+            </dependency>
+            <dependency>
+            	<groupId>org.codehaus.jackson.map</groupId>
+            	<artifactId>jackson-mapper-asl.jar</artifactId>
+            	<version>1.9.11</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -53,7 +63,8 @@
             <artifactId>jersey-container-servlet-core</artifactId>
             <!-- use the following artifactId if you don't need servlet 2.x compatibility -->
             <!-- artifactId>jersey-container-servlet</artifactId -->
-        </dependency>
+        </dependency>        
+        
         <!-- uncomment this to get JSON support
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
@@ -71,6 +82,18 @@
         	<artifactId>myutil</artifactId>
         	<scope>system</scope>
         	<systemPath>${basedir}/libs/myutil.jar</systemPath>
+        </dependency>
+        <dependency>
+        	<groupId>org.codehaus.jackson</groupId>
+        	<artifactId>jackson-core-asl</artifactId>
+        	<scope>system</scope>
+        	<systemPath>${basedir}/libs/jackson-core-asl-1.9.11.jar</systemPath>
+        </dependency>
+        <dependency>
+        	<groupId>org.codehaus.jackson.map</groupId>
+        	<artifactId>jackson-mapper-asl.jar</artifactId>
+        	<scope>system</scope>
+        	<systemPath>${basedir}/libs/jackson-mapper-asl-1.9.11.jar</systemPath>
         </dependency>
     </dependencies>
     <properties>
