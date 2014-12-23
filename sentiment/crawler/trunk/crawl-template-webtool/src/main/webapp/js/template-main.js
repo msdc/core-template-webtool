@@ -31,6 +31,23 @@ function basicInfoViewModel(){
     this.url=ko.observable('http://www.ccgp-shandong.gov.cn/fin_info/site/index.jsp');
     this.name=ko.observable('山东政府采购网');
     this.tags=ko.observableArray(['财经','体育','经济']);
+    this.viewHtmlContent=function(){
+        var url=this.url;
+        $('#modal-viewHtml').modal('show');
+        $.ajax({
+            url:'/webapi/crawlToolResource/viewHtmlContent',
+            type:'POST',
+            data:{
+                webUrl:url
+            },
+            success:function(result){
+                var modalBody=$('#modal-viewHtml-body');
+                modalBody.text('');//清空
+                modalBody.text(result);
+            },
+            error:function(){}
+        });
+    }.bind(this);
 }
 
 /**
@@ -114,7 +131,7 @@ $(function(){
     });
 
     //模态对话框事件
-    //registerModalViewContentEvent();
+    registerModalViewContentEvent();
 });
 
 /**
