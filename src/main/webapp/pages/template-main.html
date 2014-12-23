@@ -89,42 +89,46 @@
 
     <div class="row">
         <!--解析区域-->
-        <div class="col-md-2">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">解析区域</h3>
-                </div>
-                <div class="panel-body"></div>
-                <div role="tabpanel">
-                    <!-- Nav tabs --> <!--nav nav-tabs nav-stacked-->
-                    <ul class="nav nav-pills nav-stacked" role="tablist">
-                        <li role="presentation" class="active"><a href="#news_tab" aria-controls="news_tab" role="tab"
-                                                   data-toggle="tab">内容页</a>
-                        </li>
-                        <li role="presentation"><a href="#list_tab" aria-controls="list_tab"
-                                                                  role="tab"
-                                                                  data-toggle="tab">列表页</a></li>
+        <!--<div class="col-md-2">-->
+            <!--<div class="panel panel-default">-->
+                <!--<div class="panel-heading">-->
+                    <!--<h3 class="panel-title">解析区域</h3>-->
+                <!--</div>-->
+                <!--<div class="panel-body"></div>-->
+                <!--<div role="tabpanel">-->
+                    <!--&lt;!&ndash; Nav tabs &ndash;&gt; &lt;!&ndash;nav nav-tabs nav-stacked&ndash;&gt;-->
+                    <!--<ul class="nav nav-pills nav-stacked" role="tablist">-->
+                        <!--<li role="presentation" class="active"><a href="#news_tab" aria-controls="news_tab" role="tab"-->
+                                                   <!--data-toggle="tab">内容页</a>-->
+                        <!--</li>-->
+                        <!--<li role="presentation"><a href="#list_tab" aria-controls="list_tab"-->
+                                                                  <!--role="tab"-->
+                                                                  <!--data-toggle="tab">列表页</a></li>-->
 
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-10">
-            <!-- Tab panes -->
-            <div class="tab-content">
-                <div role="tabpanel" class="tab-pane active" id="news_tab"></div>
-                <div role="tabpanel" class="tab-pane" id="list_tab"></div>
-            </div>
+                    <!--</ul>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="col-md-10">-->
+            <!--&lt;!&ndash; Tab panes &ndash;&gt;-->
+            <!--<div class="tab-content">-->
+                <!--<div role="tabpanel" class="tab-pane active" id="news_tab"></div>-->
+                <!--<div role="tabpanel" class="tab-pane" id="list_tab"></div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <div class="col-md-12">
+            <!--新闻-->
+            <div id="news_tab">></div>
         </div>
         <div class="col-md-12">
-            <!--页面主体-->
-            <div id="main_content"></div>
+            <!--列表-->
+            <div id="list_tab">></div>
         </div>
 
         <!--保存按钮-->
         <div class="col-md-12">
             <div class="row text-right">
-                <button type="button" class="btn btn-primary">测试模板</button>
+                <button type="button" data-bind="click: templateTest" class="btn btn-primary">测试模板</button>
                 <button type="button" class="btn btn-primary">保存模板</button>
             </div>
         </div>
