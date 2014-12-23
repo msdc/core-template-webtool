@@ -1,14 +1,9 @@
 /**
  * Created by wang on 2014/12/9.
  */
-
 /**************Models****************/
-/**
- *
- * 自定义属性的model
- * */
 function customerAttrModel(id,target,selectorFunction,selector,attr,filter,filterCategory,formater,formatCategory){
-    this.parseEngine=['jsoup','xpath'];
+    //this.parseEngine=['jsoup','xpath'];
     this.id=id;
     this.target=target;
     this.selectorFunction=selectorFunction;
@@ -24,6 +19,27 @@ function customerAttrModel(id,target,selectorFunction,selector,attr,filter,filte
 /**************View-Models****************/
 /**
  *
+ * 自定义属性的单个Model视图
+ * */
+function singleCustomerViewModel() {
+    this.parseEngine = ko.observableArray(['jsoup', 'xpath']);
+    this.id = ko.observable();
+    this.target = ko.observable();
+    this.selectorFunction = ko.observableArray(['label','field','content', 'pagination']);
+    this.selectorFunctionSelected=ko.observable('label');
+    this.selector = ko.observable();
+    this.attr = ko.observableArray(['href', 'text', 'src', 'html']);
+    this.attrSelected = ko.observable('text');
+    this.filterCategory = ko.observableArray([ '匹配', '移除','替换']);
+    this.filterCategorySelected=ko.observable('匹配');
+    this.filter = ko.observable();
+    this.formater = ko.observable();
+    this.formatCategory = ko.observableArray([]);
+    this.formatCategorySelected = ko.observable();
+}
+
+/**
+ *
  * 基本信息View-Model
  * */
 function basicInfoViewModel(){
@@ -31,6 +47,7 @@ function basicInfoViewModel(){
     this.url=ko.observable('http://www.ccgp-shandong.gov.cn/fin_info/site/index.jsp');
     this.name=ko.observable('山东政府采购网');
     this.tags=ko.observableArray(['财经','体育','经济']);
+    this.tagsSelected=ko.observable('财经');
     this.viewHtmlContent=function(){
         var url=this.url;
         $('#modal-viewHtml').modal('show');
@@ -55,11 +72,11 @@ function basicInfoViewModel(){
  * 自定义属性View-Model
  * */
 function customerAttrViewModel(){
-    this.regions=ko.observableArray([]);
+    this.regions=ko.observableArray();
     this.parseEngines=ko.observableArray(['jsoup','xpath']);
     /*添加解析域*/
     this.addItem=function(){
-        this.regions.push(new customerAttrModel('','',['field','label','content','pagination'],'',['href','text','src','html'],'',['移除','匹配','替换'],'',['时间','日期']));
+        this.regions.push(new singleCustomerViewModel());
     }.bind(this);
     //删除元素 .bind(this)改变作用域,始终绑定当前对象
     this.removeItem=function(item){
@@ -75,12 +92,15 @@ function customerAttrViewModel(){
 function paginationViewModel(){
     this.parseEngine=ko.observableArray(['jsoup','xpath']);
     this.selector=ko.observable();
-    this.selectorAttr=ko.observableArray([]);
+    this.selectorAttr=ko.observableArray(['href','text','src','html']);
+    this.selectorAttrSelected=ko.observable('href');
     this.filter=ko.observable();
-    this.filterCategory=ko.observableArray([]);
+    this.filterCategory=ko.observableArray(['匹配','移除','替换']);
+    this.filterCategorySelected=ko.observable('匹配');
     this.formater=ko.observable();
     this.formatCategory=ko.observableArray([]);
-    this.paginationType=ko.observableArray(['PAGINATION_TYPE_PAGE','PAGINATION_TYPE_PAGENUMBER','PAGINATION_TYPE_PAGENUMBER_INTERVAL']);
+    this.paginationType=ko.observableArray(['分页步进数','分页的末尾页数','分页的末尾页数','获取分页的记录数']);
+    this.paginationTypeSelected=ko.observable('分页步进数');
     this.paginationUrl=ko.observable();
     this.currentString=ko.observable();
     this.replaceTo=ko.observable();
@@ -96,8 +116,10 @@ function commonAttrViewMode(){
     this.parseEngine=ko.observableArray(['jsoup','xpath']);
     this.selector=ko.observable();
     this.selectorAttr=ko.observable(['href','text','src','html']);
+    this.selectorAttrSelected=ko.observable('text');
     this.filter=ko.observable();
-    this.filterCategory=ko.observable(['移除','匹配','替换']);
+    this.filterCategory=ko.observable(['匹配','移除','替换']);
+    this.filterCategorySelected=ko.observable('匹配');
     this.formater=ko.observable();
     this.formatCategory=ko.observable(['时间','日期']);
 }
@@ -127,15 +149,85 @@ $(function(){
                 this.listCustomerAttrViewModel=new customerAttrViewModel();
                 this.listOutLinkViewModel=new commonAttrViewMode();
                 this.listPaginationViewModel=new paginationViewModel();
+
+                this.newsAttrModels=function(){
+                    var attrModels=[];
+                    var modelArray=this.newsCustomerAttrViewModel.regions();
+                    for(var i=0;i<modelArray.length;i++){
+                        var model=modelArray[i];
+                        var temp=new customerAttrModel(
+                            model.id(),model.target(),model.selectorFunctionSelected(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.formater(),model.formatCategorySelected()
+                        );
+                        attrModels.push(temp);
+                    }
+                    return attrModels;
+                };
+
+                this.listAttrModels=function(){
+                    var attrModels=[];
+                    var modelArray=this.listCustomerAttrViewModel.regions();
+                    for(var i=0;i<modelArray.length;i++){
+                        var model=modelArray[i];
+                        var temp=new customerAttrModel(
+                            model.id(),model.target(),model.selectorFunctionSelected(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.formater(),model.formatCategorySelected()
+                        );
+                        attrModels.push(temp);
+                    }
+                    return attrModels;
+                };
+
                 this.templateTest=function(){
                     $.ajax({
                         url: '/webapi/crawlToolResource/getJSONString',
-                        contentType: "application/json",
                         type: 'POST',
                         data: {
-                            "pageModel": {
-                                "test":"1"
-                            }
+                            data:JSON.stringify({
+                                pageModel: {
+                                    basicInfoViewModel:{
+                                        url:this.basicInfoViewModel.url(),
+                                        name:this.basicInfoViewModel.name(),
+                                        tagsSelected:this.basicInfoViewModel.tagsSelected()
+                                    },
+                                    newsCustomerAttrViewModel:{
+                                        newsCustomerModels:this.newsAttrModels()
+                                    },
+                                    newsTitleViewModel:{
+                                        selector:this.newsTitleViewModel.selector(),
+                                        selectorAttr:this.newsTitleViewModel.selectorAttrSelected()
+                                    },
+                                    newsPublishTimeViewModel:{
+                                        selector:this.newsPublishTimeViewModel.selector(),
+                                        selectorAttr:this.newsPublishTimeViewModel.selectorAttrSelected()
+                                    },
+                                    newsSourceViewModel:{
+                                        selector:this.newsSourceViewModel.selector(),
+                                        selectorAttr:this.newsSourceViewModel.selectorAttrSelected()
+                                    },
+                                    newsContentViewModel:{
+                                        selector:this.newsContentViewModel.selector(),
+                                        selectorAttr:this.newsContentViewModel.selectorAttrSelected()
+                                    },
+                                    listCustomerAttrViewModel:{
+                                        listCustomerModels:this.listAttrModels()
+                                    },
+                                    listOutLinkViewModel:{
+                                        selector:this.listOutLinkViewModel.selector(),
+                                        selectorAttr:this.listOutLinkViewModel.selectorAttrSelected()
+                                    },
+                                    listPaginationViewModel:{
+                                        selector:this.listPaginationViewModel.selector(),
+                                        selectorAttr:this.listPaginationViewModel.selectorAttrSelected(),
+                                        filterCategory:this.listPaginationViewModel.filterCategorySelected(),
+                                        filter:this.listPaginationViewModel.filter(),
+                                        paginationType:this.listPaginationViewModel.paginationTypeSelected(),
+                                        paginationUrl:this.listPaginationViewModel.paginationUrl(),
+                                        currentString:this.listPaginationViewModel.currentString(),
+                                        replaceTo:this.listPaginationViewModel.replaceTo(),
+                                        start:this.listPaginationViewModel.start(),
+                                        records:this.listPaginationViewModel.records()
+                                    }
+                                }
+                            })
                         },
                         success: function (result) {
                             alert(result);

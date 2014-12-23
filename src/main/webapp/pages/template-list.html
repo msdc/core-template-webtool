@@ -35,7 +35,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>选择器属性</label>
-                                    <select class="form-control" data-bind="options: selectorAttr"></select>
+                                    <select class="form-control" data-bind="options: selectorAttr, value:selectorAttrSelected"></select>
                                 </div>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>选择器属性</label>
-                                    <select class="form-control" data-bind="options: selectorAttr"></select>
+                                    <select class="form-control" data-bind="options: selectorAttr, value:selectorAttrSelected"></select>
                                 </div>
                             </div>
                         </div>
@@ -139,7 +139,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>列表类别</label>
-                                    <select class="form-control" data-bind="options: paginationType"></option>
+                                    <select class="form-control" data-bind="options: paginationType, value: paginationTypeSelected"></option>
                                     </select>
                                 </div>
                             </div>
@@ -251,7 +251,7 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>选择器属性</label>
-                                                    <select class="form-control" data-bind="options: attr"></select>
+                                                    <select class="form-control" data-bind="options: attr,value: attrSelected"></select>
                                                 </div>
                                             </div>
                                         </div>
@@ -261,7 +261,7 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>过滤器类别</label>
-                                                    <select class="form-control" data-bind="options: filterCategory"></select>
+                                                    <select class="form-control" data-bind="options: filterCategory, value:filterCategorySelected"></select>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -275,20 +275,20 @@
                                         </div>
 
                                         <!--格式化器内容-->
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>格式化器</label>
-                                                    <input type="text" data-bind="value: formater" class="form-control" placeholder="格式化器">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>格式化器类别</label>
-                                                    <select class="form-control" data-bind="options: formatCategory"></select>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <!--<div class="row">-->
+                                            <!--<div class="col-md-6">-->
+                                                <!--<div class="form-group">-->
+                                                    <!--<label>格式化器</label>-->
+                                                    <!--<input type="text" data-bind="value: formater" class="form-control" placeholder="格式化器">-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                            <!--<div class="col-md-6">-->
+                                                <!--<div class="form-group">-->
+                                                    <!--<label>格式化器类别</label>-->
+                                                    <!--<select class="form-control" data-bind="options: formatCategory"></select>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
                                     </div>
                                 </div>
                             </div>
