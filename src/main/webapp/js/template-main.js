@@ -181,53 +181,7 @@ $(function(){
                         url: '/webapi/crawlToolResource/getJSONString',
                         type: 'POST',
                         data: {
-                            data:JSON.stringify({
-                                pageModel: {
-                                    basicInfoViewModel:{
-                                        url:this.basicInfoViewModel.url(),
-                                        name:this.basicInfoViewModel.name(),
-                                        tagsSelected:this.basicInfoViewModel.tagsSelected()
-                                    },
-                                    newsCustomerAttrViewModel:{
-                                        newsCustomerModels:this.newsAttrModels()
-                                    },
-                                    newsTitleViewModel:{
-                                        selector:this.newsTitleViewModel.selector(),
-                                        selectorAttr:this.newsTitleViewModel.selectorAttrSelected()
-                                    },
-                                    newsPublishTimeViewModel:{
-                                        selector:this.newsPublishTimeViewModel.selector(),
-                                        selectorAttr:this.newsPublishTimeViewModel.selectorAttrSelected()
-                                    },
-                                    newsSourceViewModel:{
-                                        selector:this.newsSourceViewModel.selector(),
-                                        selectorAttr:this.newsSourceViewModel.selectorAttrSelected()
-                                    },
-                                    newsContentViewModel:{
-                                        selector:this.newsContentViewModel.selector(),
-                                        selectorAttr:this.newsContentViewModel.selectorAttrSelected()
-                                    },
-                                    listCustomerAttrViewModel:{
-                                        listCustomerModels:this.listAttrModels()
-                                    },
-                                    listOutLinkViewModel:{
-                                        selector:this.listOutLinkViewModel.selector(),
-                                        selectorAttr:this.listOutLinkViewModel.selectorAttrSelected()
-                                    },
-                                    listPaginationViewModel:{
-                                        selector:this.listPaginationViewModel.selector(),
-                                        selectorAttr:this.listPaginationViewModel.selectorAttrSelected(),
-                                        filterCategory:this.listPaginationViewModel.filterCategorySelected(),
-                                        filter:this.listPaginationViewModel.filter(),
-                                        paginationType:this.listPaginationViewModel.paginationTypeSelected(),
-                                        paginationUrl:this.listPaginationViewModel.paginationUrl(),
-                                        currentString:this.listPaginationViewModel.currentString(),
-                                        replaceTo:this.listPaginationViewModel.replaceTo(),
-                                        start:this.listPaginationViewModel.start(),
-                                        records:this.listPaginationViewModel.records()
-                                    }
-                                }
-                            })
+                            data:getJSONString(this)
                         },
                         success: function (result) {
                             alert(result);
@@ -244,6 +198,61 @@ $(function(){
     //模态对话框事件
     registerModalViewContentEvent();
 });
+
+/**
+ *
+ * @param {Object} obj=masterVM
+ * */
+function getJSONString(obj){
+    var jsonString=JSON.stringify({
+        pageModel: {
+            basicInfoViewModel:{
+                url:obj.basicInfoViewModel.url(),
+                name:obj.basicInfoViewModel.name(),
+                tagsSelected:obj.basicInfoViewModel.tagsSelected()
+            },
+            newsCustomerAttrViewModel:{
+                newsCustomerModels:obj.newsAttrModels()
+            },
+            newsTitleViewModel:{
+                selector:obj.newsTitleViewModel.selector(),
+                selectorAttr:obj.newsTitleViewModel.selectorAttrSelected()
+            },
+            newsPublishTimeViewModel:{
+                selector:obj.newsPublishTimeViewModel.selector(),
+                selectorAttr:obj.newsPublishTimeViewModel.selectorAttrSelected()
+            },
+            newsSourceViewModel:{
+                selector:obj.newsSourceViewModel.selector(),
+                selectorAttr:obj.newsSourceViewModel.selectorAttrSelected()
+            },
+            newsContentViewModel:{
+                selector:obj.newsContentViewModel.selector(),
+                selectorAttr:obj.newsContentViewModel.selectorAttrSelected()
+            },
+            listCustomerAttrViewModel:{
+                listCustomerModels:obj.listAttrModels()
+            },
+            listOutLinkViewModel:{
+                selector:obj.listOutLinkViewModel.selector(),
+                selectorAttr:obj.listOutLinkViewModel.selectorAttrSelected()
+            },
+            listPaginationViewModel:{
+                selector:obj.listPaginationViewModel.selector(),
+                selectorAttr:obj.listPaginationViewModel.selectorAttrSelected(),
+                filterCategory:obj.listPaginationViewModel.filterCategorySelected(),
+                filter:obj.listPaginationViewModel.filter(),
+                paginationType:obj.listPaginationViewModel.paginationTypeSelected(),
+                paginationUrl:obj.listPaginationViewModel.paginationUrl(),
+                currentString:obj.listPaginationViewModel.currentString(),
+                replaceTo:obj.listPaginationViewModel.replaceTo(),
+                start:obj.listPaginationViewModel.start(),
+                records:obj.listPaginationViewModel.records()
+            }
+        }
+    })
+    return jsonString;
+}
 
 /**
  *
