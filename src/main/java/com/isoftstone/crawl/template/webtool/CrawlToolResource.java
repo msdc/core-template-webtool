@@ -35,11 +35,15 @@ import com.isoftstone.crawl.template.utils.MD5Utils;
 import com.isoftstone.crawl.template.utils.RedisUtils;
 import com.lj.util.http.DownloadHtml;
 
+/**
+ * 
+ * 爬虫工具restful-services服务类
+ * */
 @Path("crawlToolResource")
 public class CrawlToolResource {
 	@POST
 	@Path("/getJSONString")
-	@Produces(MediaType.TEXT_PLAIN)	
+	@Produces(MediaType.TEXT_PLAIN)
 	public String GetJSONString(@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = null;
 		try {
@@ -55,9 +59,113 @@ public class CrawlToolResource {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		byte[] input = DownloadHtml.getHtml(pageModel.getBasicInfoViewModel()
+				.getUrl());
+		TemplateResult  templateResult=SaveTemplateResult(pageModel);
+		String templateJsonString = GetTemplateJsonString(pageModel);
+		return templateJsonString;
+	}	
+	
+	@POST
+	@Path("/saveTemplate")
+	@Produces("text/plain")	
+	public String SaveTemplate(
+			@DefaultValue("") @FormParam("data") String data) {
+		PageModel pageModel = null;
+		try {
+			ObjectMapper objectmapper = new ObjectMapper();
+			pageModel = objectmapper.readValue(data, PageModel.class);
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}			
 		
-		String jsonString=convertToJSONString(pageModel);		
-		return jsonString;
+		return "";
+	}
+
+	public ParseResult testTemplateJsonString(PageModel pageModel) {
+		byte[] input = DownloadHtml.getHtml(pageModel.getBasicInfoViewModel()
+				.getUrl());
+		TemplateResult templateResult = SaveTemplateResult(pageModel);
+		ParseResult parseResult = null;
+		String encoding = "gb2312";
+		parseResult = TemplateFactory.process(input, encoding, pageModel
+				.getBasicInfoViewModel().getUrl());
+		return parseResult;
+	}
+
+	private TemplateResult SaveTemplateResult(PageModel pageModel) {
+		TemplateResult template = new TemplateResult();
+		template.setType(Constants.TEMPLATE_LIST);
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		template.setTemplateGuid(templateGuid);
+
+		List<Selector> list = new ArrayList<Selector>();
+
+		SelectorIndexer indexer = null;
+		Selector selector = null;
+		SelectorFilter filter = null;
+		SelectorFormat format = null;
+
+		indexer = new SelectorIndexer();
+		selector = new Selector();
+		indexer.initJsoupIndexer(pageModel.getListOutLinkViewModel()
+				.getSelector(), pageModel.getListOutLinkViewModel()
+				.getSelectorAttr());
+		selector.initContentSelector(indexer, null);
+		list.add(selector);
+		template.setList(list);
+
+		RedisUtils.setTemplateResult(template, templateGuid);
+		return template;
+	}
+
+	private String GetTemplateJsonString(PageModel pageModel) {
+		TemplateResult template = new TemplateResult();
+		template.setType(Constants.TEMPLATE_LIST);
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		template.setTemplateGuid(templateGuid);
+
+		List<Selector> list = new ArrayList<Selector>();
+
+		SelectorIndexer indexer = null;
+		Selector selector = null;
+		SelectorFilter filter = null;
+		SelectorFormat format = null;
+
+		indexer = new SelectorIndexer();
+		selector = new Selector();
+		indexer.initJsoupIndexer(pageModel.getListOutLinkViewModel()
+				.getSelector(), pageModel.getListOutLinkViewModel()
+				.getSelectorAttr());
+		selector.initContentSelector(indexer, null);
+		list.add(selector);
+		template.setList(list);
+
+		String JSONString = JSONUtils.getTemplateResultJSON(template);
+		return JSONString;
+	}
+
+	/**
+	 * 
+	 * 查看html内容按钮
+	 * */
+	@POST
+	@Path("/viewHtmlContent")
+	@Produces("text/plain")
+	public String viewHtmlContent(
+			@DefaultValue("") @FormParam("webUrl") String webUrl) {
+		String htmlContent = DownloadHtml.getHtml(webUrl, "UTF-8");
+		return htmlContent;
 	}
 	
 	private String convertToJSONString(PageModel pageModel) {
@@ -79,95 +187,4 @@ public class CrawlToolResource {
 		return json;
 	}
 
-	/*根据生成的JSON模板，得到相关的页面内容*/
-	@POST @Path("/testTemplateJsonString")    
-    @Produces("application/json")    
-	public ParseResult testTemplateJsonString(
-			@DefaultValue("") @FormParam("webUrl") String webUrl,
-    		@DefaultValue("") @FormParam("jsoupSelector") String jsoupSelector,
-    		@DefaultValue("") @FormParam("attribute") String attribute,
-    		@DefaultValue("") @FormParam("filterString") String filterString,
-    		@DefaultValue("") @FormParam("formaterString") String formaterString){
-		byte[] input = DownloadHtml.getHtml(webUrl);
-		TemplateResult templateResult = getTemplateResult(webUrl,jsoupSelector,attribute,filterString,formaterString);
-		ParseResult parseResult = null;
-		String encoding = "gb2312";
-		parseResult = TemplateFactory.process(input, encoding, webUrl);
-		return parseResult;
-	}
-	
-	/*产生页面模板JSON串，并将结果保存到REDIS中*/
-	public TemplateResult getTemplateResult(String webUrl,String jsoupSelector,String attribute,String filterString,String formaterString){
-    	TemplateResult template = new TemplateResult();
-		template.setType(Constants.TEMPLATE_LIST);
-		String templateUrl = webUrl;
-		String templateGuid = MD5Utils.MD5(templateUrl);
-		template.setTemplateGuid(templateGuid);
-		
-		List<Selector> list = new ArrayList<Selector>();
-		
-		SelectorIndexer indexer = null;
-		Selector selector = null;
-		SelectorFilter filter = null;
-		SelectorFormat format = null;
-		
-		indexer = new SelectorIndexer();
-		selector = new Selector();
-		indexer.initJsoupIndexer(jsoupSelector, attribute);
-		selector.initContentSelector(indexer, null);
-		list.add(selector);
-		template.setList(list);
-		
-		RedisUtils.setTemplateResult(template, templateGuid);
-		return template;
-	}
-	
-	/*查看生成的模板JSON串*/
-    @POST @Path("/viewTemplateJsonString")    
-    @Produces("application/json")    
-    public String viewTemplateJsonString(
-    		@DefaultValue("") @FormParam("webUrl") String webUrl,
-    		@DefaultValue("") @FormParam("jsoupSelector") String jsoupSelector,
-    		@DefaultValue("") @FormParam("attribute") String attribute,
-    		@DefaultValue("") @FormParam("filterString") String filterString,
-    		@DefaultValue("") @FormParam("formaterString") String formaterString){
-    		byte[] input = DownloadHtml.getHtml(webUrl);
-    		String templateJsonString = GetTemplateJsonString(webUrl,jsoupSelector,attribute,filterString,formaterString);
-    		return templateJsonString;
-    	}     
-   
-    /* 产生模板的JSON串 */
-    private String GetTemplateJsonString(String webUrl,String jsoupSelector,String attribute,String filterString,String formaterString){
-    	TemplateResult template = new TemplateResult();
-		template.setType(Constants.TEMPLATE_LIST);
-		String templateUrl = webUrl;
-		String templateGuid = MD5Utils.MD5(templateUrl);
-		template.setTemplateGuid(templateGuid);
-		
-		List<Selector> list = new ArrayList<Selector>();
-		
-		SelectorIndexer indexer = null;
-		Selector selector = null;
-		SelectorFilter filter = null;
-		SelectorFormat format = null;
-		
-		indexer = new SelectorIndexer();
-		selector = new Selector();
-		indexer.initJsoupIndexer(jsoupSelector, attribute);
-		selector.initContentSelector(indexer, null);
-		list.add(selector);
-		template.setList(list);
-		
-		String JSONString=JSONUtils.getTemplateResultJSON(template);
-	    return JSONString;
-    }
-    
-    /* 查看html内容按钮 */
-    @POST @Path("/viewHtmlContent")
-    @Produces("text/plain")
-    public String viewHtmlContent(@DefaultValue("") @FormParam("webUrl") String webUrl){
-    	String htmlContent = DownloadHtml.getHtml(webUrl,"UTF-8");
-    	return htmlContent;
-    }
-    
 }

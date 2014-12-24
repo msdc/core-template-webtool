@@ -44,8 +44,8 @@ function singleCustomerViewModel() {
  * */
 function basicInfoViewModel(){
     this.id=ko.observable('');
-    this.url=ko.observable('http://www.ccgp-shandong.gov.cn/fin_info/site/index.jsp');
-    this.name=ko.observable('山东政府采购网');
+    this.url=ko.observable('http://www.ccgp-gansu.gov.cn/votoonadmin/article/classlist.jsp?pn=1&class_id=213');
+    this.name=ko.observable();
     this.tags=ko.observableArray(['财经','体育','经济']);
     this.tagsSelected=ko.observable('财经');
     this.viewHtmlContent=function(){
