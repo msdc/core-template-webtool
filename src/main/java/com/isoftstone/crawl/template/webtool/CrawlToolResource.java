@@ -41,76 +41,10 @@ import com.lj.util.http.DownloadHtml;
  * */
 @Path("crawlToolResource")
 public class CrawlToolResource {
-    /**
-     * 
-     * 测试模板主方法
-     * */
-	@POST
-	@Path("/getJSONString")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String GetJSONString(@DefaultValue("") @FormParam("data") String data) {
-		PageModel pageModel = null;
-		try {
-			ObjectMapper objectmapper = new ObjectMapper();
-			pageModel = objectmapper.readValue(data, PageModel.class);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		String encoding = "gb2312";
-		ParseResult parseResult = null;
-		byte[] input = DownloadHtml.getHtml(pageModel.getBasicInfoViewModel()
-				.getUrl());
-		TemplateResult templateResult = GetTemplateResult(pageModel);		
-		parseResult = TemplateFactory.localProcess(input, encoding, pageModel
-				.getBasicInfoViewModel().getUrl(), templateResult,
-				Constants.TEMPLATE_LIST);
-		//System.out.println("templateResult:" + templateResult.toJSON());
-		//System.out.println("parseResult"+parseResult.toJSON());		
-		return parseResult.toJSON();
-	}
-
 	/**
 	 * 
-	 * 保存模板的主方法
+	 * 生成模板对象
 	 * */
-	@POST
-	@Path("/saveTemplate")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String SaveTemplate(@DefaultValue("") @FormParam("data") String data) {
-		PageModel pageModel = null;
-		try {
-			ObjectMapper objectmapper = new ObjectMapper();
-			pageModel = objectmapper.readValue(data, PageModel.class);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		TemplateResult templateResult = GetTemplateResult(pageModel);	
-		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-		String templateGuid = MD5Utils.MD5(templateUrl);
-		//保存到redis
-		RedisUtils.setTemplateResult(templateResult, templateGuid);
-		return "模板保存成功!";
-	}
-
-    /**
-     * 
-     * 生成模板对象
-     * */
 	private TemplateResult GetTemplateResult(PageModel pageModel) {
 		TemplateResult template = new TemplateResult();
 		template.setType(Constants.TEMPLATE_LIST);
@@ -137,19 +71,30 @@ public class CrawlToolResource {
 		list.add(selector);
 		template.setList(list);
 
-		// // tstamp 自定义属性
-		// Selector label = new Selector();
-		// label.setType(Constants.SELECTOR_LABEL);
-		// indexer = new SelectorIndexer();
-		// indexer.initJsoupIndexer(
-		// "body > form > table:nth-child(2) > tbody > tr > td:nth-child(2) > table:nth-child(2) > tbody > tr > td > table > tbody > tr > td > table:nth-child(2) > tbody > tr:nth-child(1) > td:nth-child(2) > table > tbody > tr:nth-child(2n-1) > td:nth-child(3)",
-		// Constants.ATTRIBUTE_TEXT);
-		// filter = new SelectorFilter();
-		// filter.initMatchFilter(Constants.YYYYMMDD);
-		// label.initLabelSelector("tstamp", "", indexer, filter, null);
-		// selector.setLabel(label);
-		// list.add(selector);
-		// template.setList(list);
+		// 处理列表自定义属性 以时间为例
+		List<CustomerAttrModel> listCustomerAttrViewModel = pageModel
+				.getListCustomerAttrViewModel();
+		for (CustomerAttrModel model : listCustomerAttrViewModel) {
+			Selector label = new Selector();
+			label.setType(Constants.SELECTOR_LABEL);
+			indexer = new SelectorIndexer();
+			indexer.initJsoupIndexer(model.getTarget(), model.getAttr());
+			filter = new SelectorFilter();
+			String filterString = model.getFilter();
+			String filterCategory = model.getFilterCategory();
+			if (filterCategory.equals("匹配")) {
+				filter.initMatchFilter(filterString);
+			} else if (filterCategory.equals("替换")) {
+				// filter.initReplaceFilter(value, replaceTo);
+			} else if (filterCategory.equals("移除")) {
+				// filter.initRemoveFilter(value);
+			}
+			label.initLabelSelector(model.getTarget(), "", indexer, filter,
+					null);
+			selector.setLabel(label);
+			list.add(selector);
+			template.setList(list);
+		}
 
 		// pagitation outlink js翻页无法处理
 		indexer = new SelectorIndexer();
@@ -211,8 +156,99 @@ public class CrawlToolResource {
 		selector.initFieldSelector("content", "", indexer, null, null);
 		news.add(selector);
 		template.setNews(news);
-		
+
+		// 处理内容自定义属性 以时间为例
+		List<CustomerAttrModel> newsCustomerAttrViewModel = pageModel
+				.getNewsCustomerAttrViewModel();
+		for (CustomerAttrModel model : newsCustomerAttrViewModel) {
+			Selector label = new Selector();
+			label.setType(Constants.SELECTOR_LABEL);
+			indexer = new SelectorIndexer();
+			indexer.initJsoupIndexer(model.getTarget(), model.getAttr());
+			filter = new SelectorFilter();
+			String filterString = model.getFilter();
+			String filterCategory = model.getFilterCategory();
+			if (filterCategory.equals("匹配")) {
+				filter.initMatchFilter(filterString);
+			} else if (filterCategory.equals("替换")) {
+				// filter.initReplaceFilter(value, replaceTo);
+			} else if (filterCategory.equals("移除")) {
+				// filter.initRemoveFilter(value);
+			}
+			label.initLabelSelector(model.getTarget(), "", indexer, filter,
+					null);
+			selector.setLabel(label);
+			news.add(selector);
+			template.setNews(news);
+		}
+
 		return template;
+	}
+
+	/**
+	 * 
+	 * 测试模板主方法
+	 * */
+	@POST
+	@Path("/getJSONString")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String GetJSONString(@DefaultValue("") @FormParam("data") String data) {
+		PageModel pageModel = null;
+		try {
+			ObjectMapper objectmapper = new ObjectMapper();
+			pageModel = objectmapper.readValue(data, PageModel.class);
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		String encoding = "gb2312";
+		ParseResult parseResult = null;
+		byte[] input = DownloadHtml.getHtml(pageModel.getBasicInfoViewModel()
+				.getUrl());
+		TemplateResult templateResult = GetTemplateResult(pageModel);
+		parseResult = TemplateFactory.localProcess(input, encoding, pageModel
+				.getBasicInfoViewModel().getUrl(), templateResult,
+				Constants.TEMPLATE_LIST);
+		// System.out.println("templateResult:" + templateResult.toJSON());
+		// System.out.println("parseResult"+parseResult.toJSON());
+		return parseResult.toJSON();
+	}
+
+	/**
+	 * 
+	 * 保存模板的主方法
+	 * */
+	@POST
+	@Path("/saveTemplate")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String SaveTemplate(@DefaultValue("") @FormParam("data") String data) {
+		PageModel pageModel = null;
+		try {
+			ObjectMapper objectmapper = new ObjectMapper();
+			pageModel = objectmapper.readValue(data, PageModel.class);
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		TemplateResult templateResult = GetTemplateResult(pageModel);
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		// 保存到redis
+		RedisUtils.setTemplateResult(templateResult, templateGuid);
+		return "模板保存成功!";
 	}
 
 	/**

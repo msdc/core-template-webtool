@@ -5,6 +5,7 @@ package com.isoftstone.crawl.template.webtool;
  * 自定义属性Model实体
  * */
 public class CustomerAttrModel {
+	private String target="";
 	private String selector="";
 	private String attr = "";
 	private String filter="";
@@ -36,6 +37,12 @@ public class CustomerAttrModel {
 	}
 	public void setFilterCategory(String filterCategory) {
 		this.filterCategory = filterCategory;
+	}
+	public String getTarget() {
+		return target;
+	}
+	public void setTarget(String target) {
+		this.target = target;
 	}
 	
 	
