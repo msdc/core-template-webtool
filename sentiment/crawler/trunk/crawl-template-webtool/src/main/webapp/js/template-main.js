@@ -197,6 +197,46 @@ $(function(){
                     return attrModels;
                 };
 
+                //验证内容页
+                this.verifyNewContent=function(){
+                    $('#modalHtmlTitle').text('验证结果');
+                    $('#modal-viewHtml').modal('show');
+                    $.ajax({
+                        url: '/webapi/crawlToolResource/verifyNewContent',
+                        type: 'POST',
+                        data: {
+                            data: getJSONString(this)
+                        },
+                        success: function (result) {
+                            var modalBody=$('#modal-viewHtml-body');
+                            modalBody.text('');//清空
+                            modalBody.text(result);
+                        },
+                        error: function () {
+                        }
+                    });
+                };
+
+                //验证列表页
+                this.verifyListContent=function(){
+                    $('#modalHtmlTitle').text('验证结果');
+                    $('#modal-viewHtml').modal('show');
+                    $.ajax({
+                        url: '/webapi/crawlToolResource/verifyListContent',
+                        type: 'POST',
+                        data: {
+                            data: getJSONString(this)
+                        },
+                        success: function (result) {
+                            var modalBody=$('#modal-viewHtml-body');
+                            modalBody.text('');//清空
+                            modalBody.text(result);
+                        },
+                        error: function () {
+                        }
+                    });
+                };
+
                 /*测试模板配置*/
                 this.templateTest=function(){
                     $('#modalHtmlTitle').text('测试结果');
