@@ -1,23 +1,26 @@
 package com.isoftstone.crawl.template.webtool;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
 
-import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -30,7 +33,6 @@ import com.isoftstone.crawl.template.impl.SelectorFormat;
 import com.isoftstone.crawl.template.impl.SelectorIndexer;
 import com.isoftstone.crawl.template.impl.TemplateFactory;
 import com.isoftstone.crawl.template.impl.TemplateResult;
-import com.isoftstone.crawl.template.utils.JSONUtils;
 import com.isoftstone.crawl.template.utils.MD5Utils;
 import com.isoftstone.crawl.template.utils.RedisUtils;
 import com.lj.util.http.DownloadHtml;
@@ -206,13 +208,13 @@ public class CrawlToolResource {
 		}
 		return pageModel;
 	}
-	
+
 	@POST
 	@Path("/verifyNewContent")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String VerifyNewContent(
 			@DefaultValue("") @FormParam("data") String data) {
-		PageModel pageModel=GetPageModelByJsonString(data);
+		PageModel pageModel = GetPageModelByJsonString(data);
 		String encoding = "gb2312";
 		ParseResult parseResult = null;
 		byte[] input = DownloadHtml.getHtml(pageModel.getBasicInfoViewModel()
@@ -220,16 +222,16 @@ public class CrawlToolResource {
 		TemplateResult templateResult = GetTemplateResult(pageModel);
 		parseResult = TemplateFactory.localProcess(input, encoding, pageModel
 				.getBasicInfoViewModel().getUrl(), templateResult,
-				Constants.TEMPLATE_LIST);			
+				Constants.TEMPLATE_LIST);
 		return "";
 	}
-	
+
 	@POST
 	@Path("/verifyListContent")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String VerifyListContent(
 			@DefaultValue("") @FormParam("data") String data) {
-		PageModel pageModel=GetPageModelByJsonString(data);
+		PageModel pageModel = GetPageModelByJsonString(data);
 		String encoding = "gb2312";
 		ParseResult parseResult = null;
 		byte[] input = DownloadHtml.getHtml(pageModel.getBasicInfoViewModel()
@@ -237,10 +239,10 @@ public class CrawlToolResource {
 		TemplateResult templateResult = GetTemplateResult(pageModel);
 		parseResult = TemplateFactory.localProcess(input, encoding, pageModel
 				.getBasicInfoViewModel().getUrl(), templateResult,
-				Constants.TEMPLATE_LIST);		
+				Constants.TEMPLATE_LIST);
 		return parseResult.toJSON();
 	}
-	
+
 	/**
 	 * 
 	 * 测试模板主方法
@@ -271,15 +273,117 @@ public class CrawlToolResource {
 	@Path("/saveTemplate")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String SaveTemplate(@DefaultValue("") @FormParam("data") String data) {
-		PageModel pageModel=GetPageModelByJsonString(data);
+		PageModel pageModel = GetPageModelByJsonString(data);
+		byte[] input = DownloadHtml.getHtml(pageModel.getBasicInfoViewModel()
+				.getUrl());
+		String encoding = "gb2312";
+		ParseResult parseResult = null;
 		TemplateResult templateResult = GetTemplateResult(pageModel);
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		String templateGuid = MD5Utils.MD5(templateUrl);
 		// 保存到REDIS
 		RedisUtils.setTemplateResult(templateResult, templateGuid);
+		// 保存种子到文件
+		parseResult = TemplateFactory.localProcess(input, encoding, pageModel
+				.getBasicInfoViewModel().getUrl(), templateResult,
+				Constants.TEMPLATE_LIST);
+		HashMap<String, String> seeds = parseResult.getResult();
+		FileOutputStream out = null;
+		
+		try {
+			for (Iterator<Entry<String, String>> it = seeds.entrySet()
+					.iterator(); it.hasNext();) {
+				Entry<String, String> entry = it.next();
+				String seed = entry.getValue();
+				contentToTxt("/home/linux/drcnet.com.cn_1day_01/seed.txt",seed);				
+			}			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+
+			try {
+				if (out != null) {
+					out.close();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
 		return "模板保存成功!";
 	}
 
+	public static void contentToTxt(String filePath, String content) {  
+        String str = new String(); //原有txt内容  
+        String s1 = new String();//内容更新  
+        try {  
+            File f = new File(filePath);  
+            if (f.exists()) {  
+                System.out.print("文件存在");  
+            } else {  
+                System.out.print("文件不存在");  
+                f.createNewFile();// 不存在则创建  
+            }  
+            BufferedReader input = new BufferedReader(new FileReader(f));  
+  
+            while ((str = input.readLine()) != null) {  
+                s1 += str + "\n";  
+            }  
+            System.out.println(s1);  
+            input.close();  
+            s1 += content;  
+  
+            BufferedWriter output = new BufferedWriter(new FileWriter(f));  
+            output.write(s1);  
+            output.close();  
+        } catch (Exception e) {  
+            e.printStackTrace();  
+  
+        }  
+    }  
+	
+	/** 
+	  * 创建文件 
+	  * @param fileName 
+	  * @return 
+	  */  
+	 public static boolean createFile(File fileName)throws Exception{  
+	  boolean flag=false;  
+	  try{  
+	   if(!fileName.exists()){  
+	    fileName.createNewFile();  
+	    flag=true;  
+	   }  
+	  }catch(Exception e){  
+	   e.printStackTrace();  
+	  }  
+	  return true;  
+	 } 
+	 
+	 public static boolean writeTxtFile(String content,File  fileName)throws Exception{  
+		  RandomAccessFile mm=null;  
+		  boolean flag=false;  
+		  FileOutputStream o=null;  
+		  try {  
+		   o = new FileOutputStream(fileName);  
+		      o.write(content.getBytes());  
+		      o.close();  
+		//   mm=new RandomAccessFile(fileName,"rw");  
+		//   mm.writeBytes(content);  
+		   flag=true;  
+		  } catch (Exception e) {  
+		   // TODO: handle exception  
+		   e.printStackTrace();  
+		  }finally{  
+		   if(mm!=null){  
+		    mm.close();  
+		   }  
+		  }  
+		  return flag;  
+		 }  
+	
 	/**
 	 * 
 	 * 查看HTML内容按钮
