@@ -187,16 +187,13 @@ public class CrawlToolResource {
 
 	/**
 	 * 
-	 * 测试模板主方法
+	 * 根据JSON字符串,得到PAGE-MODEL对象
 	 * */
-	@POST
-	@Path("/getJSONString")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String GetJSONString(@DefaultValue("") @FormParam("data") String data) {
+	private PageModel GetPageModelByJsonString(String json) {
 		PageModel pageModel = null;
 		try {
 			ObjectMapper objectmapper = new ObjectMapper();
-			pageModel = objectmapper.readValue(data, PageModel.class);
+			pageModel = objectmapper.readValue(json, PageModel.class);
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -207,7 +204,52 @@ public class CrawlToolResource {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		return pageModel;
+	}
+	
+	@POST
+	@Path("/verifyNewContent")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String VerifyNewContent(
+			@DefaultValue("") @FormParam("data") String data) {
+		PageModel pageModel=GetPageModelByJsonString(data);
+		String encoding = "gb2312";
+		ParseResult parseResult = null;
+		byte[] input = DownloadHtml.getHtml(pageModel.getBasicInfoViewModel()
+				.getUrl());
+		TemplateResult templateResult = GetTemplateResult(pageModel);
+		parseResult = TemplateFactory.localProcess(input, encoding, pageModel
+				.getBasicInfoViewModel().getUrl(), templateResult,
+				Constants.TEMPLATE_LIST);			
+		return "";
+	}
+	
+	@POST
+	@Path("/verifyListContent")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String VerifyListContent(
+			@DefaultValue("") @FormParam("data") String data) {
+		PageModel pageModel=GetPageModelByJsonString(data);
+		String encoding = "gb2312";
+		ParseResult parseResult = null;
+		byte[] input = DownloadHtml.getHtml(pageModel.getBasicInfoViewModel()
+				.getUrl());
+		TemplateResult templateResult = GetTemplateResult(pageModel);
+		parseResult = TemplateFactory.localProcess(input, encoding, pageModel
+				.getBasicInfoViewModel().getUrl(), templateResult,
+				Constants.TEMPLATE_LIST);		
+		return parseResult.toJSON();
+	}
+	
+	/**
+	 * 
+	 * 测试模板主方法
+	 * */
+	@POST
+	@Path("/getJSONString")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String GetJSONString(@DefaultValue("") @FormParam("data") String data) {
+		PageModel pageModel = GetPageModelByJsonString(data);
 		String encoding = "gb2312";
 		ParseResult parseResult = null;
 		byte[] input = DownloadHtml.getHtml(pageModel.getBasicInfoViewModel()
@@ -218,7 +260,7 @@ public class CrawlToolResource {
 				Constants.TEMPLATE_LIST);
 		// System.out.println("templateResult:" + templateResult.toJSON());
 		// System.out.println("parseResult"+parseResult.toJSON());
-		return parseResult.toJSON();
+		return templateResult.toJSON();
 	}
 
 	/**
@@ -229,31 +271,18 @@ public class CrawlToolResource {
 	@Path("/saveTemplate")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String SaveTemplate(@DefaultValue("") @FormParam("data") String data) {
-		PageModel pageModel = null;
-		try {
-			ObjectMapper objectmapper = new ObjectMapper();
-			pageModel = objectmapper.readValue(data, PageModel.class);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		PageModel pageModel=GetPageModelByJsonString(data);
 		TemplateResult templateResult = GetTemplateResult(pageModel);
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		String templateGuid = MD5Utils.MD5(templateUrl);
-		// 保存到redis
+		// 保存到REDIS
 		RedisUtils.setTemplateResult(templateResult, templateGuid);
 		return "模板保存成功!";
 	}
 
 	/**
 	 * 
-	 * 查看html内容按钮
+	 * 查看HTML内容按钮
 	 * */
 	@POST
 	@Path("/viewHtmlContent")
