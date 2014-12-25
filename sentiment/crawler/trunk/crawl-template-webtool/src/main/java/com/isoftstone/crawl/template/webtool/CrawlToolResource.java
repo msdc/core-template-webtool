@@ -41,6 +41,10 @@ import com.lj.util.http.DownloadHtml;
  * */
 @Path("crawlToolResource")
 public class CrawlToolResource {
+    /**
+     * 
+     * 测试模板主方法
+     * */
 	@POST
 	@Path("/getJSONString")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -64,17 +68,22 @@ public class CrawlToolResource {
 		ParseResult parseResult = null;
 		byte[] input = DownloadHtml.getHtml(pageModel.getBasicInfoViewModel()
 				.getUrl());
-		TemplateResult templateResult = SaveTemplateResult(pageModel);
+		TemplateResult templateResult = GetTemplateResult(pageModel);		
 		parseResult = TemplateFactory.localProcess(input, encoding, pageModel
 				.getBasicInfoViewModel().getUrl(), templateResult,
 				Constants.TEMPLATE_LIST);
-		String templateJsonString = GetTemplateJsonString(pageModel);
-		return templateJsonString;
+		//System.out.println("templateResult:" + templateResult.toJSON());
+		//System.out.println("parseResult"+parseResult.toJSON());		
+		return "parseResult"+parseResult.toJSON();
 	}
 
+	/**
+	 * 
+	 * 保存模板的主方法
+	 * */
 	@POST
 	@Path("/saveTemplate")
-	@Produces("text/plain")
+	@Produces(MediaType.TEXT_PLAIN)
 	public String SaveTemplate(@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = null;
 		try {
@@ -90,22 +99,19 @@ public class CrawlToolResource {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		return "";
+		TemplateResult templateResult = GetTemplateResult(pageModel);	
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		//保存到redis
+		RedisUtils.setTemplateResult(templateResult, templateGuid);
+		return "模板保存成功!";
 	}
 
-	public ParseResult testTemplateJsonString(PageModel pageModel) {
-		byte[] input = DownloadHtml.getHtml(pageModel.getBasicInfoViewModel()
-				.getUrl());
-		TemplateResult templateResult = SaveTemplateResult(pageModel);
-		ParseResult parseResult = null;
-		String encoding = "gb2312";
-		parseResult = TemplateFactory.process(input, encoding, pageModel
-				.getBasicInfoViewModel().getUrl());
-		return parseResult;
-	}
-
-	private TemplateResult SaveTemplateResult(PageModel pageModel) {
+    /**
+     * 
+     * 生成模板对象
+     * */
+	private TemplateResult GetTemplateResult(PageModel pageModel) {
 		TemplateResult template = new TemplateResult();
 		template.setType(Constants.TEMPLATE_LIST);
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
@@ -157,11 +163,11 @@ public class CrawlToolResource {
 				.getFilter();
 		String paginationFilterCategory = pageModel
 				.getListPaginationViewModel().getFilterCategory();
-		if (paginationFilterCategory == "匹配") {
+		if (paginationFilterCategory.equals("匹配")) {
 			filter.initMatchFilter(paginationFilter);
-		} else if (paginationFilterCategory == "替换") {
+		} else if (paginationFilterCategory.equals("替换")) {
 			// filter.initReplaceFilter(value, replaceTo);
-		} else if (paginationFilterCategory == "移除") {
+		} else if (paginationFilterCategory.equals("移除")) {
 			// filter.initRemoveFilter(value);
 		}
 
@@ -205,36 +211,8 @@ public class CrawlToolResource {
 		selector.initFieldSelector("content", "", indexer, null, null);
 		news.add(selector);
 		template.setNews(news);
-
-		RedisUtils.setTemplateResult(template, templateGuid);
+		
 		return template;
-	}
-
-	private String GetTemplateJsonString(PageModel pageModel) {
-		TemplateResult template = new TemplateResult();
-		template.setType(Constants.TEMPLATE_LIST);
-		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-		String templateGuid = MD5Utils.MD5(templateUrl);
-		template.setTemplateGuid(templateGuid);
-
-		List<Selector> list = new ArrayList<Selector>();
-
-		SelectorIndexer indexer = null;
-		Selector selector = null;
-		SelectorFilter filter = null;
-		SelectorFormat format = null;
-
-		indexer = new SelectorIndexer();
-		selector = new Selector();
-		indexer.initJsoupIndexer(pageModel.getListOutLinkViewModel()
-				.getSelector(), pageModel.getListOutLinkViewModel()
-				.getSelectorAttr());
-		selector.initContentSelector(indexer, null);
-		list.add(selector);
-		template.setList(list);
-
-		String JSONString = JSONUtils.getTemplateResultJSON(template);
-		return JSONString;
 	}
 
 	/**
@@ -249,24 +227,4 @@ public class CrawlToolResource {
 		String htmlContent = DownloadHtml.getHtml(webUrl, "UTF-8");
 		return htmlContent;
 	}
-
-	private String convertToJSONString(PageModel pageModel) {
-		String json = null;
-		ObjectMapper objectmapper = new ObjectMapper();
-		try {
-			json = objectmapper.writeValueAsString(pageModel);
-		} catch (JsonGenerationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return json;
-	}
-
 }

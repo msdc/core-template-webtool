@@ -30,7 +30,7 @@ function singleCustomerViewModel() {
     this.selector = ko.observable();
     this.attr = ko.observableArray(['href', 'text', 'src', 'html']);
     this.attrSelected = ko.observable('text');
-    this.filterCategory = ko.observableArray([ '匹配', '移除','替换']);
+    this.filterCategory = ko.observableArray([ '匹配', '移除']);
     this.filterCategorySelected=ko.observable('匹配');
     this.filter = ko.observable();
     this.formater = ko.observable();
@@ -95,7 +95,7 @@ function paginationViewModel(){
     this.selectorAttr=ko.observableArray(['href','text','src','html']);
     this.selectorAttrSelected=ko.observable('href');
     this.filter=ko.observable();
-    this.filterCategory=ko.observableArray(['匹配','移除','替换']);
+    this.filterCategory=ko.observableArray(['匹配','移除']);
     this.filterCategorySelected=ko.observable('匹配');
     this.formater=ko.observable();
     this.formatCategory=ko.observableArray([]);
@@ -118,7 +118,7 @@ function commonAttrViewMode(){
     this.selectorAttr=ko.observable(['href','text','src','html']);
     this.selectorAttrSelected=ko.observable('text');
     this.filter=ko.observable();
-    this.filterCategory=ko.observable(['匹配','移除','替换']);
+    this.filterCategory=ko.observable(['匹配','移除']);
     this.filterCategorySelected=ko.observable('匹配');
     this.formater=ko.observable();
     this.formatCategory=ko.observable(['时间','日期']);
@@ -158,7 +158,7 @@ $(function(){
                 this.listCustomerAttrViewModel=new customerAttrViewModel();
                 this.listOutLinkViewModel=new commonAttrViewMode();
                 //列表页test
-                this.listOutLinkViewModel.selector('http://www.ccgp-gansu.gov.cn/votoonadmin/article/classlist.jsp?pn=1&class_id=213');
+                this.listOutLinkViewModel.selector('body > form > table:nth-child(2) > tbody > tr > td:nth-child(2) > table:nth-child(2) > tbody > tr > td > table > tbody > tr > td > table:nth-child(2) > tbody > tr:nth-child(1) > td:nth-child(2) > table > tbody > tr:nth-child(2n-1) > td:nth-child(2) > a');
                 this.listOutLinkViewModel.selectorAttrSelected('href');
 
                 this.listPaginationViewModel=new paginationViewModel();
@@ -168,7 +168,7 @@ $(function(){
                 this.listPaginationViewModel.selectorAttrSelected('text');
                 this.listPaginationViewModel.currentString('##');
                 this.listPaginationViewModel.start('2');
-                this.listPaginationViewModel.filter('\\\\d+');
+                this.listPaginationViewModel.filter('\\d+');
 
                 this.newsAttrModels=function(){
                     var attrModels=[];
@@ -202,6 +202,21 @@ $(function(){
                         type: 'POST',
                         data: {
                             data:getJSONString(this)
+                        },
+                        success: function (result) {
+                            alert(result);
+                        },
+                        error: function () {
+                        }
+                    });
+                }.bind(this);
+
+                this.saveTemplate=function(){
+                    $.ajax({
+                        url: '/webapi/crawlToolResource/saveTemplate',
+                        type: 'POST',
+                        data: {
+                            data: getJSONString(this)
                         },
                         success: function (result) {
                             alert(result);
