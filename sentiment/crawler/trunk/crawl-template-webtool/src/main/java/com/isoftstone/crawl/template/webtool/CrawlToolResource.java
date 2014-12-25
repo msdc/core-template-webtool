@@ -74,7 +74,7 @@ public class CrawlToolResource {
 				Constants.TEMPLATE_LIST);
 		//System.out.println("templateResult:" + templateResult.toJSON());
 		//System.out.println("parseResult"+parseResult.toJSON());		
-		return "parseResult"+parseResult.toJSON();
+		return parseResult.toJSON();
 	}
 
 	/**
