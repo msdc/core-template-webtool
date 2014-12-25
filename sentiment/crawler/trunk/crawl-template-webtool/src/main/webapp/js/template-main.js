@@ -44,7 +44,7 @@ function singleCustomerViewModel() {
  * */
 function basicInfoViewModel(){
     this.id=ko.observable('');
-    this.url=ko.observable('http://www.ccgp-gansu.gov.cn/votoonadmin/article/classlist.jsp?pn=1&class_id=213');
+    this.url=ko.observable('http://www.ccgp-gansu.gov.cn/votoonadmin/article/classlist.jsp?pn=1&class_id=');
     this.name=ko.observable();
     this.tags=ko.observableArray(['财经','体育','经济']);
     this.tagsSelected=ko.observable('财经');
@@ -99,8 +99,8 @@ function paginationViewModel(){
     this.filterCategorySelected=ko.observable('匹配');
     this.formater=ko.observable();
     this.formatCategory=ko.observableArray([]);
-    this.paginationType=ko.observableArray(['分页步进数','分页的末尾页数','分页的末尾页数','获取分页的记录数']);
-    this.paginationTypeSelected=ko.observable('分页步进数');
+    this.paginationType=ko.observableArray(['分页的末尾页数','分页步进数','获取分页的记录数']);
+    this.paginationTypeSelected=ko.observable('分页的末尾页数');
     this.paginationUrl=ko.observable();
     this.currentString=ko.observable();
     this.replaceTo=ko.observable();
@@ -141,14 +141,34 @@ $(function(){
                 this.basicInfoViewModel = new basicInfoViewModel();
 
                 this.newsCustomerAttrViewModel=new customerAttrViewModel();
+
                 this.newsTitleViewModel=new commonAttrViewMode();
+                //新闻内容标题test
+                this.newsTitleViewModel.selector('body > table:nth-child(2) > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > table:nth-child(1) > tbody > tr > td');
+                this.newsTitleViewModel.selectorAttrSelected('text');
+
                 this.newsPublishTimeViewModel=new commonAttrViewMode();
                 this.newsSourceViewModel=new commonAttrViewMode();
+
                 this.newsContentViewModel=new commonAttrViewMode();
+                //新闻内容test
+                this.newsContentViewModel.selector('body > table:nth-child(2) > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > table:nth-child(2) > tbody > tr > td');
+                this.newsContentViewModel.selectorAttrSelected('text');
 
                 this.listCustomerAttrViewModel=new customerAttrViewModel();
                 this.listOutLinkViewModel=new commonAttrViewMode();
+                //列表页test
+                this.listOutLinkViewModel.selector('http://www.ccgp-gansu.gov.cn/votoonadmin/article/classlist.jsp?pn=1&class_id=213');
+                this.listOutLinkViewModel.selectorAttrSelected('href');
+
                 this.listPaginationViewModel=new paginationViewModel();
+                //分页test
+                this.listPaginationViewModel.paginationUrl('http://www.ccgp-gansu.gov.cn/votoonadmin/article/classlist.jsp?pn=##&class_id=213');
+                this.listPaginationViewModel.selector('body > form > table:nth-child(2) > tbody > tr > td:nth-child(2) > table:nth-child(2) > tbody > tr > td > table > tbody > tr > td > table:nth-child(3) > tbody > tr > td:nth-child(1) > font:nth-child(2)');
+                this.listPaginationViewModel.selectorAttrSelected('text');
+                this.listPaginationViewModel.currentString('##');
+                this.listPaginationViewModel.start('2');
+                this.listPaginationViewModel.filter('\\\\d+');
 
                 this.newsAttrModels=function(){
                     var attrModels=[];

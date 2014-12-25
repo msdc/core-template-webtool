@@ -60,18 +60,22 @@ public class CrawlToolResource {
 			e.printStackTrace();
 		}
 
+		String encoding = "gb2312";
+		ParseResult parseResult = null;
 		byte[] input = DownloadHtml.getHtml(pageModel.getBasicInfoViewModel()
 				.getUrl());
-		TemplateResult  templateResult=SaveTemplateResult(pageModel);
+		TemplateResult templateResult = SaveTemplateResult(pageModel);
+		parseResult = TemplateFactory.localProcess(input, encoding, pageModel
+				.getBasicInfoViewModel().getUrl(), templateResult,
+				Constants.TEMPLATE_LIST);
 		String templateJsonString = GetTemplateJsonString(pageModel);
 		return templateJsonString;
-	}	
-	
+	}
+
 	@POST
 	@Path("/saveTemplate")
-	@Produces("text/plain")	
-	public String SaveTemplate(
-			@DefaultValue("") @FormParam("data") String data) {
+	@Produces("text/plain")
+	public String SaveTemplate(@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = null;
 		try {
 			ObjectMapper objectmapper = new ObjectMapper();
@@ -85,8 +89,8 @@ public class CrawlToolResource {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}			
-		
+		}
+
 		return "";
 	}
 
@@ -109,12 +113,15 @@ public class CrawlToolResource {
 		template.setTemplateGuid(templateGuid);
 
 		List<Selector> list = new ArrayList<Selector>();
+		List<Selector> news = new ArrayList<Selector>();
+		List<Selector> pagination = new ArrayList<Selector>();
 
 		SelectorIndexer indexer = null;
 		Selector selector = null;
 		SelectorFilter filter = null;
 		SelectorFormat format = null;
 
+		// list outlink
 		indexer = new SelectorIndexer();
 		selector = new Selector();
 		indexer.initJsoupIndexer(pageModel.getListOutLinkViewModel()
@@ -123,6 +130,81 @@ public class CrawlToolResource {
 		selector.initContentSelector(indexer, null);
 		list.add(selector);
 		template.setList(list);
+
+		// // tstamp 自定义属性
+		// Selector label = new Selector();
+		// label.setType(Constants.SELECTOR_LABEL);
+		// indexer = new SelectorIndexer();
+		// indexer.initJsoupIndexer(
+		// "body > form > table:nth-child(2) > tbody > tr > td:nth-child(2) > table:nth-child(2) > tbody > tr > td > table > tbody > tr > td > table:nth-child(2) > tbody > tr:nth-child(1) > td:nth-child(2) > table > tbody > tr:nth-child(2n-1) > td:nth-child(3)",
+		// Constants.ATTRIBUTE_TEXT);
+		// filter = new SelectorFilter();
+		// filter.initMatchFilter(Constants.YYYYMMDD);
+		// label.initLabelSelector("tstamp", "", indexer, filter, null);
+		// selector.setLabel(label);
+		// list.add(selector);
+		// template.setList(list);
+
+		// pagitation outlink js翻页无法处理
+		indexer = new SelectorIndexer();
+		selector = new Selector();
+		indexer.initJsoupIndexer(pageModel.getListPaginationViewModel()
+				.getSelector(), pageModel.getListPaginationViewModel()
+				.getSelectorAttr());
+
+		filter = new SelectorFilter();
+		String paginationFilter = pageModel.getListPaginationViewModel()
+				.getFilter();
+		String paginationFilterCategory = pageModel
+				.getListPaginationViewModel().getFilterCategory();
+		if (paginationFilterCategory == "匹配") {
+			filter.initMatchFilter(paginationFilter);
+		} else if (paginationFilterCategory == "替换") {
+			// filter.initReplaceFilter(value, replaceTo);
+		} else if (paginationFilterCategory == "移除") {
+			// filter.initRemoveFilter(value);
+		}
+
+		String paginationType = pageModel.getListPaginationViewModel()
+				.getPaginationType();
+		if (paginationType == "分页的末尾页数") {
+			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER;
+		} else if (paginationType == "分页步进数") {
+			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER_INTERVAL;
+		} else if (paginationType == "获取分页的记录数") {
+			paginationType = Constants.PAGINATION_TYPE_PAGERECORD;
+		} else {
+			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER;
+		}
+
+		// Constants.PAGINATION_TYPE_PAGENUMBER 需要取值
+		selector.initPagitationSelector(paginationType, pageModel
+				.getListPaginationViewModel().getCurrentString(), pageModel
+				.getListPaginationViewModel().getReplaceTo(), pageModel
+				.getListPaginationViewModel().getPaginationUrl(), pageModel
+				.getListPaginationViewModel().getStart(), null, indexer,
+				filter, null);
+		pagination.add(selector);
+		template.setPagination(pagination);
+
+		// title
+		indexer = new SelectorIndexer();
+		selector = new Selector();
+		indexer.initJsoupIndexer(pageModel.getNewsTitleViewModel()
+				.getSelector(), pageModel.getNewsTitleViewModel()
+				.getSelectorAttr());
+		selector.initFieldSelector("title", "", indexer, null, null);
+		news.add(selector);
+
+		// content
+		indexer = new SelectorIndexer();
+		selector = new Selector();
+		indexer.initJsoupIndexer(pageModel.getNewsContentViewModel()
+				.getSelector(), pageModel.getNewsContentViewModel()
+				.getSelectorAttr());
+		selector.initFieldSelector("content", "", indexer, null, null);
+		news.add(selector);
+		template.setNews(news);
 
 		RedisUtils.setTemplateResult(template, templateGuid);
 		return template;
@@ -167,7 +249,7 @@ public class CrawlToolResource {
 		String htmlContent = DownloadHtml.getHtml(webUrl, "UTF-8");
 		return htmlContent;
 	}
-	
+
 	private String convertToJSONString(PageModel pageModel) {
 		String json = null;
 		ObjectMapper objectmapper = new ObjectMapper();
