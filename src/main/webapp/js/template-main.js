@@ -50,6 +50,7 @@ function basicInfoViewModel(){
     this.tagsSelected=ko.observable('财经');
     this.viewHtmlContent=function(){
         var url=this.url;
+        $('#modalHtmlTitle').text('Html内容');
         $('#modal-viewHtml').modal('show');
         $.ajax({
             url:'/webapi/crawlToolResource/viewHtmlContent',
@@ -196,7 +197,10 @@ $(function(){
                     return attrModels;
                 };
 
+                /*测试模板配置*/
                 this.templateTest=function(){
+                    $('#modalHtmlTitle').text('测试结果');
+                    $('#modal-viewHtml').modal('show');
                     $.ajax({
                         url: '/webapi/crawlToolResource/getJSONString',
                         type: 'POST',
@@ -204,14 +208,19 @@ $(function(){
                             data:getJSONString(this)
                         },
                         success: function (result) {
-                            alert(result);
+                            var modalBody=$('#modal-viewHtml-body');
+                            modalBody.text('');//清空
+                            modalBody.text(result);
                         },
                         error: function () {
                         }
                     });
                 }.bind(this);
 
+                /*保存模板配置*/
                 this.saveTemplate=function(){
+                    $('#modalHtmlTitle').text('保存结果');
+                    $('#modal-viewHtml').modal('show');
                     $.ajax({
                         url: '/webapi/crawlToolResource/saveTemplate',
                         type: 'POST',
@@ -219,7 +228,9 @@ $(function(){
                             data: getJSONString(this)
                         },
                         success: function (result) {
-                            alert(result);
+                            var modalBody=$('#modal-viewHtml-body');
+                            modalBody.text('');//清空
+                            modalBody.text(result);
                         },
                         error: function () {
                         }
@@ -233,6 +244,82 @@ $(function(){
     //模态对话框事件
     registerModalViewContentEvent();
 });
+
+/**
+ *
+ * 格式化Json数据并输出
+ * */
+function FormatJSON(oData, sIndent) {
+    if (arguments.length < 2) {
+        var sIndent = "";
+    }
+    var sIndentStyle = "    ";
+    var sDataType = RealTypeOf(oData);
+
+    // open object
+    if (sDataType == "array") {
+        if (oData.length == 0) {
+            return "[]";
+        }
+        var sHTML = "[";
+    } else {
+        var iCount = 0;
+        $.each(oData, function() {
+            iCount++;
+            return;
+        });
+        if (iCount == 0) { // object is empty
+            return "{}";
+        }
+        var sHTML = "{";
+    }
+
+    // loop through items
+    var iCount = 0;
+    $.each(oData, function(sKey, vValue) {
+        if (iCount > 0) {
+            sHTML += ",";
+        }
+        if (sDataType == "array") {
+            sHTML += ("\n" + sIndent + sIndentStyle);
+        } else {
+            sHTML += ("\n" + sIndent + sIndentStyle + "\"" + sKey + "\"" + ": ");
+        }
+
+        // display relevant data type
+        switch (RealTypeOf(vValue)) {
+            case "array":
+            case "object":
+                sHTML += FormatJSON(vValue, (sIndent + sIndentStyle));
+                break;
+            case "boolean":
+            case "number":
+                sHTML += vValue.toString();
+                break;
+            case "null":
+                sHTML += "null";
+                break;
+            case "string":
+                sHTML += ("\"" + vValue + "\"");
+                break;
+            default:
+                sHTML += ("TYPEOF: " + typeof(vValue));
+        }
+
+        // loop
+        iCount++;
+    });
+
+    // close object
+    if (sDataType == "array") {
+        sHTML += ("\n" + sIndent + "]");
+    } else {
+        sHTML += ("\n" + sIndent + "}");
+    }
+
+    // return
+    return sHTML;
+}
 
 /**
  *
