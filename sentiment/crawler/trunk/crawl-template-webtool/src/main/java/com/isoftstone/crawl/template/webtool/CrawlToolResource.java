@@ -80,7 +80,7 @@ public class CrawlToolResource {
 			Selector label = new Selector();
 			label.setType(Constants.SELECTOR_LABEL);
 			indexer = new SelectorIndexer();
-			indexer.initJsoupIndexer(model.getTarget(), model.getAttr());
+			indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
 			filter = new SelectorFilter();
 			String filterString = model.getFilter();
 			String filterCategory = model.getFilterCategory();
@@ -166,7 +166,7 @@ public class CrawlToolResource {
 			Selector label = new Selector();
 			label.setType(Constants.SELECTOR_LABEL);
 			indexer = new SelectorIndexer();
-			indexer.initJsoupIndexer(model.getTarget(), model.getAttr());
+			indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
 			filter = new SelectorFilter();
 			String filterString = model.getFilter();
 			String filterCategory = model.getFilterCategory();
