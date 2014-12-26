@@ -44,7 +44,7 @@ function singleCustomerViewModel() {
  * */
 function basicInfoViewModel(){
     this.id=ko.observable('');
-    this.url=ko.observable('http://www.ccgp-gansu.gov.cn/votoonadmin/article/classlist.jsp?pn=1&class_id=213');
+    this.url=ko.observable();
     this.name=ko.observable();
     this.tags=ko.observableArray(['财经','体育','经济']);
     this.tagsSelected=ko.observable('财经');
@@ -140,32 +140,38 @@ $(function(){
             //master view model with instances of both the view models.
             var masterVM = (function(){
                 this.basicInfoViewModel = new basicInfoViewModel();
+                //测试
+                this.basicInfoViewModel.url('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018&curpage=1');
 
                 this.newsCustomerAttrViewModel=new customerAttrViewModel();
 
                 this.newsTitleViewModel=new commonAttrViewMode();
                 //新闻内容标题test
-                this.newsTitleViewModel.selector('body > table:nth-child(2) > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > table:nth-child(1) > tbody > tr > td');
+                this.newsTitleViewModel.selector('#docSubject');
                 this.newsTitleViewModel.selectorAttrSelected('text');
 
                 this.newsPublishTimeViewModel=new commonAttrViewMode();
+                //新闻内容时间
+                this.newsPublishTimeViewModel.selector('#docDeliveddate');
+                this.newsPublishTimeViewModel.selectorAttrSelected('text');
+
                 this.newsSourceViewModel=new commonAttrViewMode();
 
                 this.newsContentViewModel=new commonAttrViewMode();
                 //新闻内容test
-                this.newsContentViewModel.selector('body > table:nth-child(2) > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > table:nth-child(2) > tbody > tr > td');
+                this.newsContentViewModel.selector('#docSummary');
                 this.newsContentViewModel.selectorAttrSelected('text');
 
                 this.listCustomerAttrViewModel=new customerAttrViewModel();
                 this.listOutLinkViewModel=new commonAttrViewMode();
                 //列表页test
-                this.listOutLinkViewModel.selector('body > form > table:nth-child(2) > tbody > tr > td:nth-child(2) > table:nth-child(2) > tbody > tr > td > table > tbody > tr > td > table:nth-child(2) > tbody > tr:nth-child(1) > td:nth-child(2) > table > tbody > tr:nth-child(2n-1) > td:nth-child(2) > a');
+                this.listOutLinkViewModel.selector('#Content_WebPageDocumentsByUId1 > li > div.sub > a');
                 this.listOutLinkViewModel.selectorAttrSelected('href');
 
                 this.listPaginationViewModel=new paginationViewModel();
                 //分页test
-                this.listPaginationViewModel.paginationUrl('http://www.ccgp-gansu.gov.cn/votoonadmin/article/classlist.jsp?pn=##&class_id=213');
-                this.listPaginationViewModel.selector('body > form > table:nth-child(2) > tbody > tr > td:nth-child(2) > table:nth-child(2) > tbody > tr > td > table > tbody > tr > td > table:nth-child(3) > tbody > tr > td:nth-child(1) > font:nth-child(2)');
+                this.listPaginationViewModel.paginationUrl('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018&curpage=##');
+                this.listPaginationViewModel.selector('#Content_WebPageDocumentsByUId1_span_totalpage');
                 this.listPaginationViewModel.selectorAttrSelected('text');
                 this.listPaginationViewModel.currentString('##');
                 this.listPaginationViewModel.start('2');
@@ -201,81 +207,37 @@ $(function(){
                 this.verifyNewContent=function(){
                     $('#modalHtmlTitle').text('验证结果');
                     $('#modal-viewHtml').modal('show');
-                    $.ajax({
-                        url: '/webapi/crawlToolResource/verifyNewContent',
-                        type: 'POST',
-                        data: {
-                            data: getJSONString(this)
-                        },
-                        success: function (result) {
-                            var modalBody=$('#modal-viewHtml-body');
-                            modalBody.text('');//清空
-                            modalBody.text(result);
-                        },
-                        error: function () {
-                        }
-                    });
+                    ajaxPostRequest('/webapi/crawlToolResource/verifyNewContent', this, ajaxPostSuccess, ajaxPostError);
                 };
 
                 //验证列表页
                 this.verifyListContent=function(){
                     $('#modalHtmlTitle').text('验证结果');
                     $('#modal-viewHtml').modal('show');
-                    $.ajax({
-                        url: '/webapi/crawlToolResource/verifyListContent',
-                        type: 'POST',
-                        data: {
-                            data: getJSONString(this)
-                        },
-                        success: function (result) {
-                            var modalBody=$('#modal-viewHtml-body');
-                            modalBody.text('');//清空
-                            modalBody.text(result);
-                        },
-                        error: function () {
-                        }
-                    });
+                    ajaxPostRequest('/webapi/crawlToolResource/verifyListContent', this, ajaxPostSuccess, ajaxPostError);
                 };
 
                 /*测试模板配置*/
                 this.templateTest=function(){
                     $('#modalHtmlTitle').text('测试结果');
                     $('#modal-viewHtml').modal('show');
-                    $.ajax({
-                        url: '/webapi/crawlToolResource/getJSONString',
-                        type: 'POST',
-                        data: {
-                            data:getJSONString(this)
-                        },
-                        success: function (result) {
-                            var modalBody=$('#modal-viewHtml-body');
-                            modalBody.text('');//清空
-                            modalBody.text(result);
-                        },
-                        error: function () {
-                        }
-                    });
+                    ajaxPostRequest('/webapi/crawlToolResource/getJSONString', this, ajaxPostSuccess, ajaxPostError);
                 }.bind(this);
 
                 /*保存模板配置*/
                 this.saveTemplate=function(){
                     $('#modalHtmlTitle').text('保存结果');
                     $('#modal-viewHtml').modal('show');
-                    $.ajax({
-                        url: '/webapi/crawlToolResource/saveTemplate',
-                        type: 'POST',
-                        data: {
-                            data: getJSONString(this)
-                        },
-                        success: function (result) {
-                            var modalBody=$('#modal-viewHtml-body');
-                            modalBody.text('');//清空
-                            modalBody.text(result);
-                        },
-                        error: function () {
-                        }
-                    });
+                    ajaxPostRequest('/webapi/crawlToolResource/saveTemplate', this, ajaxPostSuccess, ajaxPostError);
                 }.bind(this);
+
+                /*保存到本地文件*/
+                this.saveToLocalFile=function(){
+                    $('#modalHtmlTitle').text('保存结果');
+                    $('#modal-viewHtml').modal('show');
+                    ajaxPostRequest('/webapi/crawlToolResource/saveToLocalFile',this,ajaxPostSuccess,ajaxPostError);
+                }.bind(this);
+
             })();
             ko.applyBindings(masterVM);
         })
@@ -284,6 +246,42 @@ $(function(){
     //模态对话框事件
     registerModalViewContentEvent();
 });
+
+/**
+ * 请求成功
+ * */
+function ajaxPostSuccess(data){
+    var modalBody=$('#modal-viewHtml-body');
+    modalBody.text('');//清空
+    modalBody.text(data);
+}
+
+/**
+ * 请求失败
+ * */
+function ajaxPostError(){
+
+}
+
+/**
+ *
+ * ajax post 请求
+ * @param {String} url
+ * @param {Object} data
+ * @param {Function} successCallback
+ * @param {Function} errorCallback
+ * */
+function ajaxPostRequest(url,data,successCallback,errorCallback){
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: {
+            data: getJSONString(data)
+        },
+        success: function(data){successCallback(data)},
+        error: function(){errorCallback}
+    });
+}
 
 /**
  *
