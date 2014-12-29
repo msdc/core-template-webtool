@@ -10,6 +10,8 @@ public class CustomerAttrModel {
 	private String attr = "";
 	private String filter="";
 	private String filterCategory = "";
+	private String replaceBefore = "";
+	private String replaceTo = "";
 	
 	public String getSelector() {
 		return selector;
@@ -43,6 +45,20 @@ public class CustomerAttrModel {
 	}
 	public void setTarget(String target) {
 		this.target = target;
+	}
+	
+	public String getReplaceBefore() {
+		return replaceBefore;
+	}
+	public void setReplaceBefore(String replaceBefore) {
+		this.replaceBefore = replaceBefore;
+	}
+	
+	public String getReplaceTo() {
+		return replaceTo;
+	}
+	public void setReplaceTo(String replaceTo) {
+		this.replaceTo = replaceTo;
 	}
 	
 	

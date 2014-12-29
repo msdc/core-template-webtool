@@ -2,7 +2,7 @@
  * Created by wang on 2014/12/9.
  */
 /**************Models****************/
-function customerAttrModel(target,selector,attr,filter,filterCategory){
+function customerAttrModel(target,selector,attr,filter,filterCategory,replaceBefore,replaceTo){
     //this.parseEngine=['jsoup','xpath'];
     //this.id=id;
     this.target=target;
@@ -13,6 +13,8 @@ function customerAttrModel(target,selector,attr,filter,filterCategory){
     this.filterCategory=filterCategory;
     //this.formater=formater;
     //this.formatCategory=formatCategory;
+    this.replaceBefore=replaceBefore;
+    this.replaceTo=replaceTo;
 }
 /**************Models****************/
 
@@ -30,9 +32,32 @@ function singleCustomerViewModel() {
     this.selector = ko.observable();
     this.attr = ko.observableArray(['href', 'text', 'src', 'html']);
     this.attrSelected = ko.observable('text');
-    this.filterCategory = ko.observableArray([ '匹配', '移除']);
+    this.filterCategory = ko.observableArray([ '匹配','替换', '移除']);
     this.filterCategorySelected=ko.observable('匹配');
     this.filter = ko.observable();
+    this.showMatchFilter=ko.computed(function(){
+        if(this.filterCategorySelected()=='匹配'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
+    this.showRemoveFilter=ko.computed(function(){
+        if(this.filterCategorySelected()=='移除'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
+    this.showReplaceFilter=ko.computed(function(){
+        if(this.filterCategorySelected()=='替换'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
+    this.replaceBefore=ko.observable();
+    this.replaceTo=ko.observable();
     this.formater = ko.observable();
     this.formatCategory = ko.observableArray([]);
     this.formatCategorySelected = ko.observable();
@@ -227,7 +252,7 @@ $(function(){
                     for(var i=0;i<modelArray.length;i++){
                         var model=modelArray[i];
                         var temp=new customerAttrModel(
-                           model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected()
+                           model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.replaceBefore(),model.replaceTo()
                         );
                         attrModels.push(temp);
                     }
@@ -240,7 +265,7 @@ $(function(){
                     for(var i=0;i<modelArray.length;i++){
                         var model=modelArray[i];
                         var temp=new customerAttrModel(
-                            model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected()
+                            model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.replaceBefore(),model.replaceTo()
                         );
                         attrModels.push(temp);
                     }
