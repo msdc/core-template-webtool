@@ -57,8 +57,7 @@ public class CrawlToolResource {
 				pageModel, Constants.TEMPLATE_LIST);
 		// HashMap<String, String> seeds = parseResult.getResult();
 		// ArrayList<String> seeds=TemplateFactory.getOutlink(parseResult);
-		ArrayList<String> seeds = TemplateFactory
-				.getOutlink(parseResult);
+		ArrayList<String> seeds = TemplateFactory.getOutlink(parseResult);
 		SaveSeedsValueToFile(seeds);
 		return "文件保存成功!";
 	}
@@ -94,6 +93,7 @@ public class CrawlToolResource {
 	public String VerifyListContent(
 			@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = GetPageModelByJsonString(data);
+		// 这里应该获取列表页的url,而不是模板的url
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		String encoding = "utf-8";
 		ParseResult parseResult = GetParseResult(encoding, templateUrl,
@@ -194,15 +194,15 @@ public class CrawlToolResource {
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		TemplateResult templateResult = GetTemplateResult(pageModel);
 		String templateGuid = MD5Utils.MD5(templateUrl);
-		ParseResult parseResult = null;			
+		ParseResult parseResult = null;
 		String encoding = "utf-8";
 		byte[] input = DownloadHtml.getHtml(templateUrl);
 		try {
 			RedisUtils.setTemplateResult(templateResult, templateGuid);
-			System.out.println("templateGuid="+templateGuid);			
+			System.out.println("templateGuid=" + templateGuid);
 			parseResult = TemplateFactory.process(input, encoding, templateUrl);
 		} catch (Exception e) {
-			// TODO: handle exception			
+			// TODO: handle exception
 			return false;
 		}
 		return true;
@@ -299,33 +299,65 @@ public class CrawlToolResource {
 				.getFilter();
 		String paginationFilterCategory = pageModel
 				.getListPaginationViewModel().getFilterCategory();
+		//替换前
+		String replaceBefore=pageModel.getListPaginationViewModel().getReplaceBefore();
+		//替换后
+		String replaceToString=pageModel.getListPaginationViewModel().getReplaceTo();
 		if (paginationFilterCategory.equals("匹配")) {
 			filter.initMatchFilter(paginationFilter);
 		} else if (paginationFilterCategory.equals("替换")) {
-			// filter.initReplaceFilter(value, replaceTo);
+			filter.initReplaceFilter(replaceBefore, replaceToString);
 		} else if (paginationFilterCategory.equals("移除")) {
-			// filter.initRemoveFilter(value);
+			filter.initRemoveFilter(paginationFilter);
 		}
 
 		String paginationType = pageModel.getListPaginationViewModel()
 				.getPaginationType();
-		if (paginationType == "分页的末尾页数") {
+		if (paginationType.equals("分页的末尾页数")) {
 			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER;
-		} else if (paginationType == "分页步进数") {
+		} else if (paginationType.equals("分页步进数")) {
 			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER_INTERVAL;
-		} else if (paginationType == "获取分页的记录数") {
+		} else if (paginationType.equals("获取分页的记录数")) {
 			paginationType = Constants.PAGINATION_TYPE_PAGERECORD;
+		} else if (paginationType.equals("获取分页URL")) {
+			paginationType = Constants.PAGINATION_TYPE_PAGE;
 		} else {
 			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER;
 		}
 
-		// Constants.PAGINATION_TYPE_PAGENUMBER 需要取值
-		selector.initPagitationSelector(paginationType, pageModel
-				.getListPaginationViewModel().getCurrentString(), pageModel
-				.getListPaginationViewModel().getReplaceTo(), pageModel
-				.getListPaginationViewModel().getPaginationUrl(), pageModel
-				.getListPaginationViewModel().getStart(), null, indexer,
-				filter, null);
+		//处理分页进步数
+		int paginationInterval = 0;
+		if (!pageModel.getListPaginationViewModel().getInterval().equals("")) {
+			try {
+				paginationInterval = Integer.parseInt(pageModel
+						.getListPaginationViewModel().getInterval());
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				paginationInterval = 0;
+			}
+		}
+
+		//按照是否使用分页进步数,调用不同的方法
+		if (paginationInterval != 0) {
+			selector.initPagitationSelector(paginationType, pageModel
+					.getListPaginationViewModel().getCurrentString(), pageModel
+					.getListPaginationViewModel().getReplaceTo(), pageModel
+					.getListPaginationViewModel().getPaginationUrl(), pageModel
+					.getListPaginationViewModel().getStart(), pageModel
+					.getListPaginationViewModel().getRecords(),
+					paginationInterval, indexer, filter, null);
+		} else {
+			// Constants.PAGINATION_TYPE_PAGENUMBER 需要取值
+			selector.initPagitationSelector(paginationType, pageModel
+					.getListPaginationViewModel().getCurrentString(), pageModel
+					.getListPaginationViewModel().getReplaceTo(), pageModel
+					.getListPaginationViewModel().getPaginationUrl(), pageModel
+					.getListPaginationViewModel().getStart(), pageModel
+					.getListPaginationViewModel().getRecords(), indexer,
+					filter, null);
+		}
+
 		if (!pageModel.getListPaginationViewModel().getSelector().equals("")) {
 			pagination.add(selector);
 			template.setPagination(pagination);
@@ -392,9 +424,9 @@ public class CrawlToolResource {
 			if (filterCategory.equals("匹配")) {
 				filter.initMatchFilter(filterString);
 			} else if (filterCategory.equals("替换")) {
-				// filter.initReplaceFilter(value, replaceTo);
+				//filter.initReplaceFilter(value, replaceTo);
 			} else if (filterCategory.equals("移除")) {
-				// filter.initRemoveFilter(value);
+				//filter.initRemoveFilter(filterString);
 			}
 			label.initLabelSelector(model.getTarget(), "", indexer, filter,
 					null);

@@ -96,7 +96,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>列表分页类型</label>
+                                    <label>分页选择器功能</label>
                                     <select class="form-control" data-bind="options: paginationType, value: paginationTypeSelected"></option>
                                     </select>
                                 </div>
@@ -130,33 +130,52 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>过滤器类别</label>
-                                    <select class="form-control" data-bind="options: filterCategory"></select>
+                                    <select class="form-control" data-bind="options: filterCategory, value:filterCategorySelected"></select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>过滤器内容</label>
-                                    <input type="text" data-bind="value: filter" class="form-control" placeholder="正则表达式,匹配字符特定位置的字符">
+                            <div class="col-md-6" data-bind="visible: showMatchFilter">
+                                <div class="form-group" data-bind="if: showMatchFilter">
+                                    <label>匹配内容</label>
+                                    <input type="text" data-bind="value: filter" class="form-control" placeholder="正则表达式,匹配特定位置的字符">
+                                </div>
+                            </div>
+                            <div class="col-md-6" data-bind="visible: showRemoveFilter">
+                                <div class="form-group" data-bind="if: showRemoveFilter">
+                                    <label>移除内容</label>
+                                    <input type="text" data-bind="value: filter" class="form-control" placeholder="正则表达式,移除特定位置的字符">
+                                </div>
+                            </div>
+                            <div class="col-md-6" data-bind="visible: showReplaceFilter">
+                                <div class="form-group" data-bind="if: showReplaceFilter">
+                                    <label>替换前内容</label>
+                                    <input type="text" data-bind="value: replaceBefore" class="form-control" placeholder="正则表达式,替换前的字符">
+                                </div>
+                            </div>
+                            <div class="col-md-6" data-bind="visible: showReplaceFilter">
+                                <div class="form-group" data-bind="if: showReplaceFilter">
+                                    <label>替换后内容</label>
+                                    <input type="text" data-bind="value: replaceTo" class="form-control" placeholder="替换后内容">
                                 </div>
                             </div>
                         </div>
 
-                        <!--<div class="row">-->
-                            <!--<div class="col-md-6">-->
-                                <!--<div class="form-group">-->
-                                    <!--<label>格式化器</label>-->
-                                    <!--<input type="text" data-bind="value: formater" class="form-control" placeholder="格式化器">-->
-                                <!--</div>-->
-                            <!--</div>-->
-                            <!--<div class="col-md-6"></div>-->
-                        <!--</div>-->
-
-
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
+                            <div class="col-md-6" data-bind="visible: showStart">
+                                <div class="form-group" data-bind="if: showStart">
                                     <label>分页开始编号</label>
                                     <input type="text" data-bind="value: start" class="form-control" placeholder="分页开始编号">
+                                </div>
+                            </div>
+                            <div class="col-md-6" data-bind="visible: showInterval">
+                                <div class="form-group" data-bind="if: showInterval">
+                                    <label>分页进步数值</label>
+                                    <input type="text" data-bind="value: interval" class="form-control" placeholder="分页进步数值">
+                                </div>
+                            </div>
+                            <div class="col-md-6" data-bind="visible: showRecords">
+                                <div class="form-group" data-bind="if: showRecords">
+                                    <label>页面记录条数</label>
+                                    <input type="text" data-bind="value: records" class="form-control" placeholder="页面记录条数">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -165,28 +184,7 @@
                                     <input type="text" data-bind="value: currentString" class="form-control" placeholder="分页链接中动态变化字符">
                                 </div>
                             </div>
-                            <!--<div class="col-md-6">-->
-                                <!--<div class="form-group">-->
-                                    <!--<label>分页链接中替换动态内容字符</label>-->
-                                    <!--<input type="text" data-bind="value: replaceTo" class="form-control" placeholder="分页链接中替换动态内容字符">-->
-                                <!--</div>-->
-                            <!--</div>-->
                         </div>
-
-                        <!--<div class="row">-->
-                            <!--<div class="col-md-6">-->
-                                <!--<div class="form-group">-->
-                                    <!--<label>分页开始编号</label>-->
-                                    <!--<input type="text" data-bind="value: start" class="form-control" placeholder="分页开始编号">-->
-                                <!--</div>-->
-                            <!--</div>-->
-                            <!--<div class="col-md-6">-->
-                                <!--<div class="form-group">-->
-                                    <!--<label>页面中新闻数量</label>-->
-                                    <!--<input type="text" data-bind="value: records" class="form-control" placeholder="页面中新闻数量">-->
-                                <!--</div>-->
-                            <!--</div>-->
-                        <!--</div>-->
                     </div>
                 </div>
             </div>
