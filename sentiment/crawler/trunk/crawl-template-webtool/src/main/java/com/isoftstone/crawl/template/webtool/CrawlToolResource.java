@@ -52,8 +52,13 @@ public class CrawlToolResource {
 	public String SaveToLocalFile(
 			@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = GetPageModelByJsonString(data);
-		ParseResult parseResult = SaveTemplateToRedis(pageModel);
-		HashMap<String, String> seeds = parseResult.getResult();
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		ParseResult parseResult = GetParseResult("utf-8", templateUrl,
+				pageModel, Constants.TEMPLATE_LIST);
+		// HashMap<String, String> seeds = parseResult.getResult();
+		// ArrayList<String> seeds=TemplateFactory.getOutlink(parseResult);
+		ArrayList<String> seeds = TemplateFactory
+				.getPaginationOutlink(parseResult);
 		SaveSeedsValueToFile(seeds);
 		return "文件保存成功!";
 	}
@@ -66,7 +71,18 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String VerifyNewContent(
 			@DefaultValue("") @FormParam("data") String data) {
-		return "暂未实现";
+		PageModel pageModel = GetPageModelByJsonString(data);
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		String encoding = "utf-8";
+		ParseResult parseResult = GetParseResult(encoding, templateUrl,
+				pageModel, Constants.TEMPLATE_LIST);
+		// 获取内容页链接
+		ArrayList<String> contentOutLinkArrayList = TemplateFactory
+				.getContentOutlink(parseResult);
+		String contentOutLink = contentOutLinkArrayList.get(0);
+		parseResult = GetParseResult("utf-8", contentOutLink, pageModel,
+				Constants.TEMPLATE_NEWS);
+		return parseResult.toJSON();
 	}
 
 	/**
@@ -78,7 +94,10 @@ public class CrawlToolResource {
 	public String VerifyListContent(
 			@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = GetPageModelByJsonString(data);
-		ParseResult parseResult = SaveTemplateToRedis(pageModel);
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		String encoding = "utf-8";
+		ParseResult parseResult = GetParseResult(encoding, templateUrl,
+				pageModel, Constants.TEMPLATE_LIST);
 		return parseResult.toJSON();
 	}
 
@@ -104,8 +123,8 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String SaveTemplate(@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = GetPageModelByJsonString(data);
-		ParseResult parseResult = SaveTemplateToRedis(pageModel);
-		if (parseResult != null) {
+		boolean result = SaveTemplateToRedis(pageModel);
+		if (result == true) {
 			return "模板保存成功!";
 		}
 		return "模板保存失败!";
@@ -141,22 +160,47 @@ public class CrawlToolResource {
 	}
 
 	/**
+	 * 保存种子到本地文件
+	 * */
+	private void SaveSeedsValueToFile(ArrayList<String> seeds) {
+		try {
+			for (String seed : seeds) {
+				contentToTxt("/home/linux/drcnet.com.cn_1day_01/seed.txt", seed);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * 返回ParseResult
+	 * */
+	private ParseResult GetParseResult(String encoding, String templateUrl,
+			PageModel pageModel, String parseType) {
+		ParseResult parseResult = null;
+		byte[] input = DownloadHtml.getHtml(templateUrl);
+		TemplateResult templateResult = GetTemplateResult(pageModel);
+		parseResult = TemplateFactory.localProcess(input, encoding,
+				templateUrl, templateResult, parseType);
+		return parseResult;
+	}
+
+	/**
 	 * 
 	 * 保存模板配置到redis
 	 * */
-	private ParseResult SaveTemplateToRedis(PageModel pageModel) {
-		ParseResult parseResult = null;
-		String encoding = "gb2312";
-		byte[] input = DownloadHtml.getHtml(pageModel.getBasicInfoViewModel()
-				.getUrl());
-		TemplateResult templateResult = GetTemplateResult(pageModel);
+	private boolean SaveTemplateToRedis(PageModel pageModel) {
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		TemplateResult templateResult = GetTemplateResult(pageModel);
 		String templateGuid = MD5Utils.MD5(templateUrl);
-
-		RedisUtils.setTemplateResult(templateResult, templateGuid);
-		parseResult = TemplateFactory.process(input, encoding, pageModel
-				.getBasicInfoViewModel().getUrl());
-		return parseResult;
+		try {
+			RedisUtils.setTemplateResult(templateResult, templateGuid);
+		} catch (Exception e) {
+			// TODO: handle exception
+			return false;
+		}
+		return true;
 	}
 
 	/**
