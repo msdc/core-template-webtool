@@ -141,7 +141,7 @@ $(function(){
             var masterVM = (function(){
                 this.basicInfoViewModel = new basicInfoViewModel();
                 //测试
-                this.basicInfoViewModel.url('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018&curpage=1');
+                this.basicInfoViewModel.url('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018');
 
                 this.newsCustomerAttrViewModel=new customerAttrViewModel();
 
