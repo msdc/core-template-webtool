@@ -96,17 +96,61 @@ function paginationViewModel(){
     this.selectorAttr=ko.observableArray(['href','text','src','html']);
     this.selectorAttrSelected=ko.observable('href');
     this.filter=ko.observable();
-    this.filterCategory=ko.observableArray(['匹配','移除']);
+    this.filterCategory=ko.observableArray(['匹配','替换','移除']);
     this.filterCategorySelected=ko.observable('匹配');
+    this.showMatchFilter=ko.computed(function(){
+        if(this.filterCategorySelected()=='匹配'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
+    this.showRemoveFilter=ko.computed(function(){
+        if(this.filterCategorySelected()=='移除'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
+    this.showReplaceFilter=ko.computed(function(){
+        if(this.filterCategorySelected()=='替换'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
     this.formater=ko.observable();
     this.formatCategory=ko.observableArray([]);
-    this.paginationType=ko.observableArray(['分页的末尾页数','分页步进数','获取分页的记录数']);
+    this.paginationType=ko.observableArray(['分页的末尾页数','分页步进数','获取分页的记录数','获取分页URL']);
     this.paginationTypeSelected=ko.observable('分页的末尾页数');
     this.paginationUrl=ko.observable();
     this.currentString=ko.observable();
+    this.replaceBefore=ko.observable();
     this.replaceTo=ko.observable();
     this.start=ko.observable();
+    this.showStart=ko.computed(function(){
+        if(this.paginationTypeSelected()=='分页的末尾页数'||this.paginationTypeSelected()=='获取分页的记录数'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
+    this.interval=ko.observable();
+    this.showInterval=ko.computed(function(){
+        if(this.paginationTypeSelected()=='分页步进数'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
     this.records=ko.observable();
+    this.showRecords=ko.computed(function(){
+        if(this.paginationTypeSelected()=='获取分页的记录数'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
 }
 
 /**
@@ -174,7 +218,7 @@ $(function(){
                 this.listPaginationViewModel.selector('#Content_WebPageDocumentsByUId1_span_totalpage');
                 this.listPaginationViewModel.selectorAttrSelected('text');
                 this.listPaginationViewModel.currentString('##');
-                this.listPaginationViewModel.start('1');
+                //this.listPaginationViewModel.start('1');
                 this.listPaginationViewModel.filter('\\d+');
 
                 this.newsAttrModels=function(){
@@ -332,9 +376,11 @@ function getJSONString(obj){
             paginationType:obj.listPaginationViewModel.paginationTypeSelected(),
             paginationUrl:obj.listPaginationViewModel.paginationUrl(),
             currentString:obj.listPaginationViewModel.currentString(),
+            replaceBefore:obj.listPaginationViewModel.replaceBefore(),
             replaceTo:obj.listPaginationViewModel.replaceTo(),
             start:obj.listPaginationViewModel.start(),
-            records:obj.listPaginationViewModel.records()
+            records:obj.listPaginationViewModel.records(),
+            interval:obj.listPaginationViewModel.interval()
         }
     });
     return jsonString;
