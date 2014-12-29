@@ -3,11 +3,9 @@ package com.isoftstone.crawl.template.webtool;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -53,6 +51,9 @@ public class CrawlToolResource {
 			@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = GetPageModelByJsonString(data);
 		ParseResult parseResult = SaveTemplateToRedis(pageModel);
+		if(parseResult==null){
+			return "请先保存模板!再执行此操作!";
+		}
 		// HashMap<String, String> seeds = parseResult.getResult();
 		// ArrayList<String> seeds=TemplateFactory.getOutlink(parseResult);
 		ArrayList<String> seeds = TemplateFactory.getOutlink(parseResult);
@@ -79,9 +80,12 @@ public class CrawlToolResource {
 		// String contentOutLink = contentOutLinkArrayList.get(0);
 		// parseResult = GetParseResult(encoding, contentOutLink, pageModel,
 		// Constants.TEMPLATE_NEWS);
-
-		PageModel pageModel = GetPageModelByJsonString(data);
-		ParseResult parseResult = SaveTemplateToRedis(pageModel);
+		
+		PageModel pageModel = GetPageModelByJsonString(data);		
+		ParseResult parseResult= SaveTemplateToRedis(pageModel);
+		if(parseResult==null){
+			return "请先保存模板!再执行此操作!";
+		}
 		// 获取内容页链接
 		ArrayList<String> contentOutLinkArrayList = TemplateFactory
 				.getContentOutlink(parseResult);
@@ -121,6 +125,9 @@ public class CrawlToolResource {
 
 		PageModel pageModel = GetPageModelByJsonString(data);
 		ParseResult parseResult = SaveTemplateToRedis(pageModel);
+		if(parseResult==null){
+			return "请先保存模板!再执行此操作!";
+		}
 		ArrayList<String> paginationOutLinkArrayList = TemplateFactory
 				.getPaginationOutlink(parseResult);
 		String paginationOutLink = paginationOutLinkArrayList.get(0);
