@@ -58,7 +58,7 @@ public class CrawlToolResource {
 		// HashMap<String, String> seeds = parseResult.getResult();
 		// ArrayList<String> seeds=TemplateFactory.getOutlink(parseResult);
 		ArrayList<String> seeds = TemplateFactory
-				.getPaginationOutlink(parseResult);
+				.getOutlink(parseResult);
 		SaveSeedsValueToFile(seeds);
 		return "文件保存成功!";
 	}
@@ -194,10 +194,15 @@ public class CrawlToolResource {
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		TemplateResult templateResult = GetTemplateResult(pageModel);
 		String templateGuid = MD5Utils.MD5(templateUrl);
+		ParseResult parseResult = null;			
+		String encoding = "utf-8";
+		byte[] input = DownloadHtml.getHtml(templateUrl);
 		try {
 			RedisUtils.setTemplateResult(templateResult, templateGuid);
+			System.out.println("templateGuid="+templateGuid);			
+			parseResult = TemplateFactory.process(input, encoding, templateUrl);
 		} catch (Exception e) {
-			// TODO: handle exception
+			// TODO: handle exception			
 			return false;
 		}
 		return true;
