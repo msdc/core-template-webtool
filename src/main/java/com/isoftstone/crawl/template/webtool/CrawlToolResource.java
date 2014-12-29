@@ -68,28 +68,34 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String VerifyNewContent(
 			@DefaultValue("") @FormParam("data") String data) {
-//		PageModel pageModel = GetPageModelByJsonString(data);
-//		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-//		String encoding = "gb2312";
-//		ParseResult parseResult = GetParseResult(encoding, templateUrl,
-//				pageModel, Constants.TEMPLATE_LIST);
-//		// 获取内容页链接
-//		ArrayList<String> contentOutLinkArrayList = TemplateFactory
-//				.getContentOutlink(parseResult);
-//		String contentOutLink = contentOutLinkArrayList.get(0);
-//		parseResult = GetParseResult(encoding, contentOutLink, pageModel,
-//				Constants.TEMPLATE_NEWS);
-		
-		 PageModel pageModel = GetPageModelByJsonString(data);
-		 ParseResult parseResult = SaveTemplateToRedis(pageModel);
-		 // 获取内容页链接
-		 ArrayList<String> contentOutLinkArrayList = TemplateFactory
-		 .getContentOutlink(parseResult);
-		 String contentOutLink = contentOutLinkArrayList.get(0);
-		 byte[] input = DownloadHtml.getHtml(contentOutLink);
-		 String encoding="gb2312";
-		 parseResult = TemplateFactory.process(input, encoding,
-		 contentOutLink);
+		// PageModel pageModel = GetPageModelByJsonString(data);
+		// String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		// String encoding = "gb2312";
+		// ParseResult parseResult = GetParseResult(encoding, templateUrl,
+		// pageModel, Constants.TEMPLATE_LIST);
+		// // 获取内容页链接
+		// ArrayList<String> contentOutLinkArrayList = TemplateFactory
+		// .getContentOutlink(parseResult);
+		// String contentOutLink = contentOutLinkArrayList.get(0);
+		// parseResult = GetParseResult(encoding, contentOutLink, pageModel,
+		// Constants.TEMPLATE_NEWS);
+
+		PageModel pageModel = GetPageModelByJsonString(data);
+		ParseResult parseResult = SaveTemplateToRedis(pageModel);
+		// 获取内容页链接
+		ArrayList<String> contentOutLinkArrayList = TemplateFactory
+				.getContentOutlink(parseResult);
+		String contentOutLink = contentOutLinkArrayList.get(0);
+		byte[] input = DownloadHtml.getHtml(contentOutLink);
+		String encoding = "gb2312";
+		try {
+			parseResult = TemplateFactory.process(input, encoding,
+					contentOutLink);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+
 		return parseResult.toJSON();
 	}
 
@@ -112,8 +118,7 @@ public class CrawlToolResource {
 		// String paginationOutLink = paginationOutLinkArrayList.get(0);
 		// parseResult = GetParseResult(encoding, paginationOutLink, pageModel,
 		// Constants.TEMPLATE_LIST);
-		
-		
+
 		PageModel pageModel = GetPageModelByJsonString(data);
 		ParseResult parseResult = SaveTemplateToRedis(pageModel);
 		ArrayList<String> paginationOutLinkArrayList = TemplateFactory
@@ -121,8 +126,13 @@ public class CrawlToolResource {
 		String paginationOutLink = paginationOutLinkArrayList.get(0);
 		byte[] input = DownloadHtml.getHtml(paginationOutLink);
 		String encoding = "gb2312";
-		parseResult = TemplateFactory.process(input, encoding,
-				paginationOutLink);
+		try {
+			parseResult = TemplateFactory.process(input, encoding,
+					paginationOutLink);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 
 		return parseResult.toJSON();
 	}
@@ -205,10 +215,16 @@ public class CrawlToolResource {
 	private ParseResult GetParseResult(String encoding, String templateUrl,
 			PageModel pageModel, String parseType) {
 		ParseResult parseResult = null;
+		TemplateResult templateResult = null;
 		byte[] input = DownloadHtml.getHtml(templateUrl);
-		TemplateResult templateResult = GetTemplateResult(pageModel);
-		parseResult = TemplateFactory.localProcess(input, encoding,
-				templateUrl, templateResult, parseType);
+		try {
+			templateResult = GetTemplateResult(pageModel);
+			parseResult = TemplateFactory.localProcess(input, encoding,
+					templateUrl, templateResult, parseType);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 		return parseResult;
 	}
 
@@ -221,7 +237,7 @@ public class CrawlToolResource {
 		TemplateResult templateResult = GetTemplateResult(pageModel);
 		String templateGuid = MD5Utils.MD5(templateUrl);
 		ParseResult parseResult = null;
-		String encoding = "utf-8";
+		String encoding = "gb2312";
 		byte[] input = DownloadHtml.getHtml(templateUrl);
 		try {
 			RedisUtils.setTemplateResult(templateResult, templateGuid);
