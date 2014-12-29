@@ -174,7 +174,7 @@ $(function(){
                 this.listPaginationViewModel.selector('#Content_WebPageDocumentsByUId1_span_totalpage');
                 this.listPaginationViewModel.selectorAttrSelected('text');
                 this.listPaginationViewModel.currentString('##');
-                this.listPaginationViewModel.start('2');
+                this.listPaginationViewModel.start('1');
                 this.listPaginationViewModel.filter('\\d+');
 
                 this.newsAttrModels=function(){
@@ -205,37 +205,37 @@ $(function(){
 
                 //验证内容页
                 this.verifyNewContent=function(){
-                    $('#modalHtmlTitle').text('验证结果');
-                    $('#modal-viewHtml').modal('show');
-                    ajaxPostRequest('/webapi/crawlToolResource/verifyNewContent', this, ajaxPostSuccess, ajaxPostError);
+                    $('#lbl_result_title').text('内容页验证结果');
+                    $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
+                    ajaxPostRequest('/webapi/crawlToolResource/verifyNewContent', this, showResultInTextArea, showResultInTextArea);
                 };
 
                 //验证列表页
                 this.verifyListContent=function(){
-                    $('#modalHtmlTitle').text('验证结果');
-                    $('#modal-viewHtml').modal('show');
-                    ajaxPostRequest('/webapi/crawlToolResource/verifyListContent', this, ajaxPostSuccess, ajaxPostError);
+                    $('#lbl_result_title').text('列表页验证结果');
+                    $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
+                    ajaxPostRequest('/webapi/crawlToolResource/verifyListContent', this, showResultInTextArea, showResultInTextArea);
                 };
 
                 /*测试模板配置*/
                 this.templateTest=function(){
-                    $('#modalHtmlTitle').text('测试结果');
-                    $('#modal-viewHtml').modal('show');
-                    ajaxPostRequest('/webapi/crawlToolResource/getJSONString', this, ajaxPostSuccess, ajaxPostError);
+                    $('#lbl_result_title').text('模板测试结果');
+                    $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red'});
+                    ajaxPostRequest('/webapi/crawlToolResource/getJSONString', this, showResultInTextArea, showResultInTextArea);
                 }.bind(this);
 
                 /*保存模板配置*/
                 this.saveTemplate=function(){
                     $('#modalHtmlTitle').text('保存结果');
                     $('#modal-viewHtml').modal('show');
-                    ajaxPostRequest('/webapi/crawlToolResource/saveTemplate', this, ajaxPostSuccess, ajaxPostError);
+                    ajaxPostRequest('/webapi/crawlToolResource/saveTemplate', this, showResultInModal, showResultInModal);
                 }.bind(this);
 
                 /*保存到本地文件*/
                 this.saveToLocalFile=function(){
                     $('#modalHtmlTitle').text('保存结果');
                     $('#modal-viewHtml').modal('show');
-                    ajaxPostRequest('/webapi/crawlToolResource/saveToLocalFile',this,ajaxPostSuccess,ajaxPostError);
+                    ajaxPostRequest('/webapi/crawlToolResource/saveToLocalFile',this,showResultInModal,showResultInModal);
                 }.bind(this);
 
             })();
@@ -248,19 +248,27 @@ $(function(){
 });
 
 /**
- * 请求成功
+ *
+ * 在textArea 中显示请求的结果
  * */
-function ajaxPostSuccess(data){
-    var modalBody=$('#modal-viewHtml-body');
-    modalBody.text('');//清空
-    modalBody.text(data);
+function showResultInTextArea(data){
+    var jsonString="";
+    try{
+        jsonString=JSON.parse(data);
+        $('#txt_testResult').val(JSON.stringify(jsonString,null,4)).css({color:'#000000',fontSize:'14px'});
+    }catch(e){
+        $('#txt_testResult').val(data).css({color:'#000000',fontSize:'14px'});
+    }
+
 }
 
 /**
- * 请求失败
+ * 在模式对话框中显示结果
  * */
-function ajaxPostError(){
-
+function showResultInModal(data){
+    var modalBody=$('#modal-viewHtml-body');
+    modalBody.text('');//清空
+    modalBody.text(data);
 }
 
 /**
@@ -279,7 +287,7 @@ function ajaxPostRequest(url,data,successCallback,errorCallback){
             data: getJSONString(data)
         },
         success: function(data){successCallback(data)},
-        error: function(){errorCallback}
+        error: function(error){errorCallback(error)}
     });
 }
 
