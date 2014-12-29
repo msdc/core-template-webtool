@@ -52,9 +52,7 @@ public class CrawlToolResource {
 	public String SaveToLocalFile(
 			@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = GetPageModelByJsonString(data);
-		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-		ParseResult parseResult = GetParseResult("utf-8", templateUrl,
-				pageModel, Constants.TEMPLATE_LIST);
+		ParseResult parseResult = SaveTemplateToRedis(pageModel);
 		// HashMap<String, String> seeds = parseResult.getResult();
 		// ArrayList<String> seeds=TemplateFactory.getOutlink(parseResult);
 		ArrayList<String> seeds = TemplateFactory.getOutlink(parseResult);
@@ -70,17 +68,28 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String VerifyNewContent(
 			@DefaultValue("") @FormParam("data") String data) {
-		PageModel pageModel = GetPageModelByJsonString(data);
-		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-		String encoding = "utf-8";
-		ParseResult parseResult = GetParseResult(encoding, templateUrl,
-				pageModel, Constants.TEMPLATE_LIST);
-		// 获取内容页链接
-		ArrayList<String> contentOutLinkArrayList = TemplateFactory
-				.getContentOutlink(parseResult);
-		String contentOutLink = contentOutLinkArrayList.get(0);
-		parseResult = GetParseResult("utf-8", contentOutLink, pageModel,
-				Constants.TEMPLATE_NEWS);
+//		PageModel pageModel = GetPageModelByJsonString(data);
+//		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+//		String encoding = "gb2312";
+//		ParseResult parseResult = GetParseResult(encoding, templateUrl,
+//				pageModel, Constants.TEMPLATE_LIST);
+//		// 获取内容页链接
+//		ArrayList<String> contentOutLinkArrayList = TemplateFactory
+//				.getContentOutlink(parseResult);
+//		String contentOutLink = contentOutLinkArrayList.get(0);
+//		parseResult = GetParseResult(encoding, contentOutLink, pageModel,
+//				Constants.TEMPLATE_NEWS);
+		
+		 PageModel pageModel = GetPageModelByJsonString(data);
+		 ParseResult parseResult = SaveTemplateToRedis(pageModel);
+		 // 获取内容页链接
+		 ArrayList<String> contentOutLinkArrayList = TemplateFactory
+		 .getContentOutlink(parseResult);
+		 String contentOutLink = contentOutLinkArrayList.get(0);
+		 byte[] input = DownloadHtml.getHtml(contentOutLink);
+		 String encoding="gb2312";
+		 parseResult = TemplateFactory.process(input, encoding,
+		 contentOutLink);
 		return parseResult.toJSON();
 	}
 
@@ -92,12 +101,29 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String VerifyListContent(
 			@DefaultValue("") @FormParam("data") String data) {
+		// PageModel pageModel = GetPageModelByJsonString(data);
+		// String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		// String encoding = "gb2312";
+		// ParseResult parseResult = GetParseResult(encoding, templateUrl,
+		// pageModel, Constants.TEMPLATE_LIST);
+		// // 获取列表页链接
+		// ArrayList<String> paginationOutLinkArrayList = TemplateFactory
+		// .getPaginationOutlink(parseResult);
+		// String paginationOutLink = paginationOutLinkArrayList.get(0);
+		// parseResult = GetParseResult(encoding, paginationOutLink, pageModel,
+		// Constants.TEMPLATE_LIST);
+		
+		
 		PageModel pageModel = GetPageModelByJsonString(data);
-		// 这里应该获取列表页的url,而不是模板的url
-		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-		String encoding = "utf-8";
-		ParseResult parseResult = GetParseResult(encoding, templateUrl,
-				pageModel, Constants.TEMPLATE_LIST);
+		ParseResult parseResult = SaveTemplateToRedis(pageModel);
+		ArrayList<String> paginationOutLinkArrayList = TemplateFactory
+				.getPaginationOutlink(parseResult);
+		String paginationOutLink = paginationOutLinkArrayList.get(0);
+		byte[] input = DownloadHtml.getHtml(paginationOutLink);
+		String encoding = "gb2312";
+		parseResult = TemplateFactory.process(input, encoding,
+				paginationOutLink);
+
 		return parseResult.toJSON();
 	}
 
@@ -123,8 +149,8 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String SaveTemplate(@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = GetPageModelByJsonString(data);
-		boolean result = SaveTemplateToRedis(pageModel);
-		if (result == true) {
+		ParseResult parseResult = SaveTemplateToRedis(pageModel);
+		if (parseResult != null) {
 			return "模板保存成功!";
 		}
 		return "模板保存失败!";
@@ -190,7 +216,7 @@ public class CrawlToolResource {
 	 * 
 	 * 保存模板配置到redis
 	 * */
-	private boolean SaveTemplateToRedis(PageModel pageModel) {
+	private ParseResult SaveTemplateToRedis(PageModel pageModel) {
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		TemplateResult templateResult = GetTemplateResult(pageModel);
 		String templateGuid = MD5Utils.MD5(templateUrl);
@@ -203,9 +229,9 @@ public class CrawlToolResource {
 			parseResult = TemplateFactory.process(input, encoding, templateUrl);
 		} catch (Exception e) {
 			// TODO: handle exception
-			return false;
+			e.printStackTrace();
 		}
-		return true;
+		return parseResult;
 	}
 
 	/**
@@ -276,7 +302,8 @@ public class CrawlToolResource {
 			if (filterCategory.equals("匹配")) {
 				filter.initMatchFilter(filterString);
 			} else if (filterCategory.equals("替换")) {
-				filter.initReplaceFilter(model.getReplaceBefore(), model.getReplaceTo());
+				filter.initReplaceFilter(model.getReplaceBefore(),
+						model.getReplaceTo());
 			} else if (filterCategory.equals("移除")) {
 				filter.initRemoveFilter(filterString);
 			}
@@ -299,10 +326,12 @@ public class CrawlToolResource {
 				.getFilter();
 		String paginationFilterCategory = pageModel
 				.getListPaginationViewModel().getFilterCategory();
-		//替换前
-		String replaceBefore=pageModel.getListPaginationViewModel().getReplaceBefore();
-		//替换后
-		String replaceToString=pageModel.getListPaginationViewModel().getReplaceTo();
+		// 替换前
+		String replaceBefore = pageModel.getListPaginationViewModel()
+				.getReplaceBefore();
+		// 替换后
+		String replaceToString = pageModel.getListPaginationViewModel()
+				.getReplaceTo();
 		if (paginationFilterCategory.equals("匹配")) {
 			filter.initMatchFilter(paginationFilter);
 		} else if (paginationFilterCategory.equals("替换")) {
@@ -325,7 +354,7 @@ public class CrawlToolResource {
 			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER;
 		}
 
-		//处理分页进步数
+		// 处理分页进步数
 		int paginationInterval = 0;
 		if (!pageModel.getListPaginationViewModel().getInterval().equals("")) {
 			try {
@@ -338,7 +367,7 @@ public class CrawlToolResource {
 			}
 		}
 
-		//按照是否使用分页进步数,调用不同的方法
+		// 按照是否使用分页进步数,调用不同的方法
 		if (paginationInterval != 0) {
 			selector.initPagitationSelector(paginationType, pageModel
 					.getListPaginationViewModel().getCurrentString(), pageModel
@@ -424,7 +453,8 @@ public class CrawlToolResource {
 			if (filterCategory.equals("匹配")) {
 				filter.initMatchFilter(filterString);
 			} else if (filterCategory.equals("替换")) {
-				filter.initReplaceFilter(model.getReplaceBefore(), model.getReplaceTo());
+				filter.initReplaceFilter(model.getReplaceBefore(),
+						model.getReplaceTo());
 			} else if (filterCategory.equals("移除")) {
 				filter.initRemoveFilter(filterString);
 			}
