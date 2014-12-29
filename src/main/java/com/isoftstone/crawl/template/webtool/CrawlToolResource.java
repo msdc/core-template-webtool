@@ -276,9 +276,9 @@ public class CrawlToolResource {
 			if (filterCategory.equals("匹配")) {
 				filter.initMatchFilter(filterString);
 			} else if (filterCategory.equals("替换")) {
-				// filter.initReplaceFilter(value, replaceTo);
+				filter.initReplaceFilter(model.getReplaceBefore(), model.getReplaceTo());
 			} else if (filterCategory.equals("移除")) {
-				// filter.initRemoveFilter(value);
+				filter.initRemoveFilter(filterString);
 			}
 			label.initLabelSelector(model.getTarget(), "", indexer, filter,
 					null);
@@ -424,9 +424,9 @@ public class CrawlToolResource {
 			if (filterCategory.equals("匹配")) {
 				filter.initMatchFilter(filterString);
 			} else if (filterCategory.equals("替换")) {
-				//filter.initReplaceFilter(value, replaceTo);
+				filter.initReplaceFilter(model.getReplaceBefore(), model.getReplaceTo());
 			} else if (filterCategory.equals("移除")) {
-				//filter.initRemoveFilter(filterString);
+				filter.initRemoveFilter(filterString);
 			}
 			label.initLabelSelector(model.getTarget(), "", indexer, filter,
 					null);
