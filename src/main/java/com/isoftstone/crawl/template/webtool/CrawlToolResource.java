@@ -459,26 +459,14 @@ public class CrawlToolResource {
 		List<CustomerAttrModel> newsCustomerAttrViewModel = pageModel
 				.getNewsCustomerAttrViewModel();
 		for (CustomerAttrModel model : newsCustomerAttrViewModel) {
-			Selector label = new Selector();
-			label.setType(Constants.SELECTOR_LABEL);
 			indexer = new SelectorIndexer();
-			indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
-			filter = new SelectorFilter();
-			String filterString = model.getFilter();
-			String filterCategory = model.getFilterCategory();
-			if (filterCategory.equals("匹配")) {
-				filter.initMatchFilter(filterString);
-			} else if (filterCategory.equals("替换")) {
-				filter.initReplaceFilter(model.getReplaceBefore(),
-						model.getReplaceTo());
-			} else if (filterCategory.equals("移除")) {
-				filter.initRemoveFilter(filterString);
+			selector = new Selector();
+			if (!model.getSelector().equals("")) {
+				indexer.initJsoupIndexer(model.getSelector(),model.getAttr());
+				selector.initFieldSelector(model.getTarget(), "", indexer, null, null);
+				news.add(selector);
+				template.setNews(news);
 			}
-			label.initLabelSelector(model.getTarget(), "", indexer, filter,
-					null);
-			selector.setLabel(label);
-			news.add(selector);
-			template.setNews(news);
 		}
 
 		return template;
