@@ -189,17 +189,19 @@ public class CrawlToolResource {
 	/**
 	 * 保存种子到本地文件
 	 * */
-	private void SaveSeedsValueToFile(HashMap<String, String> seeds) {		
+	private void SaveSeedsValueToFile(HashMap<String, String> seeds) {
+		StringBuffer stringBuilder = new StringBuffer();		
 		try {
 			for (Iterator<Entry<String, String>> it = seeds.entrySet()
 					.iterator(); it.hasNext();) {
 				Entry<String, String> entry = it.next();
 				String seed = entry.getValue();
-				contentToTxt("/home/linux/drcnet.com.cn_1day_01/seed.txt", seed);
+				stringBuilder.append(seed+System.getProperty("line.separator"));				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		contentToTxt("/home/linux/drcnet.com.cn_1day_01/seed.txt", stringBuilder.toString());
 	}
 
 	/**
