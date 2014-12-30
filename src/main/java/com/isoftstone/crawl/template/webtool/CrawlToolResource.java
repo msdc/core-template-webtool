@@ -190,32 +190,48 @@ public class CrawlToolResource {
 	 * 保存种子到本地文件
 	 * */
 	private void SaveSeedsValueToFile(HashMap<String, String> seeds) {
-		StringBuffer stringBuilder = new StringBuffer();		
+		StringBuffer stringBuilder = new StringBuffer();
 		try {
 			for (Iterator<Entry<String, String>> it = seeds.entrySet()
 					.iterator(); it.hasNext();) {
 				Entry<String, String> entry = it.next();
 				String seed = entry.getValue();
-				stringBuilder.append(seed+System.getProperty("line.separator"));				
+				stringBuilder.append(seed
+						+ System.getProperty("line.separator"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		contentToTxt("/home/linux/drcnet.com.cn_1day_01/seed.txt", stringBuilder.toString());
+		if (System.getProperty("os.name").indexOf("Linux")>-1) {
+			contentToTxt("/home/linux/drcnet.com.cn_1day_01/seed.txt",
+					stringBuilder.toString());
+		} else if (System.getProperty("os.name").indexOf("Windows")>-1) {
+			contentToTxt("C:\\drcnet.com.cn_1day_01\\seed.txt",
+					stringBuilder.toString());
+		}
+
 	}
 
 	/**
 	 * 保存种子到本地文件
 	 * */
 	private void SaveSeedsValueToFile(ArrayList<String> seeds) {
+		StringBuffer stringBuilder = new StringBuffer();
 		try {
 			for (String seed : seeds) {
-				contentToTxt("/home/linux/drcnet.com.cn_1day_01/seed.txt", seed);
+				stringBuilder.append(seed
+						+ System.getProperty("line.separator"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		if (System.getProperty("os.name").indexOf("Linux")>-1) {
+			contentToTxt("/home/linux/drcnet.com.cn_1day_01/seed.txt",
+					stringBuilder.toString());
+		} else if (System.getProperty("os.name").indexOf("Windows")>-1) {
+			contentToTxt("C:\\drcnet.com.cn_1day_01\\seed.txt",
+					stringBuilder.toString());
+		}
 	}
 
 	/**
@@ -496,9 +512,8 @@ public class CrawlToolResource {
 				parentDir.mkdirs();
 			}
 			if (f.exists()) {
-				System.out.print("文件存在");
-			} else {
-				System.out.print("文件不存在");
+				System.out.print("文件已经存在");
+			} else {				
 				f.createNewFile();// 不存在则创建
 			}
 			BufferedReader input = new BufferedReader(new FileReader(f));
