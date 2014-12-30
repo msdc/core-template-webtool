@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,7 +52,7 @@ public class CrawlToolResource {
 	public String SaveToLocalFile(
 			@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = GetPageModelByJsonString(data);
-		ParseResult parseResult = SaveTemplateToRedis(pageModel);
+		ParseResult parseResult = SaveTemplateToRedis(pageModel);			
 		if (parseResult == null) {
 			return "请先保存模板!再执行此操作!";
 		}
@@ -149,7 +151,7 @@ public class CrawlToolResource {
 		if (parseResult != null) {
 			return "模板保存成功!";
 		}
-		return "模板保存失败!";
+		return "模板保存失败!请检查模板配置是否正确!";
 	}
 
 	/**
@@ -256,14 +258,9 @@ public class CrawlToolResource {
 		ParseResult parseResult = null;
 		String encoding = "gb2312";
 		byte[] input = DownloadHtml.getHtml(templateUrl);
-		try {
-			RedisUtils.setTemplateResult(templateResult, templateGuid);
-			System.out.println("templateGuid=" + templateGuid);
-			parseResult = TemplateFactory.process(input, encoding, templateUrl);
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
+		RedisUtils.setTemplateResult(templateResult, templateGuid);
+		System.out.println("templateGuid=" + templateGuid);
+		parseResult = TemplateFactory.process(input, encoding, templateUrl);
 		return parseResult;
 	}
 
@@ -490,6 +487,17 @@ public class CrawlToolResource {
 		return template;
 	}
 
+	/**
+	 * 
+	 * 输出异常信息
+	 * */
+	private static String getStackTrace(final Throwable throwable) {
+	     final StringWriter sw = new StringWriter();
+	     final PrintWriter pw = new PrintWriter(sw, true);
+	     throwable.printStackTrace(pw);
+	     return sw.getBuffer().toString();
+	}
+	
 	/**
 	 * 
 	 * 保存内容到文件
