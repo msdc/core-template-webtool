@@ -69,20 +69,9 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String VerifyNewContent(
 			@DefaultValue("") @FormParam("data") String data) {
-		// PageModel pageModel = GetPageModelByJsonString(data);
-		// String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-		// String encoding = "gb2312";
-		// ParseResult parseResult = GetParseResult(encoding, templateUrl,
-		// pageModel, Constants.TEMPLATE_LIST);
-		// // 获取内容页链接
-		// ArrayList<String> contentOutLinkArrayList = TemplateFactory
-		// .getContentOutlink(parseResult);
-		// String contentOutLink = contentOutLinkArrayList.get(0);
-		// parseResult = GetParseResult(encoding, contentOutLink, pageModel,
-		// Constants.TEMPLATE_NEWS);
-
 		PageModel pageModel = GetPageModelByJsonString(data);
 		ParseResult parseResult = SaveTemplateToRedis(pageModel);
+		// ParseResult parseResult = GetParseResultFromRedis(pageModel);
 		if (parseResult == null) {
 			return "请先保存模板!再执行此操作!";
 		}
@@ -111,35 +100,25 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String VerifyListContent(
 			@DefaultValue("") @FormParam("data") String data) {
-		// PageModel pageModel = GetPageModelByJsonString(data);
-		// String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-		// String encoding = "gb2312";
-		// ParseResult parseResult = GetParseResult(encoding, templateUrl,
-		// pageModel, Constants.TEMPLATE_LIST);
-		// // 获取列表页链接
-		// ArrayList<String> paginationOutLinkArrayList = TemplateFactory
-		// .getPaginationOutlink(parseResult);
-		// String paginationOutLink = paginationOutLinkArrayList.get(0);
-		// parseResult = GetParseResult(encoding, paginationOutLink, pageModel,
-		// Constants.TEMPLATE_LIST);
-
 		PageModel pageModel = GetPageModelByJsonString(data);
 		ParseResult parseResult = SaveTemplateToRedis(pageModel);
 		if (parseResult == null) {
 			return "请先保存模板!再执行此操作!";
 		}
-		ArrayList<String> paginationOutLinkArrayList = TemplateFactory
-				.getPaginationOutlink(parseResult);
-		String paginationOutLink = paginationOutLinkArrayList.get(0);
-		byte[] input = DownloadHtml.getHtml(paginationOutLink);
-		String encoding = "gb2312";
-		try {
-			parseResult = TemplateFactory.process(input, encoding,
-					paginationOutLink);
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
+
+		// //测试单个页面列表中的content内容
+		// ArrayList<String> paginationOutLinkArrayList = TemplateFactory
+		// .getPaginationOutlink(parseResult);
+		// String paginationOutLink = paginationOutLinkArrayList.get(0);
+		// byte[] input = DownloadHtml.getHtml(paginationOutLink);
+		// String encoding = "gb2312";
+		// try {
+		// parseResult = TemplateFactory.process(input, encoding,
+		// paginationOutLink);
+		// } catch (Exception e) {
+		// // TODO: handle exception
+		// e.printStackTrace();
+		// }
 
 		return parseResult.toJSON();
 	}
@@ -202,10 +181,10 @@ public class CrawlToolResource {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if (System.getProperty("os.name").indexOf("Linux")>-1) {
+		if (System.getProperty("os.name").indexOf("Linux") > -1) {
 			contentToTxt("/home/linux/drcnet.com.cn_1day_01/seed.txt",
 					stringBuilder.toString());
-		} else if (System.getProperty("os.name").indexOf("Windows")>-1) {
+		} else if (System.getProperty("os.name").indexOf("Windows") > -1) {
 			contentToTxt("C:\\drcnet.com.cn_1day_01\\seed.txt",
 					stringBuilder.toString());
 		}
@@ -225,20 +204,33 @@ public class CrawlToolResource {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if (System.getProperty("os.name").indexOf("Linux")>-1) {
+		if (System.getProperty("os.name").indexOf("Linux") > -1) {
 			contentToTxt("/home/linux/drcnet.com.cn_1day_01/seed.txt",
 					stringBuilder.toString());
-		} else if (System.getProperty("os.name").indexOf("Windows")>-1) {
+		} else if (System.getProperty("os.name").indexOf("Windows") > -1) {
 			contentToTxt("C:\\drcnet.com.cn_1day_01\\seed.txt",
 					stringBuilder.toString());
 		}
 	}
 
 	/**
+	 * 
+	 * 从redis中获取ParseResult结果
+	 * */
+	private ParseResult GetParseResultFromRedis(PageModel pageModel) {
+		String guid = MD5Utils.MD5(pageModel.getBasicInfoViewModel().getUrl());
+		ParseResult parseResult = null;
+		TemplateResult templateResult = RedisUtils.getTemplateResult(guid);
+		String parseResultGuid = templateResult.getParseResultGuid(); // 获取中间结果
+		parseResult = RedisUtils.getParseResult(parseResultGuid);
+		return parseResult;
+	}
+
+	/**
 	 * 返回ParseResult
 	 * */
-	private ParseResult GetParseResult(String encoding, String templateUrl,
-			PageModel pageModel, String parseType) {
+	private ParseResult GetParseResultByLocalProcess(String encoding,
+			String templateUrl, PageModel pageModel, String parseType) {
 		ParseResult parseResult = null;
 		TemplateResult templateResult = null;
 		byte[] input = DownloadHtml.getHtml(templateUrl);
@@ -512,8 +504,8 @@ public class CrawlToolResource {
 				parentDir.mkdirs();
 			}
 			if (f.exists()) {
-				//System.out.print("文件已经存在");
-			} else {				
+				// System.out.print("文件已经存在");
+			} else {
 				f.createNewFile();// 不存在则创建
 			}
 			BufferedReader input = new BufferedReader(new FileReader(f));
@@ -521,14 +513,14 @@ public class CrawlToolResource {
 			while ((str = input.readLine()) != null) {
 				s1 += str + "\n";
 			}
-			//System.out.println(s1);
+			// System.out.println(s1);
 			input.close();
 			s1 += content;
 
 			BufferedWriter output = new BufferedWriter(new FileWriter(f));
 			output.write(s1);
 			output.close();
-			System.out.println("文件保存路径:"+filePath);
+			System.out.println("文件保存路径:" + filePath);
 		} catch (Exception e) {
 			e.printStackTrace();
 
