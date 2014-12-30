@@ -51,7 +51,7 @@ public class CrawlToolResource {
 			@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = GetPageModelByJsonString(data);
 		ParseResult parseResult = SaveTemplateToRedis(pageModel);
-		if(parseResult==null){
+		if (parseResult == null) {
 			return "请先保存模板!再执行此操作!";
 		}
 		// HashMap<String, String> seeds = parseResult.getResult();
@@ -80,10 +80,10 @@ public class CrawlToolResource {
 		// String contentOutLink = contentOutLinkArrayList.get(0);
 		// parseResult = GetParseResult(encoding, contentOutLink, pageModel,
 		// Constants.TEMPLATE_NEWS);
-		
-		PageModel pageModel = GetPageModelByJsonString(data);		
-		ParseResult parseResult= SaveTemplateToRedis(pageModel);
-		if(parseResult==null){
+
+		PageModel pageModel = GetPageModelByJsonString(data);
+		ParseResult parseResult = SaveTemplateToRedis(pageModel);
+		if (parseResult == null) {
 			return "请先保存模板!再执行此操作!";
 		}
 		// 获取内容页链接
@@ -125,7 +125,7 @@ public class CrawlToolResource {
 
 		PageModel pageModel = GetPageModelByJsonString(data);
 		ParseResult parseResult = SaveTemplateToRedis(pageModel);
-		if(parseResult==null){
+		if (parseResult == null) {
 			return "请先保存模板!再执行此操作!";
 		}
 		ArrayList<String> paginationOutLinkArrayList = TemplateFactory
@@ -189,7 +189,7 @@ public class CrawlToolResource {
 	/**
 	 * 保存种子到本地文件
 	 * */
-	private void SaveSeedsValueToFile(HashMap<String, String> seeds) {
+	private void SaveSeedsValueToFile(HashMap<String, String> seeds) {		
 		try {
 			for (Iterator<Entry<String, String>> it = seeds.entrySet()
 					.iterator(); it.hasNext();) {
@@ -469,8 +469,9 @@ public class CrawlToolResource {
 			indexer = new SelectorIndexer();
 			selector = new Selector();
 			if (!model.getSelector().equals("")) {
-				indexer.initJsoupIndexer(model.getSelector(),model.getAttr());
-				selector.initFieldSelector(model.getTarget(), "", indexer, null, null);
+				indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
+				selector.initFieldSelector(model.getTarget(), "", indexer,
+						null, null);
 				news.add(selector);
 				template.setNews(news);
 			}
@@ -488,6 +489,10 @@ public class CrawlToolResource {
 		String s1 = new String();// 内容更新
 		try {
 			File f = new File(filePath);
+			File parentDir = f.getParentFile();
+			if (parentDir != null && !parentDir.exists()) {
+				parentDir.mkdirs();
+			}
 			if (f.exists()) {
 				System.out.print("文件存在");
 			} else {
