@@ -13,3 +13,7 @@
             设置tomcat的主目录,具体操作可参考:http://blog.knowsky.com/188854.htm  或者 http://blog.csdn.net/songhuanren/article/details/3301615
         2.3 手工拷贝maven依赖的本地文件到网站目录中的WEB-INF中的lib下面
         2.4 启动Tomcat,输入http://localhost:8080/index.html访问,能够访问到界面,说明部署配置成功.
+
+特别说明:
+    1.由于爬虫项目打包后,在读取配置文件中的redis地址的问题,一直找不到解决方法,所以项目中关于redis的配置信息是写在代码里的,
+      实际部署的时候需要手工更改代码中的redis地址.
