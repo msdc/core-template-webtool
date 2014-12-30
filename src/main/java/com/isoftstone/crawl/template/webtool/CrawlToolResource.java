@@ -512,7 +512,7 @@ public class CrawlToolResource {
 				parentDir.mkdirs();
 			}
 			if (f.exists()) {
-				System.out.print("文件已经存在");
+				//System.out.print("文件已经存在");
 			} else {				
 				f.createNewFile();// 不存在则创建
 			}
@@ -521,13 +521,14 @@ public class CrawlToolResource {
 			while ((str = input.readLine()) != null) {
 				s1 += str + "\n";
 			}
-			System.out.println(s1);
+			//System.out.println(s1);
 			input.close();
 			s1 += content;
 
 			BufferedWriter output = new BufferedWriter(new FileWriter(f));
 			output.write(s1);
 			output.close();
+			System.out.println("文件保存路径:"+filePath);
 		} catch (Exception e) {
 			e.printStackTrace();
 
