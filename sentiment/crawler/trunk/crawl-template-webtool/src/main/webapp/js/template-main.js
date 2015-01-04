@@ -1,6 +1,9 @@
 /**
  * Created by wang on 2014/12/9.
  */
+//web网站的虚拟路径
+var virtualWebPath="/crawl-template-webtool";
+
 /**************Models****************/
 function customerAttrModel(target,selector,attr,filter,filterCategory,replaceBefore,replaceTo){
     //this.parseEngine=['jsoup','xpath'];
@@ -78,7 +81,7 @@ function basicInfoViewModel(){
         $('#modalHtmlTitle').text('Html内容');
         $('#modal-viewHtml').modal('show');
         $.ajax({
-            url:'/webapi/crawlToolResource/viewHtmlContent',
+            url:virtualWebPath+'/webapi/crawlToolResource/viewHtmlContent',
             type:'POST',
             data:{
                 webUrl:url
@@ -277,35 +280,35 @@ $(function(){
                 this.verifyNewContent=function(){
                     $('#lbl_result_title').text('内容页验证结果');
                     $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
-                    ajaxPostRequest('/webapi/crawlToolResource/verifyNewContent', this, showResultInTextArea, showResultInTextArea);
+                    ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyNewContent', this, showResultInTextArea, showResultInTextArea);
                 };
 
                 //验证列表页
                 this.verifyListContent=function(){
                     $('#lbl_result_title').text('列表页验证结果');
                     $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
-                    ajaxPostRequest('/webapi/crawlToolResource/verifyListContent', this, showResultInTextArea, showResultInTextArea);
+                    ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyListContent', this, showResultInTextArea, showResultInTextArea);
                 };
 
                 /*测试模板配置*/
                 this.templateTest=function(){
                     $('#lbl_result_title').text('模板测试结果');
                     $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red'});
-                    ajaxPostRequest('/webapi/crawlToolResource/getJSONString', this, showResultInTextArea, showResultInTextArea);
+                    ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/getJSONString', this, showResultInTextArea, showResultInTextArea);
                 }.bind(this);
 
                 /*保存模板配置*/
                 this.saveTemplate=function(){
                     $('#modalHtmlTitle').text('保存结果');
                     $('#modal-viewHtml').modal('show');
-                    ajaxPostRequest('/webapi/crawlToolResource/saveTemplate', this, showResultInModal, showResultInModal);
+                    ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveTemplate', this, showResultInModal, showResultInModal);
                 }.bind(this);
 
                 /*保存到本地文件*/
                 this.saveToLocalFile=function(){
                     $('#modalHtmlTitle').text('保存结果');
                     $('#modal-viewHtml').modal('show');
-                    ajaxPostRequest('/webapi/crawlToolResource/saveToLocalFile',this,showResultInModal,showResultInModal);
+                    ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveToLocalFile',this,showResultInModal,showResultInModal);
                 }.bind(this);
 
             })();
