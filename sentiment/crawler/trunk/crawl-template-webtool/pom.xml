@@ -54,26 +54,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-            	<groupId>com.isoftstone.crawl.template.impl</groupId>
-            	<artifactId>crawl-template</artifactId>
-            	<version>1.0.0</version>
-            </dependency>
-            <dependency>
-            	<groupId>myutil</groupId>
-            	<artifactId>myutil</artifactId>
-            	<version>1.0.0</version>
-            </dependency>
-            <dependency>
-            	<groupId>org.codehaus.jackson</groupId>
-            	<artifactId>jackson-core-asl</artifactId>
-            	<version>1.9.11</version>
-            </dependency>
-            <dependency>
-            	<groupId>org.codehaus.jackson.map</groupId>
-            	<artifactId>jackson-mapper-asl.jar</artifactId>
-            	<version>1.9.11</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -96,24 +76,28 @@
         	<artifactId>crawl-template</artifactId>
         	<scope>system</scope>
         	<systemPath>${basedir}/libs/crawl-template.jar</systemPath>
+        	<version>1.1.0</version>
         </dependency>
         <dependency>
         	<groupId>myutil</groupId>
         	<artifactId>myutil</artifactId>
         	<scope>system</scope>
         	<systemPath>${basedir}/libs/myutil.jar</systemPath>
+        	<version>1.1.0</version>
         </dependency>
         <dependency>
         	<groupId>org.codehaus.jackson</groupId>
         	<artifactId>jackson-core-asl</artifactId>
         	<scope>system</scope>
         	<systemPath>${basedir}/libs/jackson-core-asl-1.9.11.jar</systemPath>
+        	<version>1.9.11</version>
         </dependency>
         <dependency>
         	<groupId>org.codehaus.jackson.map</groupId>
         	<artifactId>jackson-mapper-asl.jar</artifactId>
         	<scope>system</scope>
         	<systemPath>${basedir}/libs/jackson-mapper-asl-1.9.11.jar</systemPath>
+        	<version>1.9.11</version>
         </dependency>
     </dependencies>
     <properties>
