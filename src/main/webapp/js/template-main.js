@@ -281,21 +281,21 @@ $(function(){
                     this.verifyNewContent=function(){
                         $('#lbl_result_title').text('内容页验证结果');
                         $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
-                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyNewContent', this, showResultInTextArea, showResultInTextArea);
+                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyNewContent', this, showResultInTextArea, showErrorsInTextArea);
                     };
 
                     //验证列表页
                     this.verifyListContent=function(){
                         $('#lbl_result_title').text('列表页验证结果');
                         $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
-                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyListContent', this, showResultInTextArea, showResultInTextArea);
+                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyListContent', this, showResultInTextArea, showErrorsInTextArea);
                     };
 
                     /*测试模板配置*/
                     this.templateTest=function(){
                         $('#lbl_result_title').text('模板测试结果');
                         $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red'});
-                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/getJSONString', this, showResultInTextArea, showResultInTextArea);
+                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/getJSONString', this, showResultInTextArea, showErrorsInTextArea);
                     }.bind(this);
 
                     /*保存模板配置*/
@@ -335,6 +335,14 @@ function showResultInTextArea(data){
         $('#txt_testResult').val(data).css({color:'#000000',fontSize:'14px'});
     }
 
+}
+
+/**
+ * 
+ * 在textArea中显示请求的错误信息
+ * */
+function showErrorsInTextArea(error){
+	$('#txt_testResult').val("错误信息:"+error.responseText).css({color:'#000000',fontSize:'14px'});
 }
 
 /**
