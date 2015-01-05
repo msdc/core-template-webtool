@@ -208,112 +208,114 @@ $(function(){
     };
 
     $('#news_tab').load('template-news.html',function(){
-        $('#list_tab').load('template-list.html',function(){
-            //master view model with instances of both the view models.
-            var masterVM = (function(){
-                this.basicInfoViewModel = new basicInfoViewModel();
-                //测试
-                //this.basicInfoViewModel.url('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018');
+        $('#schedule_tab').load('template-schedule.html',function(){
+            $('#list_tab').load('template-list.html',function(){
+                //master view model with instances of both the view models.
+                var masterVM = (function(){
+                    this.basicInfoViewModel = new basicInfoViewModel();
+                    //测试
+                    //this.basicInfoViewModel.url('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018');
 
-                this.newsCustomerAttrViewModel=new customerAttrViewModel();
+                    this.newsCustomerAttrViewModel=new customerAttrViewModel();
 
-                this.newsTitleViewModel=new commonAttrViewMode();
-                //新闻内容标题test
-                //this.newsTitleViewModel.selector('#docSubject');
-                this.newsTitleViewModel.selectorAttrSelected('text');
+                    this.newsTitleViewModel=new commonAttrViewMode();
+                    //新闻内容标题test
+                    //this.newsTitleViewModel.selector('#docSubject');
+                    this.newsTitleViewModel.selectorAttrSelected('text');
 
-                this.newsPublishTimeViewModel=new commonAttrViewMode();
-                //新闻内容时间
-                //this.newsPublishTimeViewModel.selector('#docDeliveddate');
-                this.newsPublishTimeViewModel.selectorAttrSelected('text');
+                    this.newsPublishTimeViewModel=new commonAttrViewMode();
+                    //新闻内容时间
+                    //this.newsPublishTimeViewModel.selector('#docDeliveddate');
+                    this.newsPublishTimeViewModel.selectorAttrSelected('text');
 
-                this.newsSourceViewModel=new commonAttrViewMode();
+                    this.newsSourceViewModel=new commonAttrViewMode();
 
-                this.newsContentViewModel=new commonAttrViewMode();
-                //新闻内容test
-                //this.newsContentViewModel.selector('#docSummary');
-                this.newsContentViewModel.selectorAttrSelected('text');
+                    this.newsContentViewModel=new commonAttrViewMode();
+                    //新闻内容test
+                    //this.newsContentViewModel.selector('#docSummary');
+                    this.newsContentViewModel.selectorAttrSelected('text');
 
-                this.listCustomerAttrViewModel=new customerAttrViewModel();
-                this.listOutLinkViewModel=new commonAttrViewMode();
-                this.listOutLinkViewModel.selectorAttrSelected('href');
+                    this.listCustomerAttrViewModel=new customerAttrViewModel();
+                    this.listOutLinkViewModel=new commonAttrViewMode();
+                    this.listOutLinkViewModel.selectorAttrSelected('href');
 
-                //列表页test
-                //this.listOutLinkViewModel.selector('#Content_WebPageDocumentsByUId1 > li > div.sub > a');
+                    //列表页test
+                    //this.listOutLinkViewModel.selector('#Content_WebPageDocumentsByUId1 > li > div.sub > a');
 
-                this.listPaginationViewModel=new paginationViewModel();
-                //分页test
-                //this.listPaginationViewModel.paginationUrl('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018&curpage=##');
-                //this.listPaginationViewModel.selector('#Content_WebPageDocumentsByUId1_span_totalpage');
-                this.listPaginationViewModel.selectorAttrSelected('text');
-                this.listPaginationViewModel.currentString('##');
-                this.listPaginationViewModel.start('2');
-                this.listPaginationViewModel.filter('\\d+');
+                    this.listPaginationViewModel=new paginationViewModel();
+                    //分页test
+                    //this.listPaginationViewModel.paginationUrl('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018&curpage=##');
+                    //this.listPaginationViewModel.selector('#Content_WebPageDocumentsByUId1_span_totalpage');
+                    this.listPaginationViewModel.selectorAttrSelected('text');
+                    this.listPaginationViewModel.currentString('##');
+                    this.listPaginationViewModel.start('2');
+                    this.listPaginationViewModel.filter('\\d+');
 
-                this.newsAttrModels=function(){
-                    var attrModels=[];
-                    var modelArray=this.newsCustomerAttrViewModel.regions();
-                    for(var i=0;i<modelArray.length;i++){
-                        var model=modelArray[i];
-                        var temp=new customerAttrModel(
-                           model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.replaceBefore(),model.replaceTo()
-                        );
-                        attrModels.push(temp);
-                    }
-                    return attrModels;
-                };
+                    this.newsAttrModels=function(){
+                        var attrModels=[];
+                        var modelArray=this.newsCustomerAttrViewModel.regions();
+                        for(var i=0;i<modelArray.length;i++){
+                            var model=modelArray[i];
+                            var temp=new customerAttrModel(
+                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.replaceBefore(),model.replaceTo()
+                            );
+                            attrModels.push(temp);
+                        }
+                        return attrModels;
+                    };
 
-                this.listAttrModels=function(){
-                    var attrModels=[];
-                    var modelArray=this.listCustomerAttrViewModel.regions();
-                    for(var i=0;i<modelArray.length;i++){
-                        var model=modelArray[i];
-                        var temp=new customerAttrModel(
-                            model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.replaceBefore(),model.replaceTo()
-                        );
-                        attrModels.push(temp);
-                    }
-                    return attrModels;
-                };
+                    this.listAttrModels=function(){
+                        var attrModels=[];
+                        var modelArray=this.listCustomerAttrViewModel.regions();
+                        for(var i=0;i<modelArray.length;i++){
+                            var model=modelArray[i];
+                            var temp=new customerAttrModel(
+                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.replaceBefore(),model.replaceTo()
+                            );
+                            attrModels.push(temp);
+                        }
+                        return attrModels;
+                    };
 
-                //验证内容页
-                this.verifyNewContent=function(){
-                    $('#lbl_result_title').text('内容页验证结果');
-                    $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
-                    ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyNewContent', this, showResultInTextArea, showResultInTextArea);
-                };
+                    //验证内容页
+                    this.verifyNewContent=function(){
+                        $('#lbl_result_title').text('内容页验证结果');
+                        $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
+                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyNewContent', this, showResultInTextArea, showResultInTextArea);
+                    };
 
-                //验证列表页
-                this.verifyListContent=function(){
-                    $('#lbl_result_title').text('列表页验证结果');
-                    $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
-                    ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyListContent', this, showResultInTextArea, showResultInTextArea);
-                };
+                    //验证列表页
+                    this.verifyListContent=function(){
+                        $('#lbl_result_title').text('列表页验证结果');
+                        $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
+                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyListContent', this, showResultInTextArea, showResultInTextArea);
+                    };
 
-                /*测试模板配置*/
-                this.templateTest=function(){
-                    $('#lbl_result_title').text('模板测试结果');
-                    $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red'});
-                    ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/getJSONString', this, showResultInTextArea, showResultInTextArea);
-                }.bind(this);
+                    /*测试模板配置*/
+                    this.templateTest=function(){
+                        $('#lbl_result_title').text('模板测试结果');
+                        $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red'});
+                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/getJSONString', this, showResultInTextArea, showResultInTextArea);
+                    }.bind(this);
 
-                /*保存模板配置*/
-                this.saveTemplate=function(){
-                    $('#modalHtmlTitle').text('保存结果');
-                    $('#modal-viewHtml').modal('show');
-                    ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveTemplate', this, showResultInModal, showResultInModal);
-                }.bind(this);
+                    /*保存模板配置*/
+                    this.saveTemplate=function(){
+                        $('#modalHtmlTitle').text('保存结果');
+                        $('#modal-viewHtml').modal('show');
+                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveTemplate', this, showResultInModal, showResultInModal);
+                    }.bind(this);
 
-                /*保存到本地文件*/
-                this.saveToLocalFile=function(){
-                    $('#modalHtmlTitle').text('保存结果');
-                    $('#modal-viewHtml').modal('show');
-                    ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveToLocalFile',this,showResultInModal,showResultInModal);
-                }.bind(this);
+                    /*保存到本地文件*/
+                    this.saveToLocalFile=function(){
+                        $('#modalHtmlTitle').text('保存结果');
+                        $('#modal-viewHtml').modal('show');
+                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveToLocalFile',this,showResultInModal,showResultInModal);
+                    }.bind(this);
 
-            })();
-            ko.applyBindings(masterVM);
-        })
+                })();
+                ko.applyBindings(masterVM);
+            })
+        });
     });
 
     //模态对话框事件
