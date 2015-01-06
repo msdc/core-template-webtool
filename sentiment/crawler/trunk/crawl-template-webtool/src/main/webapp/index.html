@@ -62,7 +62,7 @@
                     <td data-bind="text: status"></td>
                     <td>
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal_info">启用</button>
-                        <button type="button" class="btn btn-primary">修改</button>
+                        <button type="button" class="btn btn-primary" data-bind="click: $parent.updateItem">修改</button>
                         <button type="button" class="btn btn-primary" data-bind="click: $parent.deleteItem">删除</button>
                     </td>
                 </tr>

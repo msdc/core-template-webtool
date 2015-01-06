@@ -83,6 +83,24 @@ function templateViewModel(templateList){
             }
         });
     };
+    self.updateItem=function(){
+        var templateUrl=this.url;
+        $.ajax({
+            url: virtualWebPath + '/webapi/crawlToolResource/getTemplateGuid',
+            type: 'POST',
+            data:{
+                templateUrl:templateUrl
+            },
+            success: function (data) {
+                window.location.href="pages/template-main.html?templateGuid="+data;
+            },
+            error: function (error) {
+                if(error){
+                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;修改操作失败！");
+                }
+            }
+        });
+    };
 }
 /*****************View-Model***********************/
 /**
