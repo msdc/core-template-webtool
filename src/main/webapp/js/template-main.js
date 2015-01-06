@@ -266,7 +266,43 @@ function pageDataInit(initData){
                     this.listOutLinkViewModel=new commonAttrViewMode();
                     this.listPaginationViewModel=new paginationViewModel();
                     if(initData!=null){
+                        //列表页外链接
+                        var listOutLinkArray=initData.list;
+                        if(listOutLinkArray!=null){
+                            var listOutLink=listOutLinkArray[0];
+                            var listOutLinkIndexer=listOutLink.indexers[0];
+                            var listOutLinkSelector=listOutLinkIndexer.value;
+                            var listOutLinkSelectorAttr=listOutLinkIndexer.attribute;
+                            this.listOutLinkViewModel.selector(listOutLinkSelector);
+                            this.listOutLinkViewModel.selectorAttrSelected(listOutLinkSelectorAttr);
 
+                            //列表页的自定义属性
+                            var listOutLinkLabels=listOutLink.labels;
+                            if(listOutLinkLabels!=null){
+                                for(var i=0;i<listOutLinkLabels.length;i++){
+                                    var listCustomerAttrObj=listOutLinkLabels[i];
+                                    var customerViewModel=new singleCustomerViewModel();
+                                    var customerViewModelIndexer=listCustomerAttrObj.indexers[0];
+                                    customerViewModel.selector(customerViewModelIndexer.value);
+                                    customerViewModel.attrSelected(customerViewModelIndexer.attribute);
+                                    var filterCategory=customerViewModelIndexer.type;
+                                    if(filterCategory=="match"){
+                                        customerViewModel.filterCategorySelected('匹配');
+                                        customerViewModel.filter(customerViewModelIndexer.value);
+                                    }
+                                    if(filterCategory=="remove"){
+                                        customerViewModel.filterCategorySelected('移除');
+                                        customerViewModel.filter(customerViewModelIndexer.value);
+                                    }
+                                    if(filterCategory=="replace"){
+                                        customerViewModel.filterCategorySelected('替换');
+                                        customerViewModel.replaceBefore(customerViewModelIndexer.value);
+                                        customerViewModel.replaceTo(customerViewModelIndexer.replaceTo);
+                                    }
+                                    this.listCustomerAttrViewModel.regions.push(customerViewModel);
+                                }
+                            }
+                        }
                     }else{
                         //基本信息测试
                         //this.basicInfoViewModel.url('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018');
