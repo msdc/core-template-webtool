@@ -217,55 +217,88 @@ $(function(){
         }
     };
 
+    var templateGuid=getUrlParameter("templateGuid");
+    //执行的是update操作
+    if(templateGuid!=undefined&&templateGuid!=''&&templateGuid!=null){
+        $.ajax({
+            url: virtualWebPath + '/webapi/crawlToolResource/updateTemplate',
+            type: 'POST',
+            data: {
+                templateGuid: templateGuid
+            },
+            success: function (data) {
+                var json=JSON.parse(data);
+                pageDataInit(json);
+            },
+            error: function (error) {
+            }
+        });
+    }else{//添加操作页面初始化
+        pageDataInit(null);
+    }
+
+
+    //模态对话框事件
+    registerModalViewContentEvent();
+});
+
+/**
+ *
+ * 页面内容初始化
+ * @params {Object} initData 模板结果的JSON对象
+ * */
+function pageDataInit(initData){
     $('#news_tab').load('template-news.html',function(){
         $('#schedule_tab').load('template-schedule.html',function(){
             $('#list_tab').load('template-list.html',function(){
                 //master view model with instances of both the view models.
                 var masterVM = (function(){
                     this.basicInfoViewModel = new basicInfoViewModel();
-                    //测试
-                    this.basicInfoViewModel.url('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018');
-                    this.basicInfoViewModel.name('国研网-银行信托');
-
-                    //调度视图
                     this.scheduleDispatchViewModel=new scheduleDispatchViewModel();
-                    //调度参数测试test
-                    this.scheduleDispatchViewModel.sequence('3');
 
                     this.newsCustomerAttrViewModel=new customerAttrViewModel();
-
                     this.newsTitleViewModel=new commonAttrViewMode();
-                    //新闻内容标题test
-                    this.newsTitleViewModel.selector('#docSubject');
-                    this.newsTitleViewModel.selectorAttrSelected('text');
-
                     this.newsPublishTimeViewModel=new commonAttrViewMode();
-                    //新闻内容时间test
-                    this.newsPublishTimeViewModel.selector('#docDeliveddate');
-                    this.newsPublishTimeViewModel.selectorAttrSelected('text');
-
                     this.newsSourceViewModel=new commonAttrViewMode();
-
                     this.newsContentViewModel=new commonAttrViewMode();
-                    //新闻内容test
-                    this.newsContentViewModel.selector('#docSummary');
-                    this.newsContentViewModel.selectorAttrSelected('text');
 
                     this.listCustomerAttrViewModel=new customerAttrViewModel();
                     this.listOutLinkViewModel=new commonAttrViewMode();
-                    this.listOutLinkViewModel.selectorAttrSelected('href');
-
-                    //列表页test
-                    this.listOutLinkViewModel.selector('#Content_WebPageDocumentsByUId1 > li > div.sub > a');
-
                     this.listPaginationViewModel=new paginationViewModel();
-                    //分页test
-                    this.listPaginationViewModel.paginationUrl('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018&curpage=##');
-                    this.listPaginationViewModel.selector('#Content_WebPageDocumentsByUId1_span_totalpage');
-                    this.listPaginationViewModel.selectorAttrSelected('text');
-                    this.listPaginationViewModel.currentString('##');
-                    this.listPaginationViewModel.start('2');
-                    this.listPaginationViewModel.filter('\\d+');
+                    if(initData!=null){
+
+                    }else{
+                        //基本信息测试
+                        //this.basicInfoViewModel.url('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018');
+                        //this.basicInfoViewModel.name('国研网-银行信托');
+
+                        //调度参数测试test
+                        //this.scheduleDispatchViewModel.sequence('3');
+
+                        //新闻内容标题test
+                        //this.newsTitleViewModel.selector('#docSubject');
+                        this.newsTitleViewModel.selectorAttrSelected('text');
+
+                        //新闻内容时间test
+                        //this.newsPublishTimeViewModel.selector('#docDeliveddate');
+                        this.newsPublishTimeViewModel.selectorAttrSelected('text');
+
+                        //新闻内容test
+                        //this.newsContentViewModel.selector('#docSummary');
+                        this.newsContentViewModel.selectorAttrSelected('text');
+
+                        //列表页链接test
+                        this.listOutLinkViewModel.selectorAttrSelected('href');
+                        //this.listOutLinkViewModel.selector('#Content_WebPageDocumentsByUId1 > li > div.sub > a');
+
+                        //分页test
+                        //this.listPaginationViewModel.paginationUrl('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018&curpage=##');
+                        //this.listPaginationViewModel.selector('#Content_WebPageDocumentsByUId1_span_totalpage');
+                        this.listPaginationViewModel.selectorAttrSelected('text');
+                        this.listPaginationViewModel.currentString('##');
+                        this.listPaginationViewModel.start('2');
+                        this.listPaginationViewModel.filter('\\d+');
+                    }
 
                     this.newsAttrModels=function(){
                         var attrModels=[];
@@ -333,10 +366,7 @@ $(function(){
             })
         });
     });
-
-    //模态对话框事件
-    registerModalViewContentEvent();
-});
+}
 
 /**
  *

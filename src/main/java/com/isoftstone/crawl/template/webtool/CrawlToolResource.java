@@ -209,8 +209,23 @@ public class CrawlToolResource {
 	@POST
 	@Path("/updateTemplate")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String UpdateTemplate(){
-		return "";
+	public String UpdateTemplate(@DefaultValue("") @FormParam("templateGuid") String templateGuid){
+		String json="";
+		TemplateResult templateResult = RedisUtils.getTemplateResult(templateGuid);
+		json=templateResult.toJSON();
+		return json;
+	}
+	
+	/**
+	 * 
+	 * 修改模板
+	 * */
+	@POST
+	@Path("/getTemplateGuid")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getTemplateGuid(@DefaultValue("") @FormParam("templateUrl") String templateUrl){
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		return templateGuid;
 	}
 	
 	
@@ -420,7 +435,7 @@ public class CrawlToolResource {
 		templateModel.setName(pageModel.getBasicInfoViewModel().getName());
 		templateModel.setDescription(pageModel.getBasicInfoViewModel().getName());
 		templateModel.setUrl(pageModel.getBasicInfoViewModel().getUrl());
-		templateModel.setStatus("0");
+		templateModel.setStatus("true");
 		try {
 			StringBuilder str = new StringBuilder();
 			str.append(GetTemplateModelJSONString(templateModel));
