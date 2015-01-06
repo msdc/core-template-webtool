@@ -49,6 +49,9 @@ import com.lj.util.http.DownloadHtml;
  * */
 @Path("crawlToolResource")
 public class CrawlToolResource {
+	//列表的key的后缀
+	public static final String key_partern = "_templatelist";
+	
 	/**
 	 * 保存到本地文件
 	 * */
@@ -180,8 +183,23 @@ public class CrawlToolResource {
 	@POST
 	@Path("/deleteTemplate")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String DeleteTemplate(){
-		return "";
+	public Boolean DeleteTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl){
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		JedisPool pool = null;
+		Jedis jedis = null;		
+		Boolean executeResult=true;
+		try {
+			pool = com.isoftstone.crawl.template.utils.RedisUtils.getPool();
+			jedis = pool.getResource();	
+			jedis.del(templateGuid+key_partern);
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			e.printStackTrace();
+			executeResult=false;
+		} finally {
+			com.isoftstone.crawl.template.utils.RedisUtils.returnResource(pool, jedis);
+		}			
+		return executeResult;	
 	}
 	
 	/**
@@ -211,7 +229,7 @@ public class CrawlToolResource {
 		try {
 			pool = com.isoftstone.crawl.template.utils.RedisUtils.getPool();
 			jedis = pool.getResource();
-			Set<String> listKeys = jedis.keys("*_templatelist");
+			Set<String> listKeys = jedis.keys("*"+key_partern);
 			for (String key : listKeys) {  
 			      String templateString=jedis.get(key);
 			      TemplateModel templateModel=GetTemplateModel(templateString);
@@ -400,6 +418,7 @@ public class CrawlToolResource {
 		TemplateModel templateModel=new TemplateModel();
 		templateModel.setTemplateId(templateGuid);
 		templateModel.setName(pageModel.getBasicInfoViewModel().getName());
+		templateModel.setDescription(pageModel.getBasicInfoViewModel().getName());
 		templateModel.setUrl(pageModel.getBasicInfoViewModel().getUrl());
 		templateModel.setStatus("0");
 		try {
@@ -407,7 +426,7 @@ public class CrawlToolResource {
 			str.append(GetTemplateModelJSONString(templateModel));
 			pool = com.isoftstone.crawl.template.utils.RedisUtils.getPool();
 			jedis = pool.getResource();
-			jedis.set(templateGuid+"_templatelist", str.toString());
+			jedis.set(templateGuid+key_partern, str.toString());
 		} catch (Exception e) {
 			pool.returnBrokenResource(jedis);
 			e.printStackTrace();

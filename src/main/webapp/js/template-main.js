@@ -224,30 +224,31 @@ $(function(){
                 var masterVM = (function(){
                     this.basicInfoViewModel = new basicInfoViewModel();
                     //测试
-                    //this.basicInfoViewModel.url('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018');
+                    this.basicInfoViewModel.url('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018');
+                    this.basicInfoViewModel.name('国研网-银行信托');
 
                     //调度视图
                     this.scheduleDispatchViewModel=new scheduleDispatchViewModel();
-                    //调度参数测试
-                    //this.scheduleDispatchViewModel.sequence('3');
+                    //调度参数测试test
+                    this.scheduleDispatchViewModel.sequence('3');
 
                     this.newsCustomerAttrViewModel=new customerAttrViewModel();
 
                     this.newsTitleViewModel=new commonAttrViewMode();
                     //新闻内容标题test
-                    //this.newsTitleViewModel.selector('#docSubject');
+                    this.newsTitleViewModel.selector('#docSubject');
                     this.newsTitleViewModel.selectorAttrSelected('text');
 
                     this.newsPublishTimeViewModel=new commonAttrViewMode();
-                    //新闻内容时间
-                    //this.newsPublishTimeViewModel.selector('#docDeliveddate');
+                    //新闻内容时间test
+                    this.newsPublishTimeViewModel.selector('#docDeliveddate');
                     this.newsPublishTimeViewModel.selectorAttrSelected('text');
 
                     this.newsSourceViewModel=new commonAttrViewMode();
 
                     this.newsContentViewModel=new commonAttrViewMode();
                     //新闻内容test
-                    //this.newsContentViewModel.selector('#docSummary');
+                    this.newsContentViewModel.selector('#docSummary');
                     this.newsContentViewModel.selectorAttrSelected('text');
 
                     this.listCustomerAttrViewModel=new customerAttrViewModel();
@@ -255,12 +256,12 @@ $(function(){
                     this.listOutLinkViewModel.selectorAttrSelected('href');
 
                     //列表页test
-                    //this.listOutLinkViewModel.selector('#Content_WebPageDocumentsByUId1 > li > div.sub > a');
+                    this.listOutLinkViewModel.selector('#Content_WebPageDocumentsByUId1 > li > div.sub > a');
 
                     this.listPaginationViewModel=new paginationViewModel();
                     //分页test
-                    //this.listPaginationViewModel.paginationUrl('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018&curpage=##');
-                    //this.listPaginationViewModel.selector('#Content_WebPageDocumentsByUId1_span_totalpage');
+                    this.listPaginationViewModel.paginationUrl('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018&curpage=##');
+                    this.listPaginationViewModel.selector('#Content_WebPageDocumentsByUId1_span_totalpage');
                     this.listPaginationViewModel.selectorAttrSelected('text');
                     this.listPaginationViewModel.currentString('##');
                     this.listPaginationViewModel.start('2');
@@ -361,6 +362,7 @@ function showErrorsInTextArea(error){
 }
 
 /**
+ *
  * 在模式对话框中显示结果
  * */
 function showResultInModal(data){
