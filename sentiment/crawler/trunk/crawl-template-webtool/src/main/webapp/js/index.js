@@ -28,17 +28,9 @@ $(function(){
  * 页面初始化
  * */
 function pageInit(templateList){
-    //view-model
-    var pageViewModel={
-        urls:ko.observableArray(templateList),
-        addNew:function(){
-            window.location.href="pages/template-main.html";
-        }.bind(this)
-    };
-
+   var pageViewModel=new templateViewModel(templateList);
     //绑定并显示
     ko.applyBindings(pageViewModel);
-
     //加载分页
     loadPaginationComponent(pageViewModel);
 }
@@ -58,4 +50,45 @@ function loadPaginationComponent(listViewModel) {
         nextText: '下一页',
         onPageClick: function (pageNumber, eTarget) {}
     });
+}
+
+/*****************View-Model***********************/
+function templateViewModel(templateList){
+    var self=this;
+    self.urls=ko.observableArray(templateList);
+    self.addNew=function(){
+        window.location.href="pages/template-main.html";
+    };
+    self.deleteItem=function(){
+        var templateUrl=this.url;
+        var item=this;
+        $.ajax({
+            url: virtualWebPath + '/webapi/crawlToolResource/deleteTemplate',
+            type: 'POST',
+            data:{
+                templateUrl:templateUrl
+            },
+            success: function (data) {
+                if(data=="true"){
+                    self.urls.remove(item);
+                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;删除成功！");
+                }else{
+                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;删除失败！");
+                }
+            },
+            error: function (error) {
+                if(error){
+                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;删除失败！");
+                }
+            }
+        });
+    };
+}
+/*****************View-Model***********************/
+/**
+ * 操作提示
+ * */
+function optionExecuteInfo(title,message){
+    $('#option_alert').html('')
+        .html("<div class=\"alert alert-warning alert-dismissible\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button><strong>"+title+"</strong>"+message+"</div>");
 }
