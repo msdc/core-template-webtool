@@ -13,6 +13,8 @@ public class PageModel {
 	private List<CustomerAttrModel> listCustomerAttrViewModel;
 	private CommonAttrViewModel listOutLinkViewModel;	
 	private ListPaginationViewModel listPaginationViewModel;
+    private ScheduleDispatchViewModel scheduleDispatchViewModel;
+	
 	public BasicInfoViewModel getBasicInfoViewModel() {
 		return basicInfoViewModel;
 	}
@@ -84,5 +86,12 @@ public class PageModel {
 	}
 	public void setListPaginationViewModel(ListPaginationViewModel listPaginationViewModel) {
 		this.listPaginationViewModel = listPaginationViewModel;
+	}
+	
+	public ScheduleDispatchViewModel getScheduleDispatchViewModel() {
+		return scheduleDispatchViewModel;
+	}
+	public void setScheduleDispatchViewModel(ScheduleDispatchViewModel scheduleDispatchViewModel) {
+		this.scheduleDispatchViewModel = scheduleDispatchViewModel;
 	}
 }
