@@ -12,18 +12,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 import com.isoftstone.crawl.template.global.Constants;
 import com.isoftstone.crawl.template.impl.ParseResult;
@@ -160,11 +166,129 @@ public class CrawlToolResource {
 	 * */
 	@POST
 	@Path("/viewHtmlContent")
-	@Produces("text/plain")
+	@Produces(MediaType.TEXT_PLAIN)
 	public String viewHtmlContent(
 			@DefaultValue("") @FormParam("webUrl") String webUrl) {
 		String htmlContent = DownloadHtml.getHtml(webUrl, "UTF-8");
 		return htmlContent;
+	}
+	
+	/**
+	 * 
+	 * 删除模板
+	 * */
+	@POST
+	@Path("/deleteTemplate")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String DeleteTemplate(){
+		return "";
+	}
+	
+	/**
+	 * 
+	 * 修改模板
+	 * */
+	@POST
+	@Path("/updateTemplate")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String UpdateTemplate(){
+		return "";
+	}
+	
+	
+	/**
+	 * 
+	 * 获取所有的模板列表
+	 * */
+	@GET
+	@Path("/getTemplateList")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String GetTemplateList(){
+		JedisPool pool = null;
+		Jedis jedis = null;
+		TemplateList templateList = new TemplateList();
+		List<TemplateModel> templateListArrayList=new ArrayList<TemplateModel>();
+		try {
+			pool = com.isoftstone.crawl.template.utils.RedisUtils.getPool();
+			jedis = pool.getResource();
+			Set<String> listKeys = jedis.keys("templatelist_*");
+			for (String key : listKeys) {  
+			      String templateString=jedis.get(key);
+			      TemplateModel templateModel=GetTemplateModel(templateString);
+			      templateListArrayList.add(templateModel);			      
+			} 					
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			e.printStackTrace();
+		} finally {
+			com.isoftstone.crawl.template.utils.RedisUtils.returnResource(pool, jedis);
+		}	
+		templateList.setTemplateList(templateListArrayList);
+		String templateListJSONString=GetTemplateListJSONString(templateList);
+		return templateListJSONString;	
+	}
+	
+	
+	/**
+	 * 将对象转换为JSON-string形式
+	 * */
+	private String GetTemplateListJSONString(TemplateList templateList) {
+		String json = null;
+
+		ObjectMapper objectmapper = new ObjectMapper();
+		try {
+			json = objectmapper.writeValueAsString(templateList);
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return json;
+	}
+	
+	private String GetTemplateModelJSONString(TemplateModel templateModel) {
+		String json = null;
+
+		ObjectMapper objectmapper = new ObjectMapper();
+		try {
+			json = objectmapper.writeValueAsString(templateModel);
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return json;
+	}
+	
+	/**
+	 * JSON 字符转换为对象
+	 * */
+	private TemplateModel GetTemplateModel(String jsonString) {
+		TemplateModel templateModel = null;
+		try {
+			ObjectMapper objectmapper = new ObjectMapper();
+			templateModel = objectmapper.readValue(jsonString, TemplateModel.class);
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		return templateModel;
 	}
 
 	/**
@@ -259,9 +383,37 @@ public class CrawlToolResource {
 		String encoding = "gb2312";
 		byte[] input = DownloadHtml.getHtml(templateUrl);
 		RedisUtils.setTemplateResult(templateResult, templateGuid);
+		SaveTemplateToList(pageModel);//保存数据源列表所需要的key值
 		System.out.println("templateGuid=" + templateGuid);
 		parseResult = TemplateFactory.process(input, encoding, templateUrl);
 		return parseResult;
+	}
+	
+	/**
+	 * 将redis中模板的id和数据源列表做关联
+	 * */
+	private void SaveTemplateToList(PageModel pageModel) {
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		JedisPool pool = null;
+		Jedis jedis = null;
+		TemplateModel templateModel=new TemplateModel();
+		templateModel.setTemplateId(templateGuid);
+		templateModel.setName(pageModel.getBasicInfoViewModel().getName());
+		templateModel.setUrl(pageModel.getBasicInfoViewModel().getUrl());
+		templateModel.setStatus("0");
+		try {
+			StringBuilder str = new StringBuilder();
+			str.append(GetTemplateModelJSONString(templateModel));
+			pool = com.isoftstone.crawl.template.utils.RedisUtils.getPool();
+			jedis = pool.getResource();
+			jedis.set("templatelist_"+templateGuid, str.toString());
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			e.printStackTrace();
+		} finally {
+			com.isoftstone.crawl.template.utils.RedisUtils.returnResource(pool, jedis);
+		}
 	}
 
 	/**
