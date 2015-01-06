@@ -211,7 +211,7 @@ public class CrawlToolResource {
 		try {
 			pool = com.isoftstone.crawl.template.utils.RedisUtils.getPool();
 			jedis = pool.getResource();
-			Set<String> listKeys = jedis.keys("templatelist_*");
+			Set<String> listKeys = jedis.keys("*_templatelist");
 			for (String key : listKeys) {  
 			      String templateString=jedis.get(key);
 			      TemplateModel templateModel=GetTemplateModel(templateString);
@@ -407,7 +407,7 @@ public class CrawlToolResource {
 			str.append(GetTemplateModelJSONString(templateModel));
 			pool = com.isoftstone.crawl.template.utils.RedisUtils.getPool();
 			jedis = pool.getResource();
-			jedis.set("templatelist_"+templateGuid, str.toString());
+			jedis.set(templateGuid+"_templatelist", str.toString());
 		} catch (Exception e) {
 			pool.returnBrokenResource(jedis);
 			e.printStackTrace();

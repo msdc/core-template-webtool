@@ -68,6 +68,16 @@ function singleCustomerViewModel() {
 
 /**
  *
+ * 调度任务的View-Model
+ * */
+function scheduleDispatchViewModel(){
+    this.periods=ko.observable(['hour','day','week']);
+    this.periodsSelected=ko.observable('hour');
+    this.sequence=ko.observable();
+}
+
+/**
+ *
  * 基本信息View-Model
  * */
 function basicInfoViewModel(){
@@ -215,6 +225,11 @@ $(function(){
                     this.basicInfoViewModel = new basicInfoViewModel();
                     //测试
                     //this.basicInfoViewModel.url('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018');
+
+                    //调度视图
+                    this.scheduleDispatchViewModel=new scheduleDispatchViewModel();
+                    //调度参数测试
+                    //this.scheduleDispatchViewModel.sequence('3');
 
                     this.newsCustomerAttrViewModel=new customerAttrViewModel();
 
@@ -420,9 +435,35 @@ function getJSONString(obj){
             start:obj.listPaginationViewModel.start(),
             records:obj.listPaginationViewModel.records(),
             interval:obj.listPaginationViewModel.interval()
+        },
+        scheduleDispatchViewModel:{
+            domain:getDomainByUrl(obj.basicInfoViewModel.url()),
+            period:obj.scheduleDispatchViewModel.periodsSelected(),
+            sequence:obj.scheduleDispatchViewModel.sequence()
         }
     });
     return jsonString;
+}
+
+/**
+ *
+ * 根据url获取domain
+ * */
+function getDomainByUrl(url) {
+    var url = $.trim(url);
+    if(url.search(/^https?\:\/\//) != -1){
+        url = url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i, "");
+    }else{
+        url = url.match(/^([^\/?#]+)(?:[\/?#]|$)/i, "");
+    }
+
+    if(url!=null){
+        if(url.length>0){
+            return url[1];
+        }
+    }
+
+    return "";
 }
 
 /**
