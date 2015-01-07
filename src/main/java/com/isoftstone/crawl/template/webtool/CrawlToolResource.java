@@ -192,7 +192,7 @@ public class CrawlToolResource {
 		Jedis jedis = null;		
 		Boolean executeResult=true;
 		try {
-			pool = com.isoftstone.crawl.template.utils.RedisUtils.getPool();
+			pool = RedisUtils.getPool();
 			jedis = pool.getResource();	
 			jedis.del(templateGuid+key_partern);
 		} catch (Exception e) {
@@ -200,7 +200,7 @@ public class CrawlToolResource {
 			e.printStackTrace();
 			executeResult=false;
 		} finally {
-			com.isoftstone.crawl.template.utils.RedisUtils.returnResource(pool, jedis);
+			RedisUtils.returnResource(pool, jedis);
 		}			
 		return executeResult;	
 	}
@@ -245,7 +245,7 @@ public class CrawlToolResource {
 		TemplateList templateList = new TemplateList();
 		List<TemplateModel> templateListArrayList=new ArrayList<TemplateModel>();
 		try {
-			pool = com.isoftstone.crawl.template.utils.RedisUtils.getPool();
+			pool = RedisUtils.getPool();
 			jedis = pool.getResource();
 			Set<String> listKeys = jedis.keys("*"+key_partern);
 			for (String key : listKeys) {  
@@ -257,7 +257,7 @@ public class CrawlToolResource {
 			pool.returnBrokenResource(jedis);
 			e.printStackTrace();
 		} finally {
-			com.isoftstone.crawl.template.utils.RedisUtils.returnResource(pool, jedis);
+			RedisUtils.returnResource(pool, jedis);
 		}	
 		templateList.setTemplateList(templateListArrayList);
 		String templateListJSONString=GetTemplateListJSONString(templateList);
@@ -276,14 +276,14 @@ public class CrawlToolResource {
 		Jedis jedis = null;	
 		String json="";
 		try {
-			pool = com.isoftstone.crawl.template.utils.RedisUtils.getPool();
+			pool = RedisUtils.getPool();
 			jedis = pool.getResource();	
 			json=jedis.get(templateGuid+key_partern);
 		} catch (Exception e) {
 			pool.returnBrokenResource(jedis);
 			e.printStackTrace();
 		} finally {
-			com.isoftstone.crawl.template.utils.RedisUtils.returnResource(pool, jedis);
+			RedisUtils.returnResource(pool, jedis);
 		}
 		return json;
 	}
@@ -465,14 +465,14 @@ public class CrawlToolResource {
 		try {
 			StringBuilder str = new StringBuilder();
 			str.append(GetTemplateModelJSONString(templateModel));
-			pool = com.isoftstone.crawl.template.utils.RedisUtils.getPool();
+			pool = RedisUtils.getPool();
 			jedis = pool.getResource();
 			jedis.set(templateGuid+key_partern, str.toString());
 		} catch (Exception e) {
 			pool.returnBrokenResource(jedis);
 			e.printStackTrace();
 		} finally {
-			com.isoftstone.crawl.template.utils.RedisUtils.returnResource(pool, jedis);
+			RedisUtils.returnResource(pool, jedis);
 		}
 	}
 
