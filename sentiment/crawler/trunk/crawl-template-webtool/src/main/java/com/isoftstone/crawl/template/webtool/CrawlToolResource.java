@@ -42,9 +42,9 @@ import com.isoftstone.crawl.template.impl.TemplateResult;
 import com.isoftstone.crawl.template.model.CustomerAttrModel;
 import com.isoftstone.crawl.template.model.PageModel;
 import com.isoftstone.crawl.template.model.TemplateModel;
+import com.isoftstone.crawl.template.utils.DownloadHtml;
 import com.isoftstone.crawl.template.utils.MD5Utils;
 import com.isoftstone.crawl.template.utils.RedisUtils;
-import com.lj.util.http.DownloadHtml;
 
 /**
  * 
