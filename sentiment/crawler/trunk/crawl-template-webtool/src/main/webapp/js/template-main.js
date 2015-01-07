@@ -397,6 +397,39 @@ function testAddNewTemplate(pageViewModel){
  * @param {Object} pageViewModel 当前页面的View-Model
  * */
 function updateTemplate(initData,pageViewModel){
+    var templateGuid=initData.templateGuid;
+    $.ajax({
+        url: virtualWebPath + '/webapi/crawlToolResource/getSingleTemplateModel',
+        type: 'POST',
+        data: {
+            templateGuid: templateGuid
+        },
+        success: function (data) {
+            updateTemplateDataInit(initData,pageViewModel,data);
+        },
+        error: function (error) {
+        }
+    });
+}
+
+/**
+ *
+ * 模板修改 数据初始化
+ * @param {Object} initData 页面初始化数据对象
+ * @param {Object} pageViewModel 当前页面的View-Model
+ * @param {String}　singleTemplateListJSON　单个模板对象的JSON字符
+ * */
+function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
+    var templateModel=null;
+    if(singleTemplateListJSON!=''&&singleTemplateListJSON!=undefined&&singleTemplateListJSON!=null){
+        templateModel=JSON.parse(singleTemplateListJSON);
+    }
+    //基本信息
+    if(templateModel!=null){
+        pageViewModel.basicInfoViewModel.name(templateModel.name);
+        pageViewModel.basicInfoViewModel.url(templateModel.url);
+    }
+
     //列表页外链接
     var listOutLinkArray=initData.list;
     if(listOutLinkArray!=null){

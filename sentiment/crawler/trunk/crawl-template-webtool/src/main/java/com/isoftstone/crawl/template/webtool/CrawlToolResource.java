@@ -264,6 +264,29 @@ public class CrawlToolResource {
 		return templateListJSONString;	
 	}
 	
+	/**
+	 * 
+	 * 获取模板列表中单个模板对象
+	 * */
+	@POST
+	@Path("/getSingleTemplateModel")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getSingleTemplateModel(@DefaultValue("") @FormParam("templateGuid") String templateGuid){
+		JedisPool pool = null;
+		Jedis jedis = null;	
+		String json="";
+		try {
+			pool = com.isoftstone.crawl.template.utils.RedisUtils.getPool();
+			jedis = pool.getResource();	
+			json=jedis.get(templateGuid+key_partern);
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			e.printStackTrace();
+		} finally {
+			com.isoftstone.crawl.template.utils.RedisUtils.returnResource(pool, jedis);
+		}
+		return json;
+	}
 	
 	/**
 	 * 将对象转换为JSON-string形式
