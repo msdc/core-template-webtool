@@ -270,7 +270,7 @@ function loadPageContext(initData){
                     }else{
                         addNewTemplateDataInit(this);
                         //测试 添加模板
-                        testAddNewTemplate(this);
+                        //testAddNewTemplate(this);
                     }
 
                     //内容页自定义属性
