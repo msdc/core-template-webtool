@@ -245,7 +245,7 @@ $(function(){
 /**
  *
  * 页面内容初始化
- * @params {Object} initData 模板结果的JSON对象
+ * @param {Object} initData 模板结果的JSON对象
  * */
 function loadPageContext(initData){
     $('#news_tab').load('template-news.html',function(){
@@ -265,6 +265,7 @@ function loadPageContext(initData){
                     this.listCustomerAttrViewModel=new customerAttrViewModel();
                     this.listOutLinkViewModel=new commonAttrViewMode();
                     this.listPaginationViewModel=new paginationViewModel();
+
                     if(initData!=null){
                         updateTemplate(initData,this);
                     }else{
@@ -400,11 +401,13 @@ function updateTemplate(initData,pageViewModel){
     var listOutLinkArray=initData.list;
     if(listOutLinkArray!=null){
         var listOutLink=listOutLinkArray[0];
-        var listOutLinkIndexer=listOutLink.indexers[0];
-        var listOutLinkSelector=listOutLinkIndexer.value;
-        var listOutLinkSelectorAttr=listOutLinkIndexer.attribute;
-        pageViewModel.listOutLinkViewModel.selector(listOutLinkSelector);
-        pageViewModel.listOutLinkViewModel.selectorAttrSelected(listOutLinkSelectorAttr);
+        if(listOutLink.indexers!=null){
+            var listOutLinkIndexer=listOutLink.indexers[0];
+            var listOutLinkSelector=listOutLinkIndexer.value;
+            var listOutLinkSelectorAttr=listOutLinkIndexer.attribute;
+            pageViewModel.listOutLinkViewModel.selector(listOutLinkSelector);
+            pageViewModel.listOutLinkViewModel.selectorAttrSelected(listOutLinkSelectorAttr);
+        }
 
         //列表页的自定义属性
         var listOutLinkLabels=listOutLink.labels;
@@ -412,24 +415,96 @@ function updateTemplate(initData,pageViewModel){
             for(var i=0;i<listOutLinkLabels.length;i++){
                 var listCustomerAttrObj=listOutLinkLabels[i];
                 var customerViewModel=new singleCustomerViewModel();
-                var customerViewModelIndexer=listCustomerAttrObj.indexers[0];
-                customerViewModel.selector(customerViewModelIndexer.value);
-                customerViewModel.attrSelected(customerViewModelIndexer.attribute);
-                var filterCategory=customerViewModelIndexer.type;
-                if(filterCategory=="match"){
-                    customerViewModel.filterCategorySelected('匹配');
-                    customerViewModel.filter(customerViewModelIndexer.value);
+                //自定义属性索引器
+                if(listCustomerAttrObj.indexers!=null){
+                    var customerViewModelIndexer=listCustomerAttrObj.indexers[0];
+                    customerViewModel.target(listCustomerAttrObj.name);
+                    customerViewModel.selector(customerViewModelIndexer.value);
+                    customerViewModel.attrSelected(customerViewModelIndexer.attribute);
                 }
-                if(filterCategory=="remove"){
-                    customerViewModel.filterCategorySelected('移除');
-                    customerViewModel.filter(customerViewModelIndexer.value);
-                }
-                if(filterCategory=="replace"){
-                    customerViewModel.filterCategorySelected('替换');
-                    customerViewModel.replaceBefore(customerViewModelIndexer.value);
-                    customerViewModel.replaceTo(customerViewModelIndexer.replaceTo);
+
+                //自定义属性过滤器
+                if(listCustomerAttrObj.filters!=null){
+                    var customerViewModelFilter=listCustomerAttrObj.filters[0];
+                    var filterCategory=customerViewModelFilter.type;
+                    if(filterCategory=="match"){
+                        customerViewModel.filterCategorySelected('匹配');
+                        customerViewModel.filter(customerViewModelFilter.value);
+                    }
+                    if(filterCategory=="remove"){
+                        customerViewModel.filterCategorySelected('移除');
+                        customerViewModel.filter(customerViewModelFilter.value);
+                    }
+                    if(filterCategory=="replace"){
+                        customerViewModel.filterCategorySelected('替换');
+                        customerViewModel.replaceBefore(customerViewModelFilter.value);
+                        customerViewModel.replaceTo(customerViewModelFilter.replaceTo);
+                    }
                 }
                 pageViewModel.listCustomerAttrViewModel.regions.push(customerViewModel);
+            }
+        }
+    }
+
+    //列表分页
+    var listPaginationArray=initData.pagination;
+    if(listPaginationArray!=null){
+        var listPagination=listPaginationArray[0];
+        //分页索引器
+        if(listPagination.indexers!=null){
+            var listPaginationIndexer=listPagination.indexers[0];
+            var listPaginationSelector=listPaginationIndexer.value;
+            var listPaginationSelectorAttr=listPaginationIndexer.attribute;
+            pageViewModel.listPaginationViewModel.selector(listPaginationSelector);
+            pageViewModel.listPaginationViewModel.selectorAttrSelected(listPaginationSelectorAttr);
+        }
+        pageViewModel.listPaginationViewModel.paginationUrl(listPagination.pagitationUrl);
+        var paginationType=listPagination.pagitationType;
+        if(paginationType=="number"){//分页的末尾页数
+            pageViewModel.listPaginationViewModel.paginationTypeSelected('分页的末尾页数');
+        }else if(paginationType=="interval"){//分页步进数
+            pageViewModel.listPaginationViewModel.paginationTypeSelected('分页步进数');
+            pageViewModel.listPaginationViewModel.interval(listPagination.interval);
+        }else if(paginationType=="record"){//获取分页的记录数
+            pageViewModel.listPaginationViewModel.paginationTypeSelected('获取分页的记录数');
+            pageViewModel.listPaginationViewModel.records(listPagination.recordNumber);
+        }else if(paginationType=="page"){//获取分页URL
+            pageViewModel.listPaginationViewModel.paginationTypeSelected('获取分页URL');
+        }
+        pageViewModel.listPaginationViewModel.currentString(listPagination.current);
+        pageViewModel.listPaginationViewModel.start(listPagination.startNumber);
+    }
+
+    //内容页 标题
+    var newsArray=initData.news;
+    if(newsArray!=null){
+        for(var i=0;i<newsArray.length;i++){
+            var newsField=newsArray[i];
+            var newsFieldName=newsField.name;
+            if(newsField.indexers==null){
+                continue;
+            }
+            var newsFieldIndexer=newsField.indexers[0];
+            if(newsFieldName=="title"){
+                pageViewModel.newsTitleViewModel.selector(newsFieldIndexer.value);
+                pageViewModel.newsTitleViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
+            }else if(newsFieldName=="content"){
+                pageViewModel.newsContentViewModel.selector(newsFieldIndexer.value);
+                pageViewModel.newsContentViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
+            }else if(newsFieldName=="publisTime"){
+                pageViewModel.newsPublishTimeViewModel.selector(newsFieldIndexer.value);
+                pageViewModel.newsPublishTimeViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
+            }else if(newsFieldName=="source"){
+                pageViewModel.newsSourceViewModel.selector(newsFieldIndexer.value);
+                pageViewModel.newsSourceViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
+            }else{
+                //内容页的自定义属性
+                var customerViewModel=new singleCustomerViewModel();
+                //自定义属性索引器
+                customerViewModel.target(newsField.name);
+                customerViewModel.selector(newsFieldIndexer.value);
+                customerViewModel.attrSelected(newsFieldIndexer.attribute);
+                pageViewModel.newsCustomerAttrViewModel.regions.push(customerViewModel);
             }
         }
     }
