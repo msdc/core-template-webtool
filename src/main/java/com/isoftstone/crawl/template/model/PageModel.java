@@ -1,4 +1,4 @@
-package com.isoftstone.crawl.template.webtool;
+package com.isoftstone.crawl.template.model;
 
 import java.util.List;
 
