@@ -228,13 +228,13 @@ $(function(){
             },
             success: function (data) {
                 var json=JSON.parse(data);
-                pageDataInit(json);
+                loadPageContext(json);
             },
             error: function (error) {
             }
         });
     }else{//添加操作页面初始化
-        pageDataInit(null);
+        loadPageContext(null);
     }
 
 
@@ -247,7 +247,7 @@ $(function(){
  * 页面内容初始化
  * @params {Object} initData 模板结果的JSON对象
  * */
-function pageDataInit(initData){
+function loadPageContext(initData){
     $('#news_tab').load('template-news.html',function(){
         $('#schedule_tab').load('template-schedule.html',function(){
             $('#list_tab').load('template-list.html',function(){
@@ -266,76 +266,14 @@ function pageDataInit(initData){
                     this.listOutLinkViewModel=new commonAttrViewMode();
                     this.listPaginationViewModel=new paginationViewModel();
                     if(initData!=null){
-                        //列表页外链接
-                        var listOutLinkArray=initData.list;
-                        if(listOutLinkArray!=null){
-                            var listOutLink=listOutLinkArray[0];
-                            var listOutLinkIndexer=listOutLink.indexers[0];
-                            var listOutLinkSelector=listOutLinkIndexer.value;
-                            var listOutLinkSelectorAttr=listOutLinkIndexer.attribute;
-                            this.listOutLinkViewModel.selector(listOutLinkSelector);
-                            this.listOutLinkViewModel.selectorAttrSelected(listOutLinkSelectorAttr);
-
-                            //列表页的自定义属性
-                            var listOutLinkLabels=listOutLink.labels;
-                            if(listOutLinkLabels!=null){
-                                for(var i=0;i<listOutLinkLabels.length;i++){
-                                    var listCustomerAttrObj=listOutLinkLabels[i];
-                                    var customerViewModel=new singleCustomerViewModel();
-                                    var customerViewModelIndexer=listCustomerAttrObj.indexers[0];
-                                    customerViewModel.selector(customerViewModelIndexer.value);
-                                    customerViewModel.attrSelected(customerViewModelIndexer.attribute);
-                                    var filterCategory=customerViewModelIndexer.type;
-                                    if(filterCategory=="match"){
-                                        customerViewModel.filterCategorySelected('匹配');
-                                        customerViewModel.filter(customerViewModelIndexer.value);
-                                    }
-                                    if(filterCategory=="remove"){
-                                        customerViewModel.filterCategorySelected('移除');
-                                        customerViewModel.filter(customerViewModelIndexer.value);
-                                    }
-                                    if(filterCategory=="replace"){
-                                        customerViewModel.filterCategorySelected('替换');
-                                        customerViewModel.replaceBefore(customerViewModelIndexer.value);
-                                        customerViewModel.replaceTo(customerViewModelIndexer.replaceTo);
-                                    }
-                                    this.listCustomerAttrViewModel.regions.push(customerViewModel);
-                                }
-                            }
-                        }
+                        updateTemplate(initData,this);
                     }else{
-                        //基本信息测试
-                        //this.basicInfoViewModel.url('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018');
-                        //this.basicInfoViewModel.name('国研网-银行信托');
-
-                        //调度参数测试test
-                        //this.scheduleDispatchViewModel.sequence('3');
-
-                        //新闻内容标题test
-                        //this.newsTitleViewModel.selector('#docSubject');
-                        this.newsTitleViewModel.selectorAttrSelected('text');
-
-                        //新闻内容时间test
-                        //this.newsPublishTimeViewModel.selector('#docDeliveddate');
-                        this.newsPublishTimeViewModel.selectorAttrSelected('text');
-
-                        //新闻内容test
-                        //this.newsContentViewModel.selector('#docSummary');
-                        this.newsContentViewModel.selectorAttrSelected('text');
-
-                        //列表页链接test
-                        this.listOutLinkViewModel.selectorAttrSelected('href');
-                        //this.listOutLinkViewModel.selector('#Content_WebPageDocumentsByUId1 > li > div.sub > a');
-
-                        //分页test
-                        //this.listPaginationViewModel.paginationUrl('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018&curpage=##');
-                        //this.listPaginationViewModel.selector('#Content_WebPageDocumentsByUId1_span_totalpage');
-                        this.listPaginationViewModel.selectorAttrSelected('text');
-                        this.listPaginationViewModel.currentString('##');
-                        this.listPaginationViewModel.start('2');
-                        this.listPaginationViewModel.filter('\\d+');
+                        addNewTemplateDataInit(this);
+                        //测试 添加模板
+                        testAddNewTemplate(this);
                     }
 
+                    //内容页自定义属性
                     this.newsAttrModels=function(){
                         var attrModels=[];
                         var modelArray=this.newsCustomerAttrViewModel.regions();
@@ -349,6 +287,7 @@ function pageDataInit(initData){
                         return attrModels;
                     };
 
+                    //列表页自定义属性
                     this.listAttrModels=function(){
                         var attrModels=[];
                         var modelArray=this.listCustomerAttrViewModel.regions();
@@ -402,6 +341,98 @@ function pageDataInit(initData){
             })
         });
     });
+}
+
+/**
+ *
+ *添加模板 数据初始化
+ *@param {Object} pageViewModel 当前页面的View-Model
+ * */
+function addNewTemplateDataInit(pageViewModel){
+    pageViewModel.newsTitleViewModel.selectorAttrSelected('text');
+    pageViewModel.newsPublishTimeViewModel.selectorAttrSelected('text');
+    pageViewModel.newsContentViewModel.selectorAttrSelected('text');
+    pageViewModel.listOutLinkViewModel.selectorAttrSelected('href');
+    pageViewModel.listPaginationViewModel.selectorAttrSelected('text');
+    pageViewModel.listPaginationViewModel.currentString('##');
+    pageViewModel.listPaginationViewModel.start('2');
+    pageViewModel.listPaginationViewModel.filter('\\d+');
+}
+
+/**
+ *
+ *[测试] 添加模板
+ *@param {Object} pageViewModel 当前页面的View-Model
+ * */
+function testAddNewTemplate(pageViewModel){
+    //基本信息测试
+    pageViewModel.basicInfoViewModel.url('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018');
+    pageViewModel.basicInfoViewModel.name('国研网-银行信托');
+
+    //调度参数测试test
+    pageViewModel.scheduleDispatchViewModel.sequence('3');
+
+    //新闻内容标题test
+    pageViewModel.newsTitleViewModel.selector('#docSubject');
+
+    //新闻内容时间test
+    pageViewModel.newsPublishTimeViewModel.selector('#docDeliveddate');
+
+    //新闻内容test
+    pageViewModel.newsContentViewModel.selector('#docSummary');
+
+    //列表页链接test
+    pageViewModel.listOutLinkViewModel.selector('#Content_WebPageDocumentsByUId1 > li > div.sub > a');
+
+    //分页test
+    pageViewModel.listPaginationViewModel.paginationUrl('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018&curpage=##');
+    pageViewModel.listPaginationViewModel.selector('#Content_WebPageDocumentsByUId1_span_totalpage');
+}
+
+/**
+ *
+ * 模板修改
+ * @param {Object} initData 页面初始化数据对象
+ * @param {Object} pageViewModel 当前页面的View-Model
+ * */
+function updateTemplate(initData,pageViewModel){
+    //列表页外链接
+    var listOutLinkArray=initData.list;
+    if(listOutLinkArray!=null){
+        var listOutLink=listOutLinkArray[0];
+        var listOutLinkIndexer=listOutLink.indexers[0];
+        var listOutLinkSelector=listOutLinkIndexer.value;
+        var listOutLinkSelectorAttr=listOutLinkIndexer.attribute;
+        pageViewModel.listOutLinkViewModel.selector(listOutLinkSelector);
+        pageViewModel.listOutLinkViewModel.selectorAttrSelected(listOutLinkSelectorAttr);
+
+        //列表页的自定义属性
+        var listOutLinkLabels=listOutLink.labels;
+        if(listOutLinkLabels!=null){
+            for(var i=0;i<listOutLinkLabels.length;i++){
+                var listCustomerAttrObj=listOutLinkLabels[i];
+                var customerViewModel=new singleCustomerViewModel();
+                var customerViewModelIndexer=listCustomerAttrObj.indexers[0];
+                customerViewModel.selector(customerViewModelIndexer.value);
+                customerViewModel.attrSelected(customerViewModelIndexer.attribute);
+                var filterCategory=customerViewModelIndexer.type;
+                if(filterCategory=="match"){
+                    customerViewModel.filterCategorySelected('匹配');
+                    customerViewModel.filter(customerViewModelIndexer.value);
+                }
+                if(filterCategory=="remove"){
+                    customerViewModel.filterCategorySelected('移除');
+                    customerViewModel.filter(customerViewModelIndexer.value);
+                }
+                if(filterCategory=="replace"){
+                    customerViewModel.filterCategorySelected('替换');
+                    customerViewModel.replaceBefore(customerViewModelIndexer.value);
+                    customerViewModel.replaceTo(customerViewModelIndexer.replaceTo);
+                }
+                pageViewModel.listCustomerAttrViewModel.regions.push(customerViewModel);
+            }
+        }
+    }
 }
 
 /**
