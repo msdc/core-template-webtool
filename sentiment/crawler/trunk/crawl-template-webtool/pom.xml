@@ -30,11 +30,6 @@
 					<archiveClasses>true</archiveClasses>
 					<webResources>
 						<resource>
-							<directory>libs</directory>
-							<targetPath>WEB-INF/lib</targetPath>
-							<filtering>true</filtering>
-						</resource>
-						<resource>
 							<directory>src/main/resources</directory>
 							<targetPath>WEB-INF/classes</targetPath>
 							<filtering>true</filtering>
