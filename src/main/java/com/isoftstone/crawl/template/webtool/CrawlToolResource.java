@@ -75,6 +75,9 @@ public class CrawlToolResource {
         String period = pageModel.getScheduleDispatchViewModel().getPeriod();
         String sequence = pageModel.getScheduleDispatchViewModel()
                 .getSequence();
+        if(sequence == null || sequence.equals("")) {
+            return "保存失败，请输入时序.";
+        }
         String folderName = domain + "_" + "1" + period + "_" + sequence;
         ParseResult parseResult = SaveTemplateToRedis(pageModel);
         if (parseResult == null) {
@@ -83,8 +86,8 @@ public class CrawlToolResource {
         String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
         String templateGuid = MD5Utils.MD5(templateUrl);
         String redisKey = templateGuid + key_partern;
-        TemplateResult templateResult = RedisUtils.getTemplateResult(redisKey);
-        String status = templateResult.getState();
+        TemplateModel templateModel = getTemplateModel(redisKey);
+        String status = templateModel.getStatus();
         ArrayList<String> seeds = TemplateFactory.getOutlink(parseResult);
         saveSeedsValueToFile(folderName, seeds, status);
         return "文件保存成功!";
@@ -128,6 +131,25 @@ public class CrawlToolResource {
         } finally {
             RedisUtils.returnResource(pool, jedis);
         }
+    }
+    
+    public TemplateModel getTemplateModel(String guid) {
+        JedisPool pool = null;
+        Jedis jedis = null;
+        try {
+            pool = RedisUtils.getPool();
+            jedis = pool.getResource();
+            String json = jedis.get(guid);
+            if (json != null) {
+                return GetTemplateModel(json);
+            }
+        } catch (Exception e) {
+            pool.returnBrokenResource(jedis);
+            LOG.error("", e);
+        } finally {
+            RedisUtils.returnResource(pool, jedis);
+        }
+        return null;
     }
 
     /**
