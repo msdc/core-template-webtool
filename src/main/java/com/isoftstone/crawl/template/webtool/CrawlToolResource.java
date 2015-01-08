@@ -600,8 +600,7 @@ public class CrawlToolResource {
                     .getSelector(), pageModel.getListOutLinkViewModel()
                     .getSelectorAttr());
             selector.initContentSelector(indexer, null);
-            list.add(selector);
-            template.setList(list);
+            list.add(selector);           
         }
 
         // 处理列表自定义属性 以时间为例
@@ -626,9 +625,9 @@ public class CrawlToolResource {
             label.initLabelSelector(model.getTarget(), "", indexer, filter,
                 null);
             selector.setLabel(label);
-            list.add(selector);
-            template.setList(list);
+            list.add(selector);            
         }
+        template.setList(list);
 
         // pagitation outlink js翻页无法处理
         indexer = new SelectorIndexer();
@@ -704,9 +703,9 @@ public class CrawlToolResource {
         }
 
         if (!pageModel.getListPaginationViewModel().getSelector().equals("")) {
-            pagination.add(selector);
-            template.setPagination(pagination);
+            pagination.add(selector);            
         }
+        template.setPagination(pagination);
 
         // title
         indexer = new SelectorIndexer();
@@ -727,8 +726,7 @@ public class CrawlToolResource {
                     .getSelector(), pageModel.getNewsContentViewModel()
                     .getSelectorAttr());
             selector.initFieldSelector("content", "", indexer, null, null);
-            news.add(selector);
-            template.setNews(news);
+            news.add(selector);            
         }
 
         // public time
@@ -739,8 +737,7 @@ public class CrawlToolResource {
                     .getSelector(), pageModel.getNewsPublishTimeViewModel()
                     .getSelectorAttr());
             selector.initFieldSelector("publisTime", "", indexer, null, null);
-            news.add(selector);
-            template.setNews(news);
+            news.add(selector);            
         }
 
         // source
@@ -751,8 +748,7 @@ public class CrawlToolResource {
                     .getSelector(), pageModel.getNewsSourceViewModel()
                     .getSelectorAttr());
             selector.initFieldSelector("source", "", indexer, null, null);
-            news.add(selector);
-            template.setNews(news);
+            news.add(selector);            
         }
 
         // 处理内容自定义属性 以时间为例
@@ -765,10 +761,10 @@ public class CrawlToolResource {
                 indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
                 selector.initFieldSelector(model.getTarget(), "", indexer,
                     null, null);
-                news.add(selector);
-                template.setNews(news);
+                news.add(selector);                
             }
         }
+        template.setNews(news);
 
         return template;
     }
