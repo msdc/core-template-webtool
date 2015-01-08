@@ -72,6 +72,11 @@
         	<artifactId>jackson-mapper-asl</artifactId>
         	<version>1.9.13</version>
         </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.48</version>
+        </dependency>
     </dependencies>
     <properties>
         <jersey.version>2.13</jersey.version>
