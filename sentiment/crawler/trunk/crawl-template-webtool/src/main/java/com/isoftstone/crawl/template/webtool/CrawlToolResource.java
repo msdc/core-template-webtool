@@ -233,11 +233,7 @@ public class CrawlToolResource {
         runmanager.setCommand(command);
         ShellUtils.execCmd(runmanager);
     }
-    
-    public static void main(String[] args) {
-        putSeedsFolder("www.ccgp-gansu.gov.cn_1hour_3", "local");
-    }
-
+  
     /**
      * 验证内容页
      * */
