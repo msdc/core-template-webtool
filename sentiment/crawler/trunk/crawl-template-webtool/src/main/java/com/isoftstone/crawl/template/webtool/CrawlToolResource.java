@@ -48,7 +48,9 @@ import com.isoftstone.crawl.template.utils.Config;
 import com.isoftstone.crawl.template.utils.DownloadHtml;
 import com.isoftstone.crawl.template.utils.MD5Utils;
 import com.isoftstone.crawl.template.utils.RedisUtils;
+import com.isoftstone.crawl.template.utils.ShellUtils;
 import com.isoftstone.crawl.template.vo.DispatchVo;
+import com.isoftstone.crawl.template.vo.Runmanager;
 import com.isoftstone.crawl.template.vo.Seed;
 
 /**
@@ -75,7 +77,7 @@ public class CrawlToolResource {
         String period = pageModel.getScheduleDispatchViewModel().getPeriod();
         String sequence = pageModel.getScheduleDispatchViewModel()
                 .getSequence();
-        if(sequence == null || sequence.equals("")) {
+        if (sequence == null || sequence.equals("")) {
             return "保存失败，请输入时序.";
         }
         String folderName = domain + "_" + "1" + period + "_" + sequence;
@@ -132,7 +134,7 @@ public class CrawlToolResource {
             RedisUtils.returnResource(pool, jedis);
         }
     }
-    
+
     public TemplateModel getTemplateModel(String guid) {
         JedisPool pool = null;
         Jedis jedis = null;
@@ -197,6 +199,7 @@ public class CrawlToolResource {
             output = new BufferedWriter(new FileWriter(f));
             output.write(strBuf.toString());
             output.close();
+            putSeedsFolder(folderName, "local");
         } catch (Exception e) {
             LOG.error("生成文件错误.", e);
         } finally {
@@ -211,6 +214,28 @@ public class CrawlToolResource {
                 LOG.error("关闭流异常.", e);
             }
         }
+    }
+
+    private static void putSeedsFolder(String folderName, String type) {
+        Runmanager runmanager = new Runmanager();
+//        runmanager.setHostIp("192.168.100.236");
+//        runmanager.setUsername("root");
+//        runmanager.setPassword("Password1");
+//        runmanager.setPort(22);
+        String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
+        String command = "";
+        if ("local".equals(type)) {
+            command = "scp -r " + folderRoot + "/" + folderName + " root@192.168.100.231:/home/" + folderName;
+        }else {
+            //FIXME:集群模式，执行的命令.
+            command = "";
+        }
+        runmanager.setCommand(command);
+        ShellUtils.execCmd(runmanager);
+    }
+    
+    public static void main(String[] args) {
+        putSeedsFolder("www.ccgp-gansu.gov.cn_1hour_3", "local");
     }
 
     /**
@@ -622,7 +647,7 @@ public class CrawlToolResource {
                     .getSelector(), pageModel.getListOutLinkViewModel()
                     .getSelectorAttr());
             selector.initContentSelector(indexer, null);
-            list.add(selector);           
+            list.add(selector);
         }
 
         // 处理列表自定义属性 以时间为例
@@ -647,7 +672,7 @@ public class CrawlToolResource {
             label.initLabelSelector(model.getTarget(), "", indexer, filter,
                 null);
             selector.setLabel(label);
-            list.add(selector);            
+            list.add(selector);
         }
         template.setList(list);
 
@@ -725,7 +750,7 @@ public class CrawlToolResource {
         }
 
         if (!pageModel.getListPaginationViewModel().getSelector().equals("")) {
-            pagination.add(selector);            
+            pagination.add(selector);
         }
         template.setPagination(pagination);
 
@@ -748,7 +773,7 @@ public class CrawlToolResource {
                     .getSelector(), pageModel.getNewsContentViewModel()
                     .getSelectorAttr());
             selector.initFieldSelector("content", "", indexer, null, null);
-            news.add(selector);            
+            news.add(selector);
         }
 
         // public time
@@ -759,7 +784,7 @@ public class CrawlToolResource {
                     .getSelector(), pageModel.getNewsPublishTimeViewModel()
                     .getSelectorAttr());
             selector.initFieldSelector("publisTime", "", indexer, null, null);
-            news.add(selector);            
+            news.add(selector);
         }
 
         // source
@@ -770,7 +795,7 @@ public class CrawlToolResource {
                     .getSelector(), pageModel.getNewsSourceViewModel()
                     .getSelectorAttr());
             selector.initFieldSelector("source", "", indexer, null, null);
-            news.add(selector);            
+            news.add(selector);
         }
 
         // 处理内容自定义属性 以时间为例
@@ -783,7 +808,7 @@ public class CrawlToolResource {
                 indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
                 selector.initFieldSelector(model.getTarget(), "", indexer,
                     null, null);
-                news.add(selector);                
+                news.add(selector);
             }
         }
         template.setNews(news);
