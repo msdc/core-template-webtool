@@ -218,10 +218,10 @@ public class CrawlToolResource {
 
     private static void putSeedsFolder(String folderName, String type) {
         Runmanager runmanager = new Runmanager();
-//        runmanager.setHostIp("192.168.100.236");
-//        runmanager.setUsername("root");
-//        runmanager.setPassword("Password1");
-//        runmanager.setPort(22);
+        runmanager.setHostIp("192.168.100.236");
+        runmanager.setUsername("root");
+        runmanager.setPassword("Password1");
+        runmanager.setPort(22);
         String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
         String command = "";
         if ("local".equals(type)) {
