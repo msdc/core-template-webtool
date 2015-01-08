@@ -75,7 +75,7 @@ public class CrawlToolResource {
         String period = pageModel.getScheduleDispatchViewModel().getPeriod();
         String sequence = pageModel.getScheduleDispatchViewModel()
                 .getSequence();
-        String folderName = domain + "_" + "1" + period + sequence;
+        String folderName = domain + "_" + "1" + period + "_" + sequence;
         ParseResult parseResult = SaveTemplateToRedis(pageModel);
         if (parseResult == null) {
             return "请先保存模板!再执行此操作!";
