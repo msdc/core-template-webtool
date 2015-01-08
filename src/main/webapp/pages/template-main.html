@@ -47,7 +47,7 @@
     <!--基本属性-->
     <div class="row" data-bind="with: basicInfoViewModel">
         <div class="col-md-12">
-            <div class="panel panel-primary">
+            <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">基本信息</h3>
                 </div>
@@ -64,6 +64,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <button type="button" data-bind="click: viewHtmlContent" class="btn btn-primary">查看</button>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<a href="http://try.jsoup.org/">jsoup验证</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.regexworld.com/">java正则验证</a>
                                     </div>
                                 </div>
                             </div>
@@ -74,64 +75,56 @@
                                 <input type="text" data-bind="value: name" class="form-control" id="txt_webName" placeholder="页面描述">
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="select_tag">行业</label>
-                                <select class="form-control" data-bind="options: tags,value: tagsSelected" id="select_tag"></select>
-                            </div>
-                        </div>
-                        <div class="col-md-6"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!--tab菜单-->
     <div class="row">
-        <!--解析区域-->
-        <!--<div class="col-md-2">-->
-            <!--<div class="panel panel-default">-->
-                <!--<div class="panel-heading">-->
-                    <!--<h3 class="panel-title">解析区域</h3>-->
-                <!--</div>-->
-                <!--<div class="panel-body"></div>-->
-                <!--<div role="tabpanel">-->
-                    <!--&lt;!&ndash; Nav tabs &ndash;&gt; &lt;!&ndash;nav nav-tabs nav-stacked&ndash;&gt;-->
-                    <!--<ul class="nav nav-pills nav-stacked" role="tablist">-->
-                        <!--<li role="presentation" class="active"><a href="#news_tab" aria-controls="news_tab" role="tab"-->
-                                                   <!--data-toggle="tab">内容页</a>-->
-                        <!--</li>-->
-                        <!--<li role="presentation"><a href="#list_tab" aria-controls="list_tab"-->
-                                                                  <!--role="tab"-->
-                                                                  <!--data-toggle="tab">列表页</a></li>-->
+        <div class="col-md-12">
+            <div role="tabpanel">
+                <!-- Nav tabs --> <!--nav nav-tabs nav-stacked-->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#list_tab" aria-controls="list_tab"
+                                                              role="tab"
+                                                              data-toggle="tab">列表页属性配置</a></li>
+                    <li role="presentation"><a href="#news_tab" aria-controls="news_tab" role="tab"
+                                               data-toggle="tab">内容页属性配置</a>
+                    </li>
+                    <li role="presentation"><a href="#schedule_tab" aria-controls="schedule_tab" role="tab"
+                                               data-toggle="tab">爬取调度配置</a>
+                    </li>
+                </ul>
 
-                    <!--</ul>-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</div>-->
-        <!--<div class="col-md-10">-->
-            <!--&lt;!&ndash; Tab panes &ndash;&gt;-->
-            <!--<div class="tab-content">-->
-                <!--<div role="tabpanel" class="tab-pane active" id="news_tab"></div>-->
-                <!--<div role="tabpanel" class="tab-pane" id="list_tab"></div>-->
-            <!--</div>-->
-        <!--</div>-->
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="list_tab"></div>
+                    <div role="tabpanel" class="tab-pane" id="news_tab"></div>
+                    <div role="tabpanel" class="tab-pane" id="schedule_tab"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-md-12">
             <!--内容页和列表页主体-->
             <div class="row">
-                <div class="col-md-4">
+                <!--<div class="col-md-4">-->
                     <!--列表-->
-                    <div id="list_tab"></div>
-                </div>
-                <div class="col-md-4">
+                    <!--<div id="list_tab"></div>-->
+                <!--</div>-->
+                <!--<div class="col-md-4">-->
                     <!--新闻-->
-                    <div id="news_tab"></div>
+                    <!--<div id="news_tab"></div>-->
 
-                </div>
-                <div class="col-md-4">
+                <!--</div>-->
+                <!--<div class="col-md-4">-->
                     <!--调用任务-->
-                    <div id="schedule_tab"></div>
-                </div>
+                    <!--<div id="schedule_tab"></div>-->
+                <!--</div>-->
 
                 <!--验证结果-->
                 <div class="col-md-12">
@@ -145,7 +138,7 @@
                 <div class="col-md-12">
                     <div class="row text-right">
                         <div class="col-md-12">
-                            <button type="button" data-bind="click: saveToLocalFile" class="btn btn-primary">保存链接到文件(临时按钮)</button>
+                            <button type="button" data-bind="click: saveToLocalFile" class="btn btn-primary">保存到文件</button>
                             <button type="button" data-bind="click: templateTest" class="btn btn-primary">测试模板</button>
                             <button type="button" data-bind="click: saveTemplate" class="btn btn-primary">保存模板</button>
                         </div>
