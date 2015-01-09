@@ -17,6 +17,7 @@ $(function(){
             }
         },
         error: function (error) {
+            pageInit([]);
         }
     });
     
@@ -121,7 +122,7 @@ function templateViewModel(templateList){
             },
             error: function (error) {
                 if(error){
-                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;操作失败！");
+                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;停用模板操作失败！");
                 }
             }
         });
@@ -144,7 +145,7 @@ function templateViewModel(templateList){
             },
             error: function (error) {
                 if(error){
-                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;操作失败！");
+                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;启用模板操作失败！");
                 }
             }
         });
