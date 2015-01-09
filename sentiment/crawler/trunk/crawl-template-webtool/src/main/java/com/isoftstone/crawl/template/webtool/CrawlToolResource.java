@@ -255,6 +255,9 @@ public class CrawlToolResource {
         // 获取内容页链接
         ArrayList<String> contentOutLinkArrayList = TemplateFactory
                 .getContentOutlink(parseResult);
+        if(contentOutLinkArrayList.size()==0){
+        	return "列表外链接配置信息不正确！";
+        }
         String contentOutLink = contentOutLinkArrayList.get(0);
         byte[] input = DownloadHtml.getHtml(contentOutLink);
         String encoding = "gb2312";
@@ -282,21 +285,6 @@ public class CrawlToolResource {
         if (parseResult == null) {
             return "请先保存模板!再执行此操作!";
         }
-
-        // //测试单个页面列表中的content内容
-        // ArrayList<String> paginationOutLinkArrayList = TemplateFactory
-        // .getPaginationOutlink(parseResult);
-        // String paginationOutLink = paginationOutLinkArrayList.get(0);
-        // byte[] input = DownloadHtml.getHtml(paginationOutLink);
-        // String encoding = "gb2312";
-        // try {
-        // parseResult = TemplateFactory.process(input, encoding,
-        // paginationOutLink);
-        // } catch (Exception e) {
-        // // TODO: handle exception
-        // e.printStackTrace();
-        // }
-
         return parseResult.toJSON();
     }
 
