@@ -81,7 +81,7 @@ public class CrawlToolResource {
             return "保存失败，请输入时序.";
         }
         String folderName = domain + "_" + "1" + period + "_" + sequence;
-        ParseResult parseResult = saveParseResult(pageModel);
+        ParseResult parseResult = saveTemplateAndParseResult(pageModel);
         if (parseResult == null) {
             return "请先保存模板!再执行此操作!";
         }
@@ -310,11 +310,8 @@ public class CrawlToolResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String SaveTemplate(@DefaultValue("") @FormParam("data") String data) {
         PageModel pageModel = GetPageModelByJsonString(data);
-        ParseResult parseResult = saveParseResult(pageModel);
-        if (parseResult != null) {
-            return "模板保存成功!";
-        }
-        return "模板保存失败!请检查模板配置是否正确!";
+        saveTemplateResultToRedis(pageModel);
+        return "模板保存成功!";        
     }
 
     /**
@@ -347,6 +344,7 @@ public class CrawlToolResource {
             pool = RedisUtils.getPool();
             jedis = pool.getResource();
             jedis.del(templateGuid + key_partern);
+            jedis.del(templateGuid);
         } catch (Exception e) {
             pool.returnBrokenResource(jedis);
             e.printStackTrace();
@@ -563,12 +561,12 @@ public class CrawlToolResource {
         }
         return parseResult;
     }
-
+    
     /**
      * 
-     * 保存模板配置到redis
+     * 同时保存[模板]和[中间结果]到redis
      * */
-    private ParseResult saveParseResult(PageModel pageModel) {
+    private ParseResult saveTemplateAndParseResult(PageModel pageModel) {
         String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
         TemplateResult templateResult = GetTemplateResult(pageModel);
         String templateGuid = MD5Utils.MD5(templateUrl);
@@ -581,6 +579,32 @@ public class CrawlToolResource {
         parseResult = TemplateFactory.process(input, encoding, templateUrl);
         return parseResult;
     }
+
+    /**
+     * 
+     * 只保存[中间结果]到redis
+     * */
+    private ParseResult saveParseResult(PageModel pageModel) {
+        String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+        ParseResult parseResult = null;
+        String encoding = "gb2312";
+        byte[] input = DownloadHtml.getHtml(templateUrl);
+        parseResult = TemplateFactory.process(input, encoding, templateUrl);
+        return parseResult;
+    }
+    
+    /**
+     * 
+     * 只保存[模板配置]到redis
+     * */
+    private void saveTemplateResultToRedis(PageModel pageModel) {
+    	String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+        TemplateResult templateResult = GetTemplateResult(pageModel);
+        String templateGuid = MD5Utils.MD5(templateUrl);
+        RedisUtils.setTemplateResult(templateResult, templateGuid);
+      //保存数据源列表所需要的key值        模板默认为启用状态
+        SaveTemplateToList(pageModel,"true");
+	}
 
     /**
      * 将redis中模板的id和数据源列表做关联
