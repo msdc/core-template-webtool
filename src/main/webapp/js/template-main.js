@@ -356,6 +356,7 @@ function addNewTemplateDataInit(pageViewModel){
     pageViewModel.listOutLinkViewModel.selectorAttrSelected('href');
     pageViewModel.listPaginationViewModel.selectorAttrSelected('text');
     pageViewModel.listPaginationViewModel.currentString('##');
+    pageViewModel.listPaginationViewModel.start('2');
 }
 
 /**
@@ -383,7 +384,6 @@ function testAddNewTemplate(pageViewModel){
     //列表页链接test
     pageViewModel.listOutLinkViewModel.selector('#Content_WebPageDocumentsByUId1 > li > div.sub > a');
     pageViewModel.listPaginationViewModel.filter('\\d+');
-    pageViewModel.listPaginationViewModel.start('2');
 
     //分页test
     pageViewModel.listPaginationViewModel.paginationUrl('http://www.drcnet.com.cn/www/Integrated/Leaf.aspx?uid=040401&version=integrated&chnid=1017&leafid=3018&curpage=##');
