@@ -592,7 +592,11 @@ function showErrorsInTextArea(error){
 function showResultInModal(data){
     var modalBody=$('#modal-viewHtml-body');
     modalBody.text('');//清空
-    modalBody.text(data);
+    if(data.responseText){
+        modalBody.text("错误信息:"+data.responseText);
+    }else{
+        modalBody.text(data);
+    }
 }
 
 /**
