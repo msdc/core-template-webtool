@@ -47,6 +47,7 @@
             <table class="table table-bordered">
                 <thead>
                 <tr>
+                    <td>序号</td>
                     <td>名称</td>
                     <td>描述</td>
                     <td>数据源地址</td>
@@ -56,9 +57,10 @@
                 </thead>
                 <tbody>
                 <tr data-bind="foreach: urls">
+                    <td data-bind="text: ($index()+1)"></td>
                     <td data-bind="text: name"></td>
                     <td data-bind="text: description"></td>
-                    <td data-bind="text: url"></td>
+                    <td data-bind="text: url" style="width: 400px;word-break: break-all"></td>
                     <td data-bind="text: statusText"></td>
                     <td>
                         <button type="button" class="btn btn-primary" id="btn_enable" data-bind="click: $parent.enableTemplate, visible:!status">启用</button>
@@ -70,7 +72,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="5">
+                    <td colspan="6">
                         <div id="data_pagination"></div>
                     </td>
                 </tr>
