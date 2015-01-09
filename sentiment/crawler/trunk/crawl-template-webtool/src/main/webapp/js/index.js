@@ -116,6 +116,8 @@ function templateViewModel(templateList){
             },
             success: function (data) {
                 that.statusText('停用');
+                $('#btn_disable').css({display:'none'});
+                $('#btn_enable').removeAttr('style');
             },
             error: function (error) {
                 if(error){
@@ -137,6 +139,8 @@ function templateViewModel(templateList){
             },
             success: function (data) {
                 that.statusText('启用');
+                $('#btn_enable').css({display:'none'});
+                $('#btn_disable').removeAttr('style');
             },
             error: function (error) {
                 if(error){
