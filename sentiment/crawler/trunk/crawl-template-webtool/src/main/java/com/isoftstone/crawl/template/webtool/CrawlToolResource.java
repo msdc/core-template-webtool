@@ -81,7 +81,7 @@ public class CrawlToolResource {
             return "保存失败，请输入时序.";
         }
         String folderName = domain + "_" + "1" + period + "_" + sequence;
-        ParseResult parseResult = SaveTemplateToRedis(pageModel);
+        ParseResult parseResult = saveParseResult(pageModel);
         if (parseResult == null) {
             return "请先保存模板!再执行此操作!";
         }
@@ -247,7 +247,7 @@ public class CrawlToolResource {
     public String VerifyNewContent(
             @DefaultValue("") @FormParam("data") String data) {
         PageModel pageModel = GetPageModelByJsonString(data);
-        ParseResult parseResult = SaveTemplateToRedis(pageModel);
+        ParseResult parseResult = saveParseResult(pageModel);
         // ParseResult parseResult = GetParseResultFromRedis(pageModel);
         if (parseResult == null) {
             return "请先保存模板!再执行此操作!";
@@ -281,7 +281,7 @@ public class CrawlToolResource {
     public String VerifyListContent(
             @DefaultValue("") @FormParam("data") String data) {
         PageModel pageModel = GetPageModelByJsonString(data);
-        ParseResult parseResult = SaveTemplateToRedis(pageModel);
+        ParseResult parseResult = saveParseResult(pageModel);
         if (parseResult == null) {
             return "请先保存模板!再执行此操作!";
         }
@@ -310,7 +310,7 @@ public class CrawlToolResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String SaveTemplate(@DefaultValue("") @FormParam("data") String data) {
         PageModel pageModel = GetPageModelByJsonString(data);
-        ParseResult parseResult = SaveTemplateToRedis(pageModel);
+        ParseResult parseResult = saveParseResult(pageModel);
         if (parseResult != null) {
             return "模板保存成功!";
         }
@@ -568,7 +568,7 @@ public class CrawlToolResource {
      * 
      * 保存模板配置到redis
      * */
-    private ParseResult SaveTemplateToRedis(PageModel pageModel) {
+    private ParseResult saveParseResult(PageModel pageModel) {
         String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
         TemplateResult templateResult = GetTemplateResult(pageModel);
         String templateGuid = MD5Utils.MD5(templateUrl);
