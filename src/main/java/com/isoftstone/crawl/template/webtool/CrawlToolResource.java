@@ -217,12 +217,14 @@ public class CrawlToolResource {
     }
 
     private static void putSeedsFolder(String folderName, String type) {
+        LOG.info("进入方法");
         Runmanager runmanager = new Runmanager();
         runmanager.setHostIp("192.168.100.236");
         runmanager.setUsername("root");
         runmanager.setPassword("Password1");
         runmanager.setPort(22);
         String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
+        LOG.info("文件根目录" + folderRoot);
         String command = "";
         if ("local".equals(type)) {
             command = "scp -r " + folderRoot + "/" + folderName + " root@192.168.100.231:/home/" + folderName;
@@ -230,8 +232,10 @@ public class CrawlToolResource {
             //FIXME:集群模式，执行的命令.
             command = "";
         }
+        LOG.info("命令：" + command);
         runmanager.setCommand(command);
         ShellUtils.execCmd(runmanager);
+        LOG.info("命令执行完毕：" + command);
     }
   
     /**
