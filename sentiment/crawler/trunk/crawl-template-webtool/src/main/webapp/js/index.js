@@ -55,13 +55,14 @@ function loadPaginationComponent(listViewModel) {
 /*****************View-Model***********************/
 function templateViewModel(templateList){
     var self=this;
-    self.urls=ko.observableArray(templateList);
+    var templateListInitData=updateTemplateListInitData(templateList);
+    self.urls=ko.observableArray(templateListInitData);
     self.addNew=function(){
         window.location.href="pages/template-main.html";
     };
     self.deleteItem=function(){
-        var templateUrl=this.url;
         var item=this;
+        var templateUrl=item.url;
         $.ajax({
             url: virtualWebPath + '/webapi/crawlToolResource/deleteTemplate',
             type: 'POST',
@@ -84,7 +85,8 @@ function templateViewModel(templateList){
         });
     };
     self.updateItem=function(){
-        var templateUrl=this.url;
+        var that=this;
+        var templateUrl=that.url;
         $.ajax({
             url: virtualWebPath + '/webapi/crawlToolResource/getTemplateGuid',
             type: 'POST',
@@ -102,8 +104,9 @@ function templateViewModel(templateList){
         });
     };
     self.disableTemplate=function(){
-        var templateUrl=this.url;
-        var name=this.name;
+        var that=this;
+        var templateUrl=that.url;
+        var name=that.name;
         $.ajax({
             url: virtualWebPath + '/webapi/crawlToolResource/disableTemplate',
             type: 'POST',
@@ -112,7 +115,7 @@ function templateViewModel(templateList){
                 name:name
             },
             success: function (data) {
-                //this.status('false');
+                that.statusText('停用');
             },
             error: function (error) {
                 if(error){
@@ -122,8 +125,9 @@ function templateViewModel(templateList){
         });
     };
     self.enableTemplate=function(){
-        var templateUrl=this.url;
-        var name=this.name;
+        var that=this;
+        var templateUrl=that.url;
+        var name=that.name;
         $.ajax({
             url: virtualWebPath + '/webapi/crawlToolResource/enableTemplate',
             type: 'POST',
@@ -132,7 +136,7 @@ function templateViewModel(templateList){
                 name:name
             },
             success: function (data) {
-                //this.status('true');
+                that.statusText('启用');
             },
             error: function (error) {
                 if(error){
@@ -143,6 +147,30 @@ function templateViewModel(templateList){
     };
 }
 /*****************View-Model***********************/
+
+/**
+ *
+ * 初始化模板列表数据
+ * @param {Array} templateList 模板列表
+ * */
+function updateTemplateListInitData(templateList){
+    var templateListInitData=[];
+    if(templateList){
+        for(var i=0;i<templateList.length;i++){
+            var model=templateList[i];
+            if(model.status=="true"){
+                model.statusText=ko.observable("启用");
+                model.status=true;
+            }else{
+                model.statusText=ko.observable("停用");
+                model.status=false;
+            }
+            templateListInitData.push(model);
+        }
+    }
+    return templateListInitData;
+}
+
 /**
  * 操作提示
  * */
