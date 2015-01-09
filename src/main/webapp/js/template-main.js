@@ -491,6 +491,25 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
             pageViewModel.listPaginationViewModel.selector(listPaginationSelector);
             pageViewModel.listPaginationViewModel.selectorAttrSelected(listPaginationSelectorAttr);
         }
+        //过滤器
+        if(listPagination.filters!=null){
+            var listPaginationFilter=listPagination.filters[0];
+            var listPaginationFilterCategory=listPaginationFilter.type;
+            if(listPaginationFilterCategory=="match"){
+                pageViewModel.listPaginationViewModel.filterCategorySelected('匹配');
+                pageViewModel.listPaginationViewModel.filter(listPaginationFilter.value);
+            }
+            if(listPaginationFilterCategory=="remove"){
+                pageViewModel.listPaginationViewModel.filterCategorySelected('移除');
+                pageViewModel.listPaginationViewModel.filter(listPaginationFilter.value);
+            }
+            if(listPaginationFilterCategory=="replace"){
+                pageViewModel.listPaginationViewModel.filterCategorySelected('替换');
+                pageViewModel.listPaginationViewModel.replaceBefore(listPaginationFilter.value);
+                pageViewModel.listPaginationViewModel.replaceTo(listPaginationFilter.replaceTo);
+            }
+
+        }
         pageViewModel.listPaginationViewModel.paginationUrl(listPagination.pagitationUrl);
         var paginationType=listPagination.pagitationType;
         if(paginationType=="number"){//分页的末尾页数
