@@ -162,6 +162,9 @@ function updateTemplateListInitData(templateList){
     if(templateList){
         for(var i=0;i<templateList.length;i++){
             var model=templateList[i];
+            if(model==null){
+                continue;
+            }
             if(model.status=="true"){
                 model.statusText=ko.observable("启用");
                 model.status=true;

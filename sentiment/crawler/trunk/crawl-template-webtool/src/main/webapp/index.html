@@ -55,8 +55,8 @@
                     <td>操作</td>
                 </tr>
                 </thead>
-                <tbody>
-                <tr data-bind="foreach: urls">
+                <tbody data-bind="foreach: urls">
+                <tr>
                     <td data-bind="text: ($index()+1)"></td>
                     <td data-bind="text: name"></td>
                     <td data-bind="text: description"></td>
