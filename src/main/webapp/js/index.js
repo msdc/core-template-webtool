@@ -101,6 +101,46 @@ function templateViewModel(templateList){
             }
         });
     };
+    self.disableTemplate=function(){
+        var templateUrl=this.url;
+        var name=this.name;
+        $.ajax({
+            url: virtualWebPath + '/webapi/crawlToolResource/disableTemplate',
+            type: 'POST',
+            data:{
+                templateUrl:templateUrl,
+                name:name
+            },
+            success: function (data) {
+                //this.status('false');
+            },
+            error: function (error) {
+                if(error){
+                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;操作失败！");
+                }
+            }
+        });
+    };
+    self.enableTemplate=function(){
+        var templateUrl=this.url;
+        var name=this.name;
+        $.ajax({
+            url: virtualWebPath + '/webapi/crawlToolResource/enableTemplate',
+            type: 'POST',
+            data:{
+                templateUrl:templateUrl,
+                name:name
+            },
+            success: function (data) {
+                //this.status('true');
+            },
+            error: function (error) {
+                if(error){
+                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;操作失败！");
+                }
+            }
+        });
+    };
 }
 /*****************View-Model***********************/
 /**

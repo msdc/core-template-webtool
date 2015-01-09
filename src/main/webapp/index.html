@@ -59,10 +59,10 @@
                     <td data-bind="text: name"></td>
                     <td data-bind="text: description"></td>
                     <td data-bind="text: url"></td>
-                    <td data-bind="text: (status?'启用':'停用')"></td>
+                    <td data-bind="text: status"></td>
                     <td>
-                        <button type="button" class="btn btn-primary" data-bind="visible: !status">启用</button>
-                        <button type="button" class="btn btn-primary" data-bind="visible: status">停用</button>
+                        <button type="button" class="btn btn-primary" data-bind="click: $parent.enableTemplate">启用</button>
+                        <button type="button" class="btn btn-primary" data-bind="click: $parent.disableTemplate">停用</button>
                         <button type="button" class="btn btn-primary" data-bind="click: $parent.updateItem">修改</button>
                         <button type="button" class="btn btn-primary" data-bind="click: $parent.deleteItem">删除</button>
                     </td>
