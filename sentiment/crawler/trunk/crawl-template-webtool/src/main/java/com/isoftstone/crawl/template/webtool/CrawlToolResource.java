@@ -425,6 +425,32 @@ public class CrawlToolResource {
         String templateListJSONString = GetTemplateListJSONString(templateList);
         return templateListJSONString;
     }
+    
+    /**
+     * 
+     * 停用模板
+     * */
+    @POST
+    @Path("/disableTemplate")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String DisableTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl,
+    		@DefaultValue("") @FormParam("name") String name){
+    	 setTemplateStatus(templateUrl, name, "false");
+    	 return "success";
+    }
+    
+    /**
+     * 
+     * 启用模板
+     * */
+    @POST
+    @Path("/enableTemplate")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String EnableTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl,
+    		@DefaultValue("") @FormParam("name") String name){
+    	setTemplateStatus(templateUrl, name, "true");
+    	return "success";
+    }
 
     /**
      * 
@@ -558,7 +584,7 @@ public class CrawlToolResource {
         String encoding = "gb2312";
         byte[] input = DownloadHtml.getHtml(templateUrl);
         RedisUtils.setTemplateResult(templateResult, templateGuid);
-        SaveTemplateToList(pageModel);//保存数据源列表所需要的key值
+        SaveTemplateToList(pageModel,"true");//保存数据源列表所需要的key值
         System.out.println("templateGuid=" + templateGuid);
         parseResult = TemplateFactory.process(input, encoding, templateUrl);
         return parseResult;
@@ -567,18 +593,12 @@ public class CrawlToolResource {
     /**
      * 将redis中模板的id和数据源列表做关联
      * */
-    private void SaveTemplateToList(PageModel pageModel) {
+    private void SaveTemplateToList(PageModel pageModel,String status) {
         String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
         String templateGuid = MD5Utils.MD5(templateUrl);
         JedisPool pool = null;
         Jedis jedis = null;
-        TemplateModel templateModel = new TemplateModel();
-        templateModel.setTemplateId(templateGuid);
-        templateModel.setName(pageModel.getBasicInfoViewModel().getName());
-        templateModel.setDescription(pageModel.getBasicInfoViewModel()
-                .getName());
-        templateModel.setUrl(pageModel.getBasicInfoViewModel().getUrl());
-        templateModel.setStatus("true");
+        TemplateModel templateModel=setTemplateStatus(pageModel,status);
         try {
             StringBuilder str = new StringBuilder();
             str.append(GetTemplateModelJSONString(templateModel));
@@ -593,6 +613,49 @@ public class CrawlToolResource {
         }
     }
 
+    /**
+     * 设置模板列表中单个模板的状态
+     * */
+    private  TemplateModel setTemplateStatus(PageModel pageModel,String status) {
+    	 TemplateModel templateModel = new TemplateModel();
+    	 String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+         String templateGuid = MD5Utils.MD5(templateUrl);
+    	 templateModel.setTemplateId(templateGuid);
+         templateModel.setName(pageModel.getBasicInfoViewModel().getName());
+         templateModel.setDescription(pageModel.getBasicInfoViewModel()
+                 .getName());
+         templateModel.setUrl(pageModel.getBasicInfoViewModel().getUrl());
+         templateModel.setStatus(status);
+    	 return templateModel;
+	}
+    
+    /**
+     * 设置模板列表中单个模板的状态
+     * */
+    private void setTemplateStatus(String templateUrl,String name,String status) {
+    	String templateGuid = MD5Utils.MD5(templateUrl);
+        JedisPool pool = null;
+        Jedis jedis = null;
+        TemplateModel templateModel=new TemplateModel();
+        templateModel.setTemplateId(templateGuid);
+        templateModel.setName(name);
+        templateModel.setDescription(name);
+        templateModel.setUrl(templateUrl);
+        templateModel.setStatus(status);
+        try {
+            StringBuilder str = new StringBuilder();
+            str.append(GetTemplateModelJSONString(templateModel));
+            pool = RedisUtils.getPool();
+            jedis = pool.getResource();
+            jedis.set(templateGuid + key_partern, str.toString());
+        } catch (Exception e) {
+            pool.returnBrokenResource(jedis);
+            e.printStackTrace();
+        } finally {
+            RedisUtils.returnResource(pool, jedis);
+        }
+	}
+    
     /**
      * 
      * 根据JSON字符串,得到PAGE-MODEL对象
