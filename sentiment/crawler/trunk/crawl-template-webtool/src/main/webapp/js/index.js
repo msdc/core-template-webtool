@@ -34,6 +34,74 @@ function pageInit(templateList){
     ko.applyBindings(pageViewModel);
     //加载分页
     loadPaginationComponent(pageViewModel);
+    //模式对话框注册事件
+    registerExportModalEvent();
+}
+
+function registerExportModalEvent(){
+    $('#model_export').on('hidden', function () {
+        $('#export_result').text('');//清空错误信息
+    });
+
+    $('#model_export').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var optionType = button.data('optiontype');// Extract info from data-* attributes
+        var modal = $(this);
+        var btnConfirm=modal.find('#btn_modalexport_confirm');
+        btnConfirm.unbind();//移除按钮之前绑定的事件
+        if(optionType=="file_export"){//导出
+            btnConfirm.click(btnModalExportConfirmHandler);
+        }
+        if(optionType=="file_import"){//导入
+            btnConfirm.click(btnModalImportConfirmHandler);
+        }
+    })
+}
+
+function btnModalImportConfirmHandler(){
+    var filePath=$('#file_path').val();
+    $.ajax({
+        url: virtualWebPath + '/webapi/crawlToolResource/importAllTemplates',
+        type: 'POST',
+        data: {
+            filePath:filePath
+        },
+        success: function (data) {
+            if(data =="true"){
+                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作成功！");
+            }else{
+                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作失败！");
+            }
+            $('#model_export').modal('hide');
+        },
+        error: function (error) {
+            $('#export_result').text('');
+            $('#export_result').text("错误信息:"+error.responseText);
+        }
+    });
+}
+
+function btnModalExportConfirmHandler(){
+    var filePath=$('#file_path').val();
+    $.ajax({
+        url: virtualWebPath + '/webapi/crawlToolResource/exportAllTemplates',
+        type: 'POST',
+        data: {
+            filePath:filePath
+        },
+        success: function (data) {
+            if(data =="true"){
+                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作成功！");
+            }else{
+                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作失败！");
+            }
+            $('#model_export').modal('hide');
+        },
+        error: function (error) {
+            $('#export_result').text('');
+            $('#export_result').text("错误信息:"+error.responseText);
+        }
+    });
 }
 
 /**
@@ -117,8 +185,8 @@ function templateViewModel(templateList){
             },
             success: function (data) {
                 that.statusText('停用');
-                $('#btn_disable').css({display:'none'});
-                $('#btn_enable').removeAttr('style');
+                //$('#btn_disable').css({display:'none'});
+                //$('#btn_enable').removeAttr('style');
             },
             error: function (error) {
                 if(error){
@@ -140,8 +208,8 @@ function templateViewModel(templateList){
             },
             success: function (data) {
                 that.statusText('启用');
-                $('#btn_enable').css({display:'none'});
-                $('#btn_disable').removeAttr('style');
+                //$('#btn_enable').css({display:'none'});
+                //$('#btn_disable').removeAttr('style');
             },
             error: function (error) {
                 if(error){

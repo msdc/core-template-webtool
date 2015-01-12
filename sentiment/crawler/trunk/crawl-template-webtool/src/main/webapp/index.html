@@ -33,6 +33,31 @@
     </div>
 </div>
 
+<!--导入导出-->
+<div class="modal fade" id="model_export" tabindex="-1" role="dialog" aria-labelledby="model_export_title"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="model_export_title">导入导出</h4>
+            </div>
+            <div class="modal-body">
+                <div class="control-group">
+                    <label class="control-label" for="file_path">文件夹路径：</label>
+                    <input type="text" id="file_path" value="D:\template\"/>
+                </div>
+                <div id="export_result"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="btn_modalexport_confirm">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container">
     <div class="row">
         <h1 class="text-center">数据源列表</h1>
@@ -40,6 +65,8 @@
     <div class="row addRowTopMargin">
         <div class="col-md-12">
             <button type="button" class="btn btn-primary" data-bind="click: addNew">添加</button>
+            <button type="button" class="btn btn-primary" data-optiontype="file_export" data-toggle="modal" data-target="#model_export">批量导出模板</button>
+            <button type="button" class="btn btn-primary" data-optiontype="file_import" data-toggle="modal" data-target="#model_export">批量导入模板</button>
         </div>
     </div>
     <div class="row addRowTopMargin">
@@ -63,8 +90,8 @@
                     <td data-bind="text: url" style="width: 400px;word-break: break-all"></td>
                     <td data-bind="text: statusText"></td>
                     <td>
-                        <button type="button" class="btn btn-primary" id="btn_enable" data-bind="click: $parent.enableTemplate, visible:!status">启用</button>
-                        <button type="button" class="btn btn-primary" id="btn_disable" data-bind="click: $parent.disableTemplate, visible:status">停用</button>
+                        <button type="button" class="btn btn-primary" data-bind="click: $parent.enableTemplate, visible:!status">启用</button>
+                        <button type="button" class="btn btn-primary" data-bind="click: $parent.disableTemplate, visible:status">停用</button>
                         <button type="button" class="btn btn-primary" data-bind="click: $parent.updateItem">修改</button>
                         <button type="button" class="btn btn-primary" data-bind="click: $parent.deleteItem">删除</button>
                     </td>
