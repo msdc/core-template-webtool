@@ -47,12 +47,15 @@ function registerExportModalEvent(){
         var button = $(event.relatedTarget); // Button that triggered the modal
         var optionType = button.data('optiontype');// Extract info from data-* attributes
         var modal = $(this);
+        var modalTitle=modal.find('#model_export_title');
         var btnConfirm=modal.find('#btn_modalexport_confirm');
         btnConfirm.unbind();//移除按钮之前绑定的事件
         if(optionType=="file_export"){//导出
+            modalTitle.text('导出模板到文件');
             btnConfirm.click(btnModalExportConfirmHandler);
         }
         if(optionType=="file_import"){//导入
+            modalTitle.text('导入模板文件');
             btnConfirm.click(btnModalImportConfirmHandler);
         }
     })
