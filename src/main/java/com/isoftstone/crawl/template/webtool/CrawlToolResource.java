@@ -3,6 +3,7 @@ package com.isoftstone.crawl.template.webtool;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -466,6 +467,135 @@ public class CrawlToolResource {
         }
         return json;
     }
+    
+    /**
+     * 
+     * 导出所有模板到文件
+     * */
+    @POST
+    @Path("/exportAllTemplates")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String exportAllTemplates(@DefaultValue("") @FormParam("filePath") String filePath){
+    	JedisPool pool = null;
+        Jedis jedis = null; 
+        String resultStatus="true";
+        try {
+            pool = RedisUtils.getPool();
+            jedis = pool.getResource();
+            Set<String> listKeys = jedis.keys("*" + key_partern);
+            for (String key : listKeys) {
+                String templateString = jedis.get(key);
+                TemplateModel templateModel = GetTemplateModel(templateString);
+                String templateGuid=templateModel.getTemplateId();
+                String templateJsonString=jedis.get(templateGuid);
+                String fileName=templateGuid+".txt";
+                exportTemplateJSONStringToFile(filePath+fileName,templateJsonString);
+            }            
+        } catch (Exception e) {
+        	resultStatus="false";
+            pool.returnBrokenResource(jedis);
+            e.printStackTrace();
+        } finally {
+            RedisUtils.returnResource(pool, jedis);
+        }               
+    	return resultStatus;
+    }
+
+    /**
+     * 
+     * 导入所有模板文件
+     * */
+    @POST
+    @Path("/importAllTemplates")
+    @Produces(MediaType.TEXT_PLAIN)
+	public String importAllTemplates(
+			@DefaultValue("") @FormParam("filePath") String dirPath) {
+		JedisPool pool = null;
+		Jedis jedis = null;
+		String resultStatus="true";
+		try {
+			pool = RedisUtils.getPool();
+			jedis = pool.getResource();
+			File file = new File(dirPath);  
+			File[] files = file.listFiles();
+			for (File f : files)  
+            {
+				if (f.isFile()) {					
+					String fileName = f.getName();
+					String templateString = readTemplateFile(dirPath+fileName);
+					String templateGuid = fileName.substring(0,fileName.lastIndexOf("."));
+					jedis.set(templateGuid, templateString);
+				}
+            }			
+		} catch (Exception e) {
+			resultStatus="false";
+			e.printStackTrace();
+			pool.returnBrokenResource(jedis);
+		}
+		finally {
+            RedisUtils.returnResource(pool, jedis);
+        }
+
+		return resultStatus;
+	}
+    
+    /**
+     * 
+     * 读取文件
+     * */
+    public String readTemplateFile(String path) throws IOException{
+        File file=new File(path);
+        if(!file.exists()||file.isDirectory()){
+        	throw new FileNotFoundException();
+        }            
+        BufferedReader br=new BufferedReader(new FileReader(file));
+        String temp=null;
+        StringBuffer sb=new StringBuffer();
+        temp=br.readLine();
+        while(temp!=null){
+            sb.append(temp+" ");
+            temp=br.readLine();
+        }
+        return sb.toString();
+    }
+
+    
+    /**
+	 * 
+	 * 保存内容到文件
+	 * */
+	private void exportTemplateJSONStringToFile(String filePath,String content) {
+		String str = new String(); // 原有txt内容
+		String s1 = new String();// 内容更新
+		try {
+			File f = new File(filePath);
+			File parentDir = f.getParentFile();
+			if (parentDir != null && !parentDir.exists()) {
+				parentDir.mkdirs();
+			}
+			if (f.exists()) {
+				// System.out.print("文件已经存在");
+			} else {
+				f.createNewFile();// 不存在则创建
+			}
+			BufferedReader input = new BufferedReader(new FileReader(f));
+
+			while ((str = input.readLine()) != null) {
+				s1 += str + "\n";
+			}
+			// System.out.println(s1);
+			input.close();
+			s1 += content;
+
+			BufferedWriter output = new BufferedWriter(new FileWriter(f));
+			output.write(s1);
+			output.close();
+			System.out.println("文件保存路径:" + filePath);
+		} catch (Exception e) {
+			e.printStackTrace();
+
+		}
+	}
 
     /**
      * 将对象转换为JSON-string形式
