@@ -62,6 +62,8 @@ import com.isoftstone.crawl.template.vo.Seed;
 public class CrawlToolResource {
     //列表的key的后缀
     public static final String key_partern = "_templatelist";
+    //文件扩展名
+    public static final String file_extensionName=".txt";
 
     private static final Log LOG = LogFactory.getLog(CrawlToolResource.class);
 
@@ -488,8 +490,12 @@ public class CrawlToolResource {
                 TemplateModel templateModel = GetTemplateModel(templateString);
                 String templateGuid=templateModel.getTemplateId();
                 String templateJsonString=jedis.get(templateGuid);
-                String fileName=templateGuid+".txt";
-                exportTemplateJSONStringToFile(filePath+fileName,templateJsonString);
+                String templateFileName=templateGuid+file_extensionName;
+                String templateListName=key+file_extensionName;
+                //保存模板
+                exportTemplateJSONStringToFile(filePath+templateFileName,templateJsonString);
+                //保存模板列表
+                exportTemplateJSONStringToFile(filePath+templateListName,templateString);
             }            
         } catch (Exception e) {
         	resultStatus="false";
@@ -524,7 +530,7 @@ public class CrawlToolResource {
 					String fileName = f.getName();
 					String templateString = readTemplateFile(dirPath+fileName);
 					String templateGuid = fileName.substring(0,fileName.lastIndexOf("."));
-					jedis.set(templateGuid, templateString);
+					jedis.set(templateGuid, templateString);				
 				}
             }			
 		} catch (Exception e) {
@@ -565,35 +571,21 @@ public class CrawlToolResource {
 	 * 保存内容到文件
 	 * */
 	private void exportTemplateJSONStringToFile(String filePath,String content) {
-		String str = new String(); // 原有txt内容
-		String s1 = new String();// 内容更新
 		try {
 			File f = new File(filePath);
 			File parentDir = f.getParentFile();
 			if (parentDir != null && !parentDir.exists()) {
 				parentDir.mkdirs();
 			}
-			if (f.exists()) {
-				// System.out.print("文件已经存在");
-			} else {
+			if (!f.exists()) {				
 				f.createNewFile();// 不存在则创建
 			}
-			BufferedReader input = new BufferedReader(new FileReader(f));
-
-			while ((str = input.readLine()) != null) {
-				s1 += str + "\n";
-			}
-			// System.out.println(s1);
-			input.close();
-			s1 += content;
-
 			BufferedWriter output = new BufferedWriter(new FileWriter(f));
-			output.write(s1);
+			output.write(content);
 			output.close();
-			System.out.println("文件保存路径:" + filePath);
+			System.out.println("导出模板文件保存路径:" + filePath);
 		} catch (Exception e) {
 			e.printStackTrace();
-
 		}
 	}
 
