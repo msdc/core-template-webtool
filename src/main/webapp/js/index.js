@@ -68,9 +68,9 @@ function btnModalImportConfirmHandler(){
         },
         success: function (data) {
             if(data =="true"){
-                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作成功！");
+                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作成功！");
             }else{
-                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作失败！");
+                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作失败！");
             }
             $('#model_export').modal('hide');
         },
