@@ -188,8 +188,7 @@ function templateViewModel(templateList){
             },
             success: function (data) {
                 that.statusText('停用');
-                //$('#btn_disable').css({display:'none'});
-                //$('#btn_enable').removeAttr('style');
+                that.status(false);
             },
             error: function (error) {
                 if(error){
@@ -211,8 +210,7 @@ function templateViewModel(templateList){
             },
             success: function (data) {
                 that.statusText('启用');
-                //$('#btn_enable').css({display:'none'});
-                //$('#btn_disable').removeAttr('style');
+                that.status(true);
             },
             error: function (error) {
                 if(error){
@@ -239,10 +237,10 @@ function updateTemplateListInitData(templateList){
             }
             if(model.status=="true"){
                 model.statusText=ko.observable("启用");
-                model.status=true;
+                model.status=ko.observable(true);
             }else{
                 model.statusText=ko.observable("停用");
-                model.status=false;
+                model.status=ko.observable(false);
             }
             templateListInitData.push(model);
         }
