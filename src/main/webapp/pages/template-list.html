@@ -144,13 +144,13 @@
                             <div class="col-md-6" data-bind="visible: showReplaceFilter">
                                 <div class="form-group" data-bind="if: showReplaceFilter">
                                     <label>替换前内容</label>
-                                    <input type="text" data-bind="value: replaceBefore" class="form-control" placeholder="正则表达式,替换前的字符">
+                                    <input type="text" data-bind="value: filter" class="form-control" placeholder="正则表达式,替换前的字符">
                                 </div>
                             </div>
                             <div class="col-md-6" data-bind="visible: showReplaceFilter">
                                 <div class="form-group" data-bind="if: showReplaceFilter">
                                     <label>替换后内容</label>
-                                    <input type="text" data-bind="value: replaceTo" class="form-control" placeholder="替换后内容">
+                                    <input type="text" data-bind="value: filterReplaceTo" class="form-control" placeholder="替换后内容">
                                 </div>
                             </div>
                         </div>
@@ -176,8 +176,14 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>分页链接中动态页码字符</label>
+                                    <label>分页链接中动态变化字符</label>
                                     <input type="text" data-bind="value: currentString" class="form-control" placeholder="分页链接中动态变化字符">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>分页链接中动态变化字符为</label>
+                                    <input type="text" data-bind="value: replaceTo" class="form-control" placeholder="分页链接中动态变化字符为">
                                 </div>
                             </div>
                         </div>
@@ -280,13 +286,13 @@
                                             <div class="col-md-6" data-bind="visible: showReplaceFilter">
                                                 <div class="form-group" data-bind="if: showReplaceFilter">
                                                     <label>替换前内容</label>
-                                                    <input type="text" data-bind="value: replaceBefore" class="form-control" placeholder="正则表达式,替换前的字符">
+                                                    <input type="text" data-bind="value: filter" class="form-control" placeholder="正则表达式,替换前的字符">
                                                 </div>
                                             </div>
                                             <div class="col-md-6" data-bind="visible: showReplaceFilter">
                                                 <div class="form-group" data-bind="if: showReplaceFilter">
                                                     <label>替换后内容</label>
-                                                    <input type="text" data-bind="value: replaceTo" class="form-control" placeholder="替换后内容">
+                                                    <input type="text" data-bind="value: filterReplaceTo" class="form-control" placeholder="替换后内容">
                                                 </div>
                                             </div>
                                         </div>

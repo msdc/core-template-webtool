@@ -5,7 +5,7 @@
 var virtualWebPath="/crawl-template-webtool";
 
 /**************Models****************/
-function customerAttrModel(target,selector,attr,filter,filterCategory,replaceBefore,replaceTo){
+function customerAttrModel(target,selector,attr,filter,filterCategory,replaceBefore,filterReplaceTo){
     //this.parseEngine=['jsoup','xpath'];
     //this.id=id;
     this.target=target;
@@ -17,7 +17,7 @@ function customerAttrModel(target,selector,attr,filter,filterCategory,replaceBef
     //this.formater=formater;
     //this.formatCategory=formatCategory;
     this.replaceBefore=replaceBefore;
-    this.replaceTo=replaceTo;
+    this.filterReplaceTo=filterReplaceTo;
 }
 /**************Models****************/
 
@@ -60,7 +60,7 @@ function singleCustomerViewModel() {
         }
     },this);
     this.replaceBefore=ko.observable();
-    this.replaceTo=ko.observable();
+    this.filterReplaceTo=ko.observable();
     this.formater = ko.observable();
     this.formatCategory = ko.observableArray([]);
     this.formatCategorySelected = ko.observable();
@@ -163,8 +163,9 @@ function paginationViewModel(){
     this.paginationTypeSelected=ko.observable('分页的末尾页数');
     this.paginationUrl=ko.observable();
     this.currentString=ko.observable();
-    this.replaceBefore=ko.observable();
     this.replaceTo=ko.observable();
+    this.replaceBefore=ko.observable();
+    this.filterReplaceTo=ko.observable();
     this.start=ko.observable();
     this.showStart=ko.computed(function(){
         if(this.paginationTypeSelected()=='分页的末尾页数'||this.paginationTypeSelected()=='获取分页的记录数'){
@@ -281,7 +282,7 @@ function loadPageContext(initData){
                         for(var i=0;i<modelArray.length;i++){
                             var model=modelArray[i];
                             var temp=new customerAttrModel(
-                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.replaceBefore(),model.replaceTo()
+                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.replaceBefore(),model.filterReplaceTo()
                             );
                             attrModels.push(temp);
                         }
@@ -295,7 +296,7 @@ function loadPageContext(initData){
                         for(var i=0;i<modelArray.length;i++){
                             var model=modelArray[i];
                             var temp=new customerAttrModel(
-                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.replaceBefore(),model.replaceTo()
+                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.replaceBefore(),model.filterReplaceTo()
                             );
                             attrModels.push(temp);
                         }
@@ -471,7 +472,7 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
                     if(filterCategory=="replace"){
                         customerViewModel.filterCategorySelected('替换');
                         customerViewModel.replaceBefore(customerViewModelFilter.value);
-                        customerViewModel.replaceTo(customerViewModelFilter.replaceTo);
+                        customerViewModel.filterReplaceTo(customerViewModelFilter.replaceTo);
                     }
                 }
                 pageViewModel.listCustomerAttrViewModel.regions.push(customerViewModel);
@@ -506,7 +507,7 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
             if(listPaginationFilterCategory=="replace"){
                 pageViewModel.listPaginationViewModel.filterCategorySelected('替换');
                 pageViewModel.listPaginationViewModel.replaceBefore(listPaginationFilter.value);
-                pageViewModel.listPaginationViewModel.replaceTo(listPaginationFilter.replaceTo);
+                pageViewModel.listPaginationViewModel.filterReplaceTo(listPaginationFilter.replaceTo);
             }
 
         }
@@ -524,6 +525,7 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
             pageViewModel.listPaginationViewModel.paginationTypeSelected('获取分页URL');
         }
         pageViewModel.listPaginationViewModel.currentString(listPagination.current);
+        pageViewModel.listPaginationViewModel.replaceTo(listPagination.replaceTo);
         pageViewModel.listPaginationViewModel.start(listPagination.startNumber);
     }
 
@@ -660,8 +662,9 @@ function getJSONString(obj){
             paginationType:obj.listPaginationViewModel.paginationTypeSelected(),
             paginationUrl:obj.listPaginationViewModel.paginationUrl(),
             currentString:obj.listPaginationViewModel.currentString(),
-            replaceBefore:obj.listPaginationViewModel.replaceBefore(),
             replaceTo:obj.listPaginationViewModel.replaceTo(),
+            replaceBefore:obj.listPaginationViewModel.replaceBefore(),
+            filterReplaceTo:obj.listPaginationViewModel.filterReplaceTo(),
             start:obj.listPaginationViewModel.start(),
             records:obj.listPaginationViewModel.records(),
             interval:obj.listPaginationViewModel.interval()

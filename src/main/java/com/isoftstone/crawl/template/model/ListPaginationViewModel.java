@@ -12,8 +12,9 @@ public class ListPaginationViewModel {
 	private String paginationType="";
 	private String paginationUrl = "";
 	private String currentString="";
+	private String replaceTo="";
 	private String replaceBefore = "";
-	private String replaceTo = "";
+	private String filterReplaceTo = "";
 	private String start="";
 	private String records = "";
 	private String interval="";
@@ -67,11 +68,11 @@ public class ListPaginationViewModel {
 		this.currentString = currentString;
 	}
 	
-	public String getReplaceTo() {
-		return replaceTo;
+	public String getFilterReplaceTo() {
+		return filterReplaceTo;
 	}
-	public void setReplaceTo(String replaceTo) {
-		this.replaceTo = replaceTo;
+	public void setFilterReplaceTo(String filterReplaceTo) {
+		this.filterReplaceTo = filterReplaceTo;
 	}
 	
 	public String getStart() {
@@ -100,5 +101,12 @@ public class ListPaginationViewModel {
 	}
 	public void setReplaceBefore(String replaceBefore) {
 		this.replaceBefore = replaceBefore;
+	}
+	
+	public String getReplaceTo() {
+		return replaceTo;
+	}
+	public void setReplaceTo(String replaceTo) {
+		this.replaceTo = replaceTo;
 	}
 }

@@ -11,7 +11,7 @@ public class CustomerAttrModel {
 	private String filter="";
 	private String filterCategory = "";
 	private String replaceBefore = "";
-	private String replaceTo = "";
+	private String filterReplaceTo = "";
 	
 	public String getSelector() {
 		return selector;
@@ -54,11 +54,11 @@ public class CustomerAttrModel {
 		this.replaceBefore = replaceBefore;
 	}
 	
-	public String getReplaceTo() {
-		return replaceTo;
+	public String getFilterReplaceTo() {
+		return filterReplaceTo;
 	}
-	public void setReplaceTo(String replaceTo) {
-		this.replaceTo = replaceTo;
+	public void setFilterReplaceTo(String filterReplaceTo) {
+		this.filterReplaceTo = filterReplaceTo;
 	}
 	
 	

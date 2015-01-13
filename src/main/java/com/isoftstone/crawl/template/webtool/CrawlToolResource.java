@@ -9,10 +9,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -263,7 +267,7 @@ public class CrawlToolResource {
         }
         String contentOutLink = contentOutLinkArrayList.get(0);
         byte[] input = DownloadHtml.getHtml(contentOutLink);
-        String encoding = "gb2312";
+        String encoding = sniffCharacterEncoding(input);
         try {
             parseResult = TemplateFactory.process(input, encoding,
                 contentOutLink);
@@ -692,9 +696,9 @@ public class CrawlToolResource {
         String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
         TemplateResult templateResult = GetTemplateResult(pageModel);
         String templateGuid = MD5Utils.MD5(templateUrl);
-        ParseResult parseResult = null;
-        String encoding = "gb2312";
-        byte[] input = DownloadHtml.getHtml(templateUrl);
+        ParseResult parseResult = null;        
+        byte[] input = DownloadHtml.getHtml(templateUrl);        
+        String encoding = sniffCharacterEncoding(input);
         RedisUtils.setTemplateResult(templateResult, templateGuid);
         SaveTemplateToList(pageModel,"true");//保存数据源列表所需要的key值
         System.out.println("templateGuid=" + templateGuid);
@@ -708,9 +712,9 @@ public class CrawlToolResource {
      * */
     private ParseResult saveParseResult(PageModel pageModel) {
         String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-        ParseResult parseResult = null;
-        String encoding = "gb2312";
+        ParseResult parseResult = null;        
         byte[] input = DownloadHtml.getHtml(templateUrl);
+        String encoding = sniffCharacterEncoding(input);
         parseResult = TemplateFactory.process(input, encoding, templateUrl);
         return parseResult;
     }
@@ -826,6 +830,7 @@ public class CrawlToolResource {
         String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
         String templateGuid = MD5Utils.MD5(templateUrl);
         template.setTemplateGuid(templateGuid);
+        template.setState(Constants.UN_FETCH);
 
         List<Selector> list = new ArrayList<Selector>();
         List<Selector> news = new ArrayList<Selector>();
@@ -844,7 +849,6 @@ public class CrawlToolResource {
                     .getSelector(), pageModel.getListOutLinkViewModel()
                     .getSelectorAttr());
             selector.initContentSelector(indexer, null);
-            list.add(selector);
         }
 
         // 处理列表自定义属性 以时间为例
@@ -858,19 +862,24 @@ public class CrawlToolResource {
             filter = new SelectorFilter();
             String filterString = model.getFilter();
             String filterCategory = model.getFilterCategory();
-            if (filterCategory.equals("匹配")) {
-                filter.initMatchFilter(filterString);
-            } else if (filterCategory.equals("替换")) {
-                filter.initReplaceFilter(model.getReplaceBefore(),
-                    model.getReplaceTo());
-            } else if (filterCategory.equals("移除")) {
-                filter.initRemoveFilter(filterString);
-            }
+            //过滤字段为空时，直接将filter设置为null值
+            if(filterString.equals("")){
+            	filter=null;
+            }else{
+            	if (filterCategory.equals("匹配")) {
+                    filter.initMatchFilter(filterString);
+                } else if (filterCategory.equals("替换")) {
+                    filter.initReplaceFilter(filterString,
+                        model.getFilterReplaceTo());
+                } else if (filterCategory.equals("移除")) {
+                    filter.initRemoveFilter(filterString);
+                }
+            }            
             label.initLabelSelector(model.getTarget(), "", indexer, filter,
                 null);
-            selector.setLabel(label);
-            list.add(selector);
+            selector.setLabel(label);            
         }
+        list.add(selector);
         template.setList(list);
 
         // pagitation outlink js翻页无法处理
@@ -884,19 +893,22 @@ public class CrawlToolResource {
         String paginationFilter = pageModel.getListPaginationViewModel()
                 .getFilter();
         String paginationFilterCategory = pageModel
-                .getListPaginationViewModel().getFilterCategory();
-        // 替换前
-        String replaceBefore = pageModel.getListPaginationViewModel()
-                .getReplaceBefore();
+                .getListPaginationViewModel().getFilterCategory();       
         // 替换后
-        String replaceToString = pageModel.getListPaginationViewModel()
-                .getReplaceTo();
-        if (paginationFilterCategory.equals("匹配")) {
-            filter.initMatchFilter(paginationFilter);
-        } else if (paginationFilterCategory.equals("替换")) {
-            filter.initReplaceFilter(replaceBefore, replaceToString);
-        } else if (paginationFilterCategory.equals("移除")) {
-            filter.initRemoveFilter(paginationFilter);
+        String filterReplaceToString = pageModel.getListPaginationViewModel()
+                .getFilterReplaceTo();
+        
+        //过滤器为空时，直接将filter设置为null
+        if(paginationFilter.equals("")){
+        	filter=null;
+        }else{
+        	if (paginationFilterCategory.equals("匹配")) {
+                filter.initMatchFilter(paginationFilter);
+            } else if (paginationFilterCategory.equals("替换")) {
+                filter.initReplaceFilter(paginationFilter, filterReplaceToString);
+            } else if (paginationFilterCategory.equals("移除")) {
+                filter.initRemoveFilter(paginationFilter);
+            }
         }
 
         String paginationType = pageModel.getListPaginationViewModel()
@@ -975,12 +987,14 @@ public class CrawlToolResource {
 
         // public time
         indexer = new SelectorIndexer();
-        selector = new Selector();
+        selector = new Selector();           
         if (!pageModel.getNewsPublishTimeViewModel().getSelector().equals("")) {
+        	filter = new SelectorFilter();
+    		filter.initMatchFilter(Constants.YYYYMMDD);
             indexer.initJsoupIndexer(pageModel.getNewsPublishTimeViewModel()
                     .getSelector(), pageModel.getNewsPublishTimeViewModel()
                     .getSelectorAttr());
-            selector.initFieldSelector("publisTime", "", indexer, null, null);
+            selector.initFieldSelector("publisTime", "", indexer, filter, null);
             news.add(selector);
         }
 
@@ -1012,6 +1026,66 @@ public class CrawlToolResource {
 
         return template;
     }
+    
+	// I used 1000 bytes at first, but found that some documents have
+	// meta tag well past the first 1000 bytes.
+	// (e.g. http://cn.promo.yahoo.com/customcare/music.html)
+	private static final int CHUNK_SIZE = 2000;
+	// NUTCH-1006 Meta equiv with single quotes not accepted
+	private static Pattern metaPattern = Pattern.compile(
+			"<meta\\s+([^>]*http-equiv=(\"|')?content-type(\"|')?[^>]*)>",
+			Pattern.CASE_INSENSITIVE);
+	private static Pattern charsetPattern = Pattern.compile(
+			"charset=\\s*([a-z][_\\-0-9a-z]*)", Pattern.CASE_INSENSITIVE);
+	private static Pattern charsetPatternHTML5 = Pattern.compile(
+			"<meta\\s+charset\\s*=\\s*[\"']?([a-z][_\\-0-9a-z]*)[^>]*>",
+			Pattern.CASE_INSENSITIVE);
+
+	private static String sniffCharacterEncoding(byte[] content) {
+		int length = content.length < CHUNK_SIZE ? content.length : CHUNK_SIZE;
+		String str = "";
+		try {
+			// System.out.println("content:"+new String(content,"utf-8"));
+			str = new String(content, 0, length, Charset.forName("ASCII")
+					.toString());
+			// System.out.println("str:"+str);
+		} catch (UnsupportedEncodingException e) {
+			return null;
+		}
+
+		Matcher metaMatcher = metaPattern.matcher(str);
+		String encoding = null;
+		if (metaMatcher.find()) {
+			Matcher charsetMatcher = charsetPattern.matcher(metaMatcher
+					.group(1));
+			if (charsetMatcher.find())
+				encoding = new String(charsetMatcher.group(1));
+		}
+		if (encoding == null) {
+			// check for HTML5 meta charset
+			metaMatcher = charsetPatternHTML5.matcher(str);
+			if (metaMatcher.find()) {
+				encoding = new String(metaMatcher.group(1));
+			}
+		}
+		if (encoding == null) {
+			// check for BOM
+			if (content.length >= 3 && content[0] == (byte) 0xEF
+					&& content[1] == (byte) 0xBB && content[2] == (byte) 0xBF) {
+				encoding = "UTF-8";
+			} else if (content.length >= 2) {
+				if (content[0] == (byte) 0xFF && content[1] == (byte) 0xFE) {
+					encoding = "UTF-16LE";
+				} else if (content[0] == (byte) 0xFE
+						&& content[1] == (byte) 0xFF) {
+					encoding = "UTF-16BE";
+				} else {
+					encoding = "UTF-8";// ”尼玛“个别网站不设定编码
+				}
+			}
+		}
+		return encoding;
+	}
 
     /**
      * 
