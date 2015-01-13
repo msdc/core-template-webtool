@@ -34,7 +34,7 @@ function pageInit(templateList){
     ko.applyBindings(pageViewModel);
     //加载分页
     loadPaginationComponent(pageViewModel);
-    //模式对话框注册事件
+    //【导入导出】模式对话框注册事件
     registerExportModalEvent();
 }
 
@@ -58,7 +58,7 @@ function registerExportModalEvent(){
             modalTitle.text('导入模板文件');
             btnConfirm.click(btnModalImportConfirmHandler);
         }
-    })
+    });
 }
 
 function btnModalImportConfirmHandler(){
@@ -71,15 +71,15 @@ function btnModalImportConfirmHandler(){
         },
         success: function (data) {
             if(data =="true"){
-                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作成功！");
+                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作成功！请刷新该页面！");
             }else{
-                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作失败！");
+                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作失败！请刷新该页面！");
             }
             $('#model_export').modal('hide');
         },
         error: function (error) {
             $('#export_result').text('');
-            $('#export_result').text("错误信息:"+error.responseText);
+            $('#export_result').text("操作失败！错误信息:"+error.responseText);
         }
     });
 }
@@ -102,7 +102,7 @@ function btnModalExportConfirmHandler(){
         },
         error: function (error) {
             $('#export_result').text('');
-            $('#export_result').text("错误信息:"+error.responseText);
+            $('#export_result').text("操作失败！错误信息:"+error.responseText);
         }
     });
 }
@@ -132,29 +132,43 @@ function templateViewModel(templateList){
     self.addNew=function(){
         window.location.href="pages/template-main.html";
     };
-    self.deleteItem=function(){
-        var item=this;
-        var templateUrl=item.url;
-        $.ajax({
-            url: virtualWebPath + '/webapi/crawlToolResource/deleteTemplate',
-            type: 'POST',
-            data:{
-                templateUrl:templateUrl
-            },
-            success: function (data) {
-                if(data=="true"){
-                    self.urls.remove(item);
-                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;删除成功！");
-                }else{
-                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;删除失败！");
+
+    //删除对话框中的【确定】按钮
+    self.modalDelete=function(){
+        var item=self.tempData();
+        if(item){
+            var templateUrl=item.url;
+            $.ajax({
+                url: virtualWebPath + '/webapi/crawlToolResource/deleteTemplate',
+                type: 'POST',
+                data:{
+                    templateUrl:templateUrl
+                },
+                success: function (data) {
+                    if(data=="true"){
+                        self.urls.remove(item);
+                        optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;删除成功！");
+                    }else{
+                        optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;删除失败！");
+                    }
+                    //手工关闭对话框
+                    $('#modal_delete_info').modal('hide');
+                },
+                error: function (error) {
+                    if(error){
+                        optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;删除失败！");
+                    }
+                    //手工关闭对话框
+                    $('#modal_delete_info').modal('hide');
                 }
-            },
-            error: function (error) {
-                if(error){
-                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;删除失败！");
-                }
-            }
-        });
+            });
+        }
+    };
+    self.tempData=ko.observable();
+    //显示删除对话框
+    self.showDeleteModal=function(item){
+        $('#modal_delete_info').modal('show');
+        self.tempData(item);
     };
     self.updateItem=function(){
         var that=this;
