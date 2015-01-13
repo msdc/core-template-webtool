@@ -116,7 +116,7 @@ function loadPaginationComponent(listViewModel) {
     var totalCount = listViewModel.urls().length;
     $('#data_pagination').pagination({
         items: totalCount,
-        itemsOnPage: 8,
+        itemsOnPage: 100,
         cssStyle: 'light-theme',
         prevText: '上一页',
         nextText: '下一页',
