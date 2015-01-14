@@ -97,7 +97,9 @@ public class CrawlToolResource {
         String redisKey = templateGuid + key_partern;
         TemplateModel templateModel = getTemplateModel(redisKey);
         String status = templateModel.getStatus();
-        ArrayList<String> seeds = TemplateFactory.getOutlink(parseResult);
+//        ArrayList<String> seeds = TemplateFactory.getOutlink(parseResult);
+        ArrayList<String> seeds = new ArrayList<String>();
+        seeds.add(templateUrl);
         saveSeedsValueToFile(folderName, seeds, status);
         return "文件保存成功!";
     }
