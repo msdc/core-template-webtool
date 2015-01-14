@@ -12,6 +12,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -49,6 +50,7 @@ import com.isoftstone.crawl.template.impl.TemplateResult;
 import com.isoftstone.crawl.template.model.CustomerAttrModel;
 import com.isoftstone.crawl.template.model.PageModel;
 import com.isoftstone.crawl.template.model.TemplateModel;
+import com.isoftstone.crawl.template.model.TemplateTagModel;
 import com.isoftstone.crawl.template.utils.Config;
 import com.isoftstone.crawl.template.utils.DownloadHtml;
 import com.isoftstone.crawl.template.utils.MD5Utils;
@@ -833,6 +835,15 @@ public class CrawlToolResource {
         String templateGuid = MD5Utils.MD5(templateUrl);
         template.setTemplateGuid(templateGuid);
         template.setState(Constants.UN_FETCH);
+        
+		// 处理模板tag静态属性
+        HashMap<String, String> dictionary = new HashMap<String, String>();
+		List<TemplateTagModel> tempalteTags = pageModel
+				.getTemplateTagsViewModel();
+		for (TemplateTagModel model : tempalteTags) {
+			dictionary.put(model.getTagKey(), model.getTagValue());
+		}
+		template.setTags(dictionary);
 
         List<Selector> list = new ArrayList<Selector>();
         List<Selector> news = new ArrayList<Selector>();
@@ -1025,7 +1036,7 @@ public class CrawlToolResource {
             }
         }
         template.setNews(news);
-
+        //System.out.println("templateResult:"+template.toJSON());
         return template;
     }
     

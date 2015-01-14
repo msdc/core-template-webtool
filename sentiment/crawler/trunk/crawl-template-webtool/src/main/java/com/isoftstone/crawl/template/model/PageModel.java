@@ -14,6 +14,8 @@ public class PageModel {
 	private CommonAttrViewModel listOutLinkViewModel;	
 	private ListPaginationViewModel listPaginationViewModel;
     private ScheduleDispatchViewModel scheduleDispatchViewModel;
+    private TemplateIncreaseViewModel templateIncreaseViewModel;
+    private List<TemplateTagModel> templateTagsViewModel;
 	
 	public BasicInfoViewModel getBasicInfoViewModel() {
 		return basicInfoViewModel;
@@ -93,5 +95,19 @@ public class PageModel {
 	}
 	public void setScheduleDispatchViewModel(ScheduleDispatchViewModel scheduleDispatchViewModel) {
 		this.scheduleDispatchViewModel = scheduleDispatchViewModel;
+	}
+	
+	public TemplateIncreaseViewModel getTemplateIncreaseViewModel() {
+		return templateIncreaseViewModel;
+	}
+	public void setTemplateIncreaseViewModel(TemplateIncreaseViewModel templateIncreaseViewModel) {
+		this.templateIncreaseViewModel = templateIncreaseViewModel;
+	}
+	
+	public List<TemplateTagModel> getTemplateTagsViewModel() {
+		return templateTagsViewModel;
+	}
+	public void setTemplateTagsViewModel(List<TemplateTagModel> templateTagsViewModel) {
+		this.templateTagsViewModel = templateTagsViewModel;
 	}
 }
