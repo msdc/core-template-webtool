@@ -66,526 +66,504 @@ import com.isoftstone.crawl.template.vo.Seed;
  * */
 @Path("crawlToolResource")
 public class CrawlToolResource {
-    //列表的key的后缀
-    public static final String key_partern = "_templatelist";
-    //文件扩展名
-    public static final String file_extensionName=".txt";
+	// 列表的key的后缀
+	public static final String key_partern = "_templatelist";
+	// 文件扩展名
+	public static final String file_extensionName = ".txt";
 
-    private static final Log LOG = LogFactory.getLog(CrawlToolResource.class);
+	private static final Log LOG = LogFactory.getLog(CrawlToolResource.class);
 
-    /**
-     * 保存到本地文件
-     * */
-    @POST
-    @Path("/saveToLocalFile")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String saveToLocalFile(
-            @DefaultValue("") @FormParam("data") String data) {
-        PageModel pageModel = GetPageModelByJsonString(data);
-        String domain = pageModel.getScheduleDispatchViewModel().getDomain();
-        String period = pageModel.getScheduleDispatchViewModel().getPeriod();
-        String sequence = pageModel.getScheduleDispatchViewModel()
-                .getSequence();
-        if (sequence == null || sequence.equals("")) {
-            return "保存失败，请输入时序.";
-        }
-        String folderName = domain + "_" + "1" + period + "_" + sequence;
-        ParseResult parseResult = saveTemplateAndParseResult(pageModel);
-        if (parseResult == null) {
-            return "请先保存模板!再执行此操作!";
-        }
-        String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-        String templateGuid = MD5Utils.MD5(templateUrl);
-        String redisKey = templateGuid + key_partern;
-        TemplateModel templateModel = getTemplateModel(redisKey);
-        String status = templateModel.getStatus();
-//        ArrayList<String> seeds = TemplateFactory.getOutlink(parseResult);
-        ArrayList<String> seeds = new ArrayList<String>();
-        seeds.add(templateUrl);
-        saveSeedsValueToFile(folderName, seeds, status);
-        return "文件保存成功!";
-    }
+	/**
+	 * 保存到本地文件
+	 * */
+	@POST
+	@Path("/saveToLocalFile")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String saveToLocalFile(@DefaultValue("") @FormParam("data") String data) {
+		PageModel pageModel = GetPageModelByJsonString(data);
+		String domain = pageModel.getScheduleDispatchViewModel().getDomain();
+		String period = pageModel.getScheduleDispatchViewModel().getPeriod();
+		String sequence = pageModel.getScheduleDispatchViewModel().getSequence();
+		if (sequence == null || sequence.equals("")) {
+			return "保存失败，请输入时序.";
+		}
+		String folderName = domain + "_" + "1" + period + "_" + sequence;
+		ParseResult parseResult = saveTemplateAndParseResult(pageModel);
+		if (parseResult == null) {
+			return "请先保存模板!再执行此操作!";
+		}
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		String redisKey = templateGuid + key_partern;
+		TemplateModel templateModel = getTemplateModel(redisKey);
+		String status = templateModel.getStatus();
+		// ArrayList<String> seeds = TemplateFactory.getOutlink(parseResult);
+		ArrayList<String> seeds = new ArrayList<String>();
+		seeds.add(templateUrl);
+		saveSeedsValueToFile(folderName, seeds, status);
+		return "文件保存成功!";
+	}
 
-    /**
-     * 保存种子到本地文件.
-     * 并将文件夹相关信息存入redis.
-     */
-    private void saveSeedsValueToFile(String folderName, List<String> seeds,
-            String status) {
-        //--1.保存到本地文件.
-        contentToTxt(folderName, seeds, status);
+	/**
+	 * 保存种子到本地文件. 并将文件夹相关信息存入redis.
+	 */
+	private void saveSeedsValueToFile(String folderName, List<String> seeds, String status) {
+		// --1.保存到本地文件.
+		contentToTxt(folderName, seeds, status);
 
-        //--2.保存到redis中.
-        String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
-        DispatchVo dispatchVo = new DispatchVo();
-        dispatchVo.setStatus(WebtoolConstants.DISPATCH_STATIS_START);
-        List<Seed> seedList = new ArrayList<Seed>();
-        for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
-            String seedStr = it.next();
-            Seed seed = new Seed(seedStr, status);
-            seedList.add(seed);
-        }
-        dispatchVo.setSeed(seedList);
-        setDispatchResult(dispatchVo, redisKey);
-    }
+		// --2.保存到redis中.
+		String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
+		DispatchVo dispatchVo = new DispatchVo();
+		dispatchVo.setStatus(WebtoolConstants.DISPATCH_STATIS_START);
+		List<Seed> seedList = new ArrayList<Seed>();
+		for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
+			String seedStr = it.next();
+			Seed seed = new Seed(seedStr, status);
+			seedList.add(seed);
+		}
+		dispatchVo.setSeed(seedList);
+		setDispatchResult(dispatchVo, redisKey);
+	}
 
-    private void setDispatchResult(DispatchVo dispatchVo, String guid) {
-        JedisPool pool = null;
-        Jedis jedis = null;
-        try {
-            StringBuilder str = new StringBuilder();
-            str.append(JSON.toJSONString(dispatchVo));
-            pool = RedisUtils.getPool();
-            jedis = pool.getResource();
-            jedis.set(guid, str.toString());
-        } catch (Exception e) {
-            pool.returnBrokenResource(jedis);
-            LOG.error("", e);
-        } finally {
-            RedisUtils.returnResource(pool, jedis);
-        }
-    }
-
-    public TemplateModel getTemplateModel(String guid) {
-        JedisPool pool = null;
-        Jedis jedis = null;
-        try {
-            pool = RedisUtils.getPool();
-            jedis = pool.getResource();
-            String json = jedis.get(guid);
-            if (json != null) {
-                return GetTemplateModel(json);
-            }
-        } catch (Exception e) {
-            pool.returnBrokenResource(jedis);
-            LOG.error("", e);
-        } finally {
-            RedisUtils.returnResource(pool, jedis);
-        }
-        return null;
-    }
-
-    /**
-     * 
-     * 保存内容到文件
-     * */
-    private void contentToTxt(String folderName, List<String> seeds,
-            String status) {
-        String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
-        String filePath = folderRoot + File.separator + folderName
-                + File.separator + WebtoolConstants.SEED_FILE_NAME;
-        String str = null; // 原有txt内容
-        StringBuffer strBuf = new StringBuffer();// 内容更新
-        BufferedReader input = null;
-        BufferedWriter output = null;
-        try {
-            File f = new File(filePath);
-            File parentDir = f.getParentFile();
-            if (parentDir != null && !parentDir.exists()) {
-                parentDir.mkdirs();
-            }
-            if (!f.exists()) {
-                f.createNewFile(); //不存在则创建
-            } else {
-                input = new BufferedReader(new FileReader(f));
-
-                while ((str = input.readLine()) != null) {
-                    String temp = str;
-                    if (str.startsWith("#")) {
-                        temp = str.substring(1, str.length());
-                    }
-                    if (!seeds.contains(temp)) {
-                        strBuf.append(str);
-                    }
-                }
-                input.close();
-            }
-            for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
-                String seedStr = it.next();
-                if (WebtoolConstants.URL_STATUS_FALSE.equals(status)) {
-                    strBuf.append("#");
-                }
-                strBuf.append(seedStr + System.getProperty("line.separator"));
-            }
-            output = new BufferedWriter(new FileWriter(f));
-            output.write(strBuf.toString());
-            output.close();
-            putSeedsFolder(folderName, "local");
-        } catch (Exception e) {
-            LOG.error("生成文件错误.", e);
-        } finally {
-            try {
-                if (input != null) {
-                    input.close();
-                }
-                if (output != null) {
-                    output.close();
-                }
-            } catch (IOException e) {
-                LOG.error("关闭流异常.", e);
-            }
-        }
-    }
-
-    private static void putSeedsFolder(String folderName, String type) {
-        LOG.info("进入方法");
-        Runmanager runmanager = new Runmanager();
-        runmanager.setHostIp("192.168.100.236");
-        runmanager.setUsername("root");
-        runmanager.setPassword("Password1");
-        runmanager.setPort(22);
-        String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
-        LOG.info("文件根目录" + folderRoot);
-        String command = "";
-        if ("local".equals(type)) {
-            command = "scp -r " + folderRoot + "/" + folderName + " root@192.168.100.231:/home/" + folderName;
-        }else {
-            //FIXME:集群模式，执行的命令.
-            command = "";
-        }
-        LOG.info("命令：" + command);
-        runmanager.setCommand(command);
-        ShellUtils.execCmd(runmanager);
-        LOG.info("命令执行完毕：" + command);
-    }
-  
-    /**
-     * 验证内容页
-     * */
-    @POST
-    @Path("/verifyNewContent")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String VerifyNewContent(
-            @DefaultValue("") @FormParam("data") String data) {
-        PageModel pageModel = GetPageModelByJsonString(data);
-        ParseResult parseResult = saveParseResult(pageModel);
-        // ParseResult parseResult = GetParseResultFromRedis(pageModel);
-        if (parseResult == null) {
-            return "请先保存模板!再执行此操作!";
-        }
-        // 获取内容页链接
-        ArrayList<String> contentOutLinkArrayList = TemplateFactory
-                .getContentOutlink(parseResult);
-        if(contentOutLinkArrayList.size()==0){
-        	return "列表外链接配置信息不正确！";
-        }
-        String contentOutLink = contentOutLinkArrayList.get(0);
-        byte[] input = DownloadHtml.getHtml(contentOutLink);
-        String encoding = sniffCharacterEncoding(input);
-        try {
-            parseResult = TemplateFactory.process(input, encoding,
-                contentOutLink);
-        } catch (Exception e) {
-            // TODO: handle exception
-            e.printStackTrace();
-        }
-
-        return parseResult.toJSON();
-    }
-
-    /**
-     * 验证列表页
-     * */
-    @POST
-    @Path("/verifyListContent")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String VerifyListContent(
-            @DefaultValue("") @FormParam("data") String data) {
-        PageModel pageModel = GetPageModelByJsonString(data);
-        ParseResult parseResult = saveParseResult(pageModel);
-        if (parseResult == null) {
-            return "请先保存模板!再执行此操作!";
-        }
-        return parseResult.toJSON();
-    }
-
-    /**
-     * 
-     * 测试模板主方法
-     * */
-    @POST
-    @Path("/getJSONString")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String GetJSONString(@DefaultValue("") @FormParam("data") String data) {
-        PageModel pageModel = GetPageModelByJsonString(data);
-        TemplateResult templateResult = GetTemplateResult(pageModel);
-        return templateResult.toJSON();
-    }
-
-    /**
-     * 
-     * 保存模板的主方法
-     * */
-    @POST
-    @Path("/saveTemplate")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String SaveTemplate(@DefaultValue("") @FormParam("data") String data) {
-        PageModel pageModel = GetPageModelByJsonString(data);
-        saveTemplateResultToRedis(pageModel);
-        return "模板保存成功!";        
-    }
-
-    /**
-     * 
-     * 查看HTML内容按钮
-     * */
-    @POST
-    @Path("/viewHtmlContent")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String viewHtmlContent(
-            @DefaultValue("") @FormParam("webUrl") String webUrl) {
-        String htmlContent = DownloadHtml.getHtml(webUrl, "UTF-8");
-        return htmlContent;
-    }
-
-    /**
-     * 
-     * 删除模板
-     * */
-    @POST
-    @Path("/deleteTemplate")
-    @Produces(MediaType.TEXT_PLAIN)
-    public Boolean DeleteTemplate(
-            @DefaultValue("") @FormParam("templateUrl") String templateUrl) {
-        String templateGuid = MD5Utils.MD5(templateUrl);
-        JedisPool pool = null;
-        Jedis jedis = null;
-        Boolean executeResult = true;
-        try {
-            pool = RedisUtils.getPool();
-            jedis = pool.getResource();
-            jedis.del(templateGuid + key_partern);
-            jedis.del(templateGuid);
-        } catch (Exception e) {
-            pool.returnBrokenResource(jedis);
-            e.printStackTrace();
-            executeResult = false;
-        } finally {
-            RedisUtils.returnResource(pool, jedis);
-        }
-        return executeResult;
-    }
-
-    /**
-     * 
-     * 修改模板
-     * */
-    @POST
-    @Path("/updateTemplate")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String UpdateTemplate(
-            @DefaultValue("") @FormParam("templateGuid") String templateGuid) {
-        String json = "";
-        TemplateResult templateResult = RedisUtils
-                .getTemplateResult(templateGuid);
-        json = templateResult.toJSON();
-        return json;
-    }
-
-    /**
-     * 
-     * 修改模板
-     * */
-    @POST
-    @Path("/getTemplateGuid")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getTemplateGuid(
-            @DefaultValue("") @FormParam("templateUrl") String templateUrl) {
-        String templateGuid = MD5Utils.MD5(templateUrl);
-        return templateGuid;
-    }
-
-    /**
-     * 
-     * 获取所有的模板列表
-     * */
-    @GET
-    @Path("/getTemplateList")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String GetTemplateList() {
-        JedisPool pool = null;
-        Jedis jedis = null;
-        TemplateList templateList = new TemplateList();
-        List<TemplateModel> templateListArrayList = new ArrayList<TemplateModel>();
-        try {
-            pool = RedisUtils.getPool();
-            jedis = pool.getResource();
-            Set<String> listKeys = jedis.keys("*" + key_partern);
-            for (String key : listKeys) {
-                String templateString = jedis.get(key);
-                TemplateModel templateModel = GetTemplateModel(templateString);
-                templateListArrayList.add(templateModel);
-            }
-        } catch (Exception e) {
-            pool.returnBrokenResource(jedis);
-            e.printStackTrace();
-        } finally {
-            RedisUtils.returnResource(pool, jedis);
-        }
-        templateList.setTemplateList(templateListArrayList);
-        String templateListJSONString = GetTemplateListJSONString(templateList);
-        return templateListJSONString;
-    }
-    
-    /**
-     * 
-     * 停用模板
-     * */
-    @POST
-    @Path("/disableTemplate")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String DisableTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl,
-    		@DefaultValue("") @FormParam("name") String name){
-    	 setTemplateStatus(templateUrl, name, "false");
-    	 return "success";
-    }
-    
-    /**
-     * 
-     * 启用模板
-     * */
-    @POST
-    @Path("/enableTemplate")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String EnableTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl,
-    		@DefaultValue("") @FormParam("name") String name){
-    	setTemplateStatus(templateUrl, name, "true");
-    	return "success";
-    }
-
-    /**
-     * 
-     * 获取模板列表中单个模板对象
-     * */
-    @POST
-    @Path("/getSingleTemplateModel")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getSingleTemplateModel(
-            @DefaultValue("") @FormParam("templateGuid") String templateGuid) {
-        JedisPool pool = null;
-        Jedis jedis = null;
-        String json = "";
-        try {
-            pool = RedisUtils.getPool();
-            jedis = pool.getResource();
-            json = jedis.get(templateGuid + key_partern);
-        } catch (Exception e) {
-            pool.returnBrokenResource(jedis);
-            e.printStackTrace();
-        } finally {
-            RedisUtils.returnResource(pool, jedis);
-        }
-        return json;
-    }
-    
-    /**
-     * 
-     * 导出所有模板到文件
-     * */
-    @POST
-    @Path("/exportAllTemplates")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String exportAllTemplates(@DefaultValue("") @FormParam("filePath") String filePath){
-    	JedisPool pool = null;
-        Jedis jedis = null; 
-        String resultStatus="true";
-        try {
-            pool = RedisUtils.getPool();
-            jedis = pool.getResource();
-            Set<String> listKeys = jedis.keys("*" + key_partern);
-            for (String key : listKeys) {
-                String templateString = jedis.get(key);
-                TemplateModel templateModel = GetTemplateModel(templateString);
-                String templateGuid=templateModel.getTemplateId();
-                String templateJsonString=jedis.get(templateGuid);
-                String templateFileName=templateGuid+file_extensionName;
-                String templateListName=key+file_extensionName;
-                //保存模板
-                exportTemplateJSONStringToFile(filePath+templateFileName,templateJsonString);
-                //保存模板列表
-                exportTemplateJSONStringToFile(filePath+templateListName,templateString);
-            }            
-        } catch (Exception e) {
-        	resultStatus="false";
-            pool.returnBrokenResource(jedis);
-            e.printStackTrace();
-        } finally {
-            RedisUtils.returnResource(pool, jedis);
-        }               
-    	return resultStatus;
-    }
-
-    /**
-     * 
-     * 导入所有模板文件
-     * */
-    @POST
-    @Path("/importAllTemplates")
-    @Produces(MediaType.TEXT_PLAIN)
-	public String importAllTemplates(
-			@DefaultValue("") @FormParam("filePath") String dirPath) {
+	private void setDispatchResult(DispatchVo dispatchVo, String guid) {
 		JedisPool pool = null;
 		Jedis jedis = null;
-		String resultStatus="true";
+		try {
+			StringBuilder str = new StringBuilder();
+			str.append(JSON.toJSONString(dispatchVo));
+			pool = RedisUtils.getPool();
+			jedis = pool.getResource();
+			jedis.set(guid, str.toString());
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			LOG.error("", e);
+		} finally {
+			RedisUtils.returnResource(pool, jedis);
+		}
+	}
+
+	public TemplateModel getTemplateModel(String guid) {
+		JedisPool pool = null;
+		Jedis jedis = null;
 		try {
 			pool = RedisUtils.getPool();
 			jedis = pool.getResource();
-			File file = new File(dirPath);  
-			File[] files = file.listFiles();
-			for (File f : files)  
-            {
-				if (f.isFile()) {					
-					String fileName = f.getName();
-					String templateString = readTemplateFile(dirPath+fileName);
-					String templateGuid = fileName.substring(0,fileName.lastIndexOf("."));
-					jedis.set(templateGuid, templateString);				
-				}
-            }			
+			String json = jedis.get(guid);
+			if (json != null) {
+				return GetTemplateModel(json);
+			}
 		} catch (Exception e) {
-			resultStatus="false";
-			e.printStackTrace();
 			pool.returnBrokenResource(jedis);
+			LOG.error("", e);
+		} finally {
+			RedisUtils.returnResource(pool, jedis);
 		}
-		finally {
-            RedisUtils.returnResource(pool, jedis);
-        }
-
-		return resultStatus;
+		return null;
 	}
-    
-    /**
-     * 
-     * 读取文件
-     * */
-    public String readTemplateFile(String path) throws IOException{
-        File file=new File(path);
-        if(!file.exists()||file.isDirectory()){
-        	throw new FileNotFoundException();
-        }            
-        BufferedReader br=new BufferedReader(new FileReader(file));
-        String temp=null;
-        StringBuffer sb=new StringBuffer();
-        temp=br.readLine();
-        while(temp!=null){
-            sb.append(temp+" ");
-            temp=br.readLine();
-        }
-        return sb.toString();
-    }
 
-    
-    /**
+	/**
 	 * 
 	 * 保存内容到文件
 	 * */
-	private void exportTemplateJSONStringToFile(String filePath,String content) {
+	private void contentToTxt(String folderName, List<String> seeds, String status) {
+		String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
+		String filePath = folderRoot + File.separator + folderName + File.separator + WebtoolConstants.SEED_FILE_NAME;
+		String str = null; // 原有txt内容
+		StringBuffer strBuf = new StringBuffer();// 内容更新
+		BufferedReader input = null;
+		BufferedWriter output = null;
 		try {
 			File f = new File(filePath);
 			File parentDir = f.getParentFile();
 			if (parentDir != null && !parentDir.exists()) {
 				parentDir.mkdirs();
 			}
-			if (!f.exists()) {				
+			if (!f.exists()) {
+				f.createNewFile(); // 不存在则创建
+			} else {
+				input = new BufferedReader(new FileReader(f));
+
+				while ((str = input.readLine()) != null) {
+					String temp = str;
+					if (str.startsWith("#")) {
+						temp = str.substring(1, str.length());
+					}
+					if (!seeds.contains(temp)) {
+						strBuf.append(str);
+					}
+				}
+				input.close();
+			}
+			for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
+				String seedStr = it.next();
+				if (WebtoolConstants.URL_STATUS_FALSE.equals(status)) {
+					strBuf.append("#");
+				}
+				strBuf.append(seedStr + System.getProperty("line.separator"));
+			}
+			output = new BufferedWriter(new FileWriter(f));
+			output.write(strBuf.toString());
+			output.close();
+			putSeedsFolder(folderName, "local");
+		} catch (Exception e) {
+			LOG.error("生成文件错误.", e);
+		} finally {
+			try {
+				if (input != null) {
+					input.close();
+				}
+				if (output != null) {
+					output.close();
+				}
+			} catch (IOException e) {
+				LOG.error("关闭流异常.", e);
+			}
+		}
+	}
+
+	private static void putSeedsFolder(String folderName, String type) {
+		LOG.info("进入方法");
+		Runmanager runmanager = new Runmanager();
+		runmanager.setHostIp("192.168.100.236");
+		runmanager.setUsername("root");
+		runmanager.setPassword("Password1");
+		runmanager.setPort(22);
+		String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
+		LOG.info("文件根目录" + folderRoot);
+		String command = "";
+		if ("local".equals(type)) {
+			command = "scp -r " + folderRoot + "/" + folderName + " root@192.168.100.231:/home/" + folderName;
+		} else {
+			// FIXME:集群模式，执行的命令.
+			command = "";
+		}
+		LOG.info("命令：" + command);
+		runmanager.setCommand(command);
+		ShellUtils.execCmd(runmanager);
+		LOG.info("命令执行完毕：" + command);
+	}
+
+	/**
+	 * 验证内容页
+	 * */
+	@POST
+	@Path("/verifyNewContent")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String VerifyNewContent(@DefaultValue("") @FormParam("data") String data) {
+		PageModel pageModel = GetPageModelByJsonString(data);
+		ParseResult parseResult = saveParseResult(pageModel);
+		// ParseResult parseResult = GetParseResultFromRedis(pageModel);
+		if (parseResult == null) {
+			return "请先保存模板!再执行此操作!";
+		}
+		// 获取内容页链接
+		ArrayList<String> contentOutLinkArrayList = TemplateFactory.getContentOutlink(parseResult);
+		if (contentOutLinkArrayList.size() == 0) {
+			return "列表外链接配置信息不正确！";
+		}
+		String contentOutLink = contentOutLinkArrayList.get(0);
+		byte[] input = DownloadHtml.getHtml(contentOutLink);
+		String encoding = sniffCharacterEncoding(input);
+		try {
+			parseResult = TemplateFactory.process(input, encoding, contentOutLink);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+
+		return parseResult.toJSON();
+	}
+
+	/**
+	 * 验证列表页
+	 * */
+	@POST
+	@Path("/verifyListContent")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String VerifyListContent(@DefaultValue("") @FormParam("data") String data) {
+		PageModel pageModel = GetPageModelByJsonString(data);
+		ParseResult parseResult = saveParseResult(pageModel);
+		if (parseResult == null) {
+			return "请先保存模板!再执行此操作!";
+		}
+		return parseResult.toJSON();
+	}
+
+	/**
+	 * 
+	 * 测试模板主方法
+	 * */
+	@POST
+	@Path("/getJSONString")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String GetJSONString(@DefaultValue("") @FormParam("data") String data) {
+		PageModel pageModel = GetPageModelByJsonString(data);
+		TemplateResult templateResult = GetTemplateResult(pageModel);
+		return templateResult.toJSON();
+	}
+
+	/**
+	 * 
+	 * 保存模板的主方法
+	 * */
+	@POST
+	@Path("/saveTemplate")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String SaveTemplate(@DefaultValue("") @FormParam("data") String data) {
+		PageModel pageModel = GetPageModelByJsonString(data);
+		saveTemplateResultToRedis(pageModel);
+		return "模板保存成功!";
+	}
+
+	/**
+	 * 
+	 * 查看HTML内容按钮
+	 * */
+	@POST
+	@Path("/viewHtmlContent")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String viewHtmlContent(@DefaultValue("") @FormParam("webUrl") String webUrl) {
+		String htmlContent = DownloadHtml.getHtml(webUrl, "UTF-8");
+		return htmlContent;
+	}
+
+	/**
+	 * 
+	 * 删除模板
+	 * */
+	@POST
+	@Path("/deleteTemplate")
+	@Produces(MediaType.TEXT_PLAIN)
+	public Boolean DeleteTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl) {
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		JedisPool pool = null;
+		Jedis jedis = null;
+		Boolean executeResult = true;
+		try {
+			pool = RedisUtils.getPool();
+			jedis = pool.getResource();
+			jedis.del(templateGuid + key_partern);
+			jedis.del(templateGuid);
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			e.printStackTrace();
+			executeResult = false;
+		} finally {
+			RedisUtils.returnResource(pool, jedis);
+		}
+		return executeResult;
+	}
+
+	/**
+	 * 
+	 * 修改模板
+	 * */
+	@POST
+	@Path("/updateTemplate")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String UpdateTemplate(@DefaultValue("") @FormParam("templateGuid") String templateGuid) {
+		String json = "";
+		TemplateResult templateResult = RedisUtils.getTemplateResult(templateGuid);
+		json = templateResult.toJSON();
+		return json;
+	}
+
+	/**
+	 * 
+	 * 修改模板
+	 * */
+	@POST
+	@Path("/getTemplateGuid")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getTemplateGuid(@DefaultValue("") @FormParam("templateUrl") String templateUrl) {
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		return templateGuid;
+	}
+
+	/**
+	 * 
+	 * 获取所有的模板列表
+	 * */
+	@GET
+	@Path("/getTemplateList")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String GetTemplateList() {
+		JedisPool pool = null;
+		Jedis jedis = null;
+		TemplateList templateList = new TemplateList();
+		List<TemplateModel> templateListArrayList = new ArrayList<TemplateModel>();
+		try {
+			pool = RedisUtils.getPool();
+			jedis = pool.getResource();
+			Set<String> listKeys = jedis.keys("*" + key_partern);
+			for (String key : listKeys) {
+				String templateString = jedis.get(key);
+				TemplateModel templateModel = GetTemplateModel(templateString);
+				templateListArrayList.add(templateModel);
+			}
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			e.printStackTrace();
+		} finally {
+			RedisUtils.returnResource(pool, jedis);
+		}
+		templateList.setTemplateList(templateListArrayList);
+		String templateListJSONString = GetTemplateListJSONString(templateList);
+		return templateListJSONString;
+	}
+
+	/**
+	 * 
+	 * 停用模板
+	 * */
+	@POST
+	@Path("/disableTemplate")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String DisableTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl, @DefaultValue("") @FormParam("name") String name) {
+		setTemplateStatus(templateUrl, name, "false");
+		return "success";
+	}
+
+	/**
+	 * 
+	 * 启用模板
+	 * */
+	@POST
+	@Path("/enableTemplate")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String EnableTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl, @DefaultValue("") @FormParam("name") String name) {
+		setTemplateStatus(templateUrl, name, "true");
+		return "success";
+	}
+
+	/**
+	 * 
+	 * 获取模板列表中单个模板对象
+	 * */
+	@POST
+	@Path("/getSingleTemplateModel")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getSingleTemplateModel(@DefaultValue("") @FormParam("templateGuid") String templateGuid) {
+		JedisPool pool = null;
+		Jedis jedis = null;
+		String json = "";
+		try {
+			pool = RedisUtils.getPool();
+			jedis = pool.getResource();
+			json = jedis.get(templateGuid + key_partern);
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			e.printStackTrace();
+		} finally {
+			RedisUtils.returnResource(pool, jedis);
+		}
+		return json;
+	}
+
+	/**
+	 * 
+	 * 导出所有模板到文件
+	 * */
+	@POST
+	@Path("/exportAllTemplates")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String exportAllTemplates(@DefaultValue("") @FormParam("filePath") String filePath) {
+		JedisPool pool = null;
+		Jedis jedis = null;
+		String resultStatus = "true";
+		try {
+			pool = RedisUtils.getPool();
+			jedis = pool.getResource();
+			Set<String> listKeys = jedis.keys("*" + key_partern);
+			for (String key : listKeys) {
+				String templateString = jedis.get(key);
+				TemplateModel templateModel = GetTemplateModel(templateString);
+				String templateGuid = templateModel.getTemplateId();
+				String templateJsonString = jedis.get(templateGuid);
+				String templateFileName = templateGuid + file_extensionName;
+				String templateListName = key + file_extensionName;
+				// 保存模板
+				exportTemplateJSONStringToFile(filePath + templateFileName, templateJsonString);
+				// 保存模板列表
+				exportTemplateJSONStringToFile(filePath + templateListName, templateString);
+			}
+		} catch (Exception e) {
+			resultStatus = "false";
+			pool.returnBrokenResource(jedis);
+			e.printStackTrace();
+		} finally {
+			RedisUtils.returnResource(pool, jedis);
+		}
+		return resultStatus;
+	}
+
+	/**
+	 * 
+	 * 导入所有模板文件
+	 * */
+	@POST
+	@Path("/importAllTemplates")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String importAllTemplates(@DefaultValue("") @FormParam("filePath") String dirPath) {
+		JedisPool pool = null;
+		Jedis jedis = null;
+		String resultStatus = "true";
+		try {
+			pool = RedisUtils.getPool();
+			jedis = pool.getResource();
+			File file = new File(dirPath);
+			File[] files = file.listFiles();
+			for (File f : files) {
+				if (f.isFile()) {
+					String fileName = f.getName();
+					String templateString = readTemplateFile(dirPath + fileName);
+					String templateGuid = fileName.substring(0, fileName.lastIndexOf("."));
+					jedis.set(templateGuid, templateString);
+				}
+			}
+		} catch (Exception e) {
+			resultStatus = "false";
+			e.printStackTrace();
+			pool.returnBrokenResource(jedis);
+		} finally {
+			RedisUtils.returnResource(pool, jedis);
+		}
+
+		return resultStatus;
+	}
+
+	/**
+	 * 
+	 * 读取文件
+	 * */
+	public String readTemplateFile(String path) throws IOException {
+		File file = new File(path);
+		if (!file.exists() || file.isDirectory()) {
+			throw new FileNotFoundException();
+		}
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		String temp = null;
+		StringBuffer sb = new StringBuffer();
+		temp = br.readLine();
+		while (temp != null) {
+			sb.append(temp + " ");
+			temp = br.readLine();
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 
+	 * 保存内容到文件
+	 * */
+	private void exportTemplateJSONStringToFile(String filePath, String content) {
+		try {
+			File f = new File(filePath);
+			File parentDir = f.getParentFile();
+			if (parentDir != null && !parentDir.exists()) {
+				parentDir.mkdirs();
+			}
+			if (!f.exists()) {
 				f.createNewFile();// 不存在则创建
 			}
 			BufferedWriter output = new BufferedWriter(new FileWriter(f));
@@ -597,470 +575,425 @@ public class CrawlToolResource {
 		}
 	}
 
-    /**
-     * 将对象转换为JSON-string形式
-     * */
-    private String GetTemplateListJSONString(TemplateList templateList) {
-        String json = null;
+	/**
+	 * 将对象转换为JSON-string形式
+	 * */
+	private String GetTemplateListJSONString(TemplateList templateList) {
+		String json = null;
 
-        ObjectMapper objectmapper = new ObjectMapper();
-        try {
-            json = objectmapper.writeValueAsString(templateList);
-        } catch (JsonGenerationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return json;
-    }
-
-    private String GetTemplateModelJSONString(TemplateModel templateModel) {
-        String json = null;
-
-        ObjectMapper objectmapper = new ObjectMapper();
-        try {
-            json = objectmapper.writeValueAsString(templateModel);
-        } catch (JsonGenerationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return json;
-    }
-
-    /**
-     * JSON 字符转换为对象
-     * */
-    private TemplateModel GetTemplateModel(String jsonString) {
-        TemplateModel templateModel = null;
-        try {
-            ObjectMapper objectmapper = new ObjectMapper();
-            templateModel = objectmapper.readValue(jsonString,
-                TemplateModel.class);
-        } catch (JsonParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return templateModel;
-    }
-
-    /**
-     * 
-     * 从redis中获取ParseResult结果
-     * */
-    private ParseResult GetParseResultFromRedis(PageModel pageModel) {
-        String guid = MD5Utils.MD5(pageModel.getBasicInfoViewModel().getUrl());
-        ParseResult parseResult = null;
-        TemplateResult templateResult = RedisUtils.getTemplateResult(guid);
-        String parseResultGuid = templateResult.getParseResultGuid(); // 获取中间结果
-        parseResult = RedisUtils.getParseResult(parseResultGuid);
-        return parseResult;
-    }
-
-    /**
-     * 返回ParseResult
-     * */
-    private ParseResult GetParseResultByLocalProcess(String encoding,
-            String templateUrl, PageModel pageModel, String parseType) {
-        ParseResult parseResult = null;
-        TemplateResult templateResult = null;
-        byte[] input = DownloadHtml.getHtml(templateUrl);
-        try {
-            templateResult = GetTemplateResult(pageModel);
-            parseResult = TemplateFactory.localProcess(input, encoding,
-                templateUrl, templateResult, parseType);
-        } catch (Exception e) {
-            // TODO: handle exception
-            e.printStackTrace();
-        }
-        return parseResult;
-    }
-    
-    /**
-     * 
-     * 同时保存[模板]和[中间结果]到redis
-     * */
-    private ParseResult saveTemplateAndParseResult(PageModel pageModel) {
-        String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-        TemplateResult templateResult = GetTemplateResult(pageModel);
-        String templateGuid = MD5Utils.MD5(templateUrl);
-        ParseResult parseResult = null;        
-        byte[] input = DownloadHtml.getHtml(templateUrl);        
-        String encoding = sniffCharacterEncoding(input);
-        RedisUtils.setTemplateResult(templateResult, templateGuid);
-        SaveTemplateToList(pageModel,"true");//保存数据源列表所需要的key值
-        System.out.println("templateGuid=" + templateGuid);
-        parseResult = TemplateFactory.process(input, encoding, templateUrl);
-        return parseResult;
-    }
-
-    /**
-     * 
-     * 只保存[中间结果]到redis
-     * */
-    private ParseResult saveParseResult(PageModel pageModel) {
-        String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-        ParseResult parseResult = null;        
-        byte[] input = DownloadHtml.getHtml(templateUrl);
-        String encoding = sniffCharacterEncoding(input);
-        parseResult = TemplateFactory.process(input, encoding, templateUrl);
-        return parseResult;
-    }
-    
-    /**
-     * 
-     * 只保存[模板配置]到redis
-     * */
-    private void saveTemplateResultToRedis(PageModel pageModel) {
-    	String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-        TemplateResult templateResult = GetTemplateResult(pageModel);
-        String templateGuid = MD5Utils.MD5(templateUrl);
-        RedisUtils.setTemplateResult(templateResult, templateGuid);
-      //保存数据源列表所需要的key值        模板默认为启用状态
-        SaveTemplateToList(pageModel,"true");
+		ObjectMapper objectmapper = new ObjectMapper();
+		try {
+			json = objectmapper.writeValueAsString(templateList);
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return json;
 	}
 
-    /**
-     * 将redis中模板的id和数据源列表做关联
-     * */
-    private void SaveTemplateToList(PageModel pageModel,String status) {
-        String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-        String templateGuid = MD5Utils.MD5(templateUrl);
-        JedisPool pool = null;
-        Jedis jedis = null;
-        TemplateModel templateModel=setTemplateStatus(pageModel,status);
-        try {
-            StringBuilder str = new StringBuilder();
-            str.append(GetTemplateModelJSONString(templateModel));
-            pool = RedisUtils.getPool();
-            jedis = pool.getResource();
-            jedis.set(templateGuid + key_partern, str.toString());
-        } catch (Exception e) {
-            pool.returnBrokenResource(jedis);
-            e.printStackTrace();
-        } finally {
-            RedisUtils.returnResource(pool, jedis);
-        }
-    }
+	private String GetTemplateModelJSONString(TemplateModel templateModel) {
+		String json = null;
 
-    /**
-     * 设置模板列表中单个模板的状态
-     * */
-    private  TemplateModel setTemplateStatus(PageModel pageModel,String status) {
-    	 TemplateModel templateModel = new TemplateModel();
-    	 String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-         String templateGuid = MD5Utils.MD5(templateUrl);
-    	 templateModel.setTemplateId(templateGuid);
-         templateModel.setName(pageModel.getBasicInfoViewModel().getName());
-         templateModel.setDescription(pageModel.getBasicInfoViewModel()
-                 .getName());
-         templateModel.setUrl(pageModel.getBasicInfoViewModel().getUrl());
-         templateModel.setStatus(status);
-    	 return templateModel;
+		ObjectMapper objectmapper = new ObjectMapper();
+		try {
+			json = objectmapper.writeValueAsString(templateModel);
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return json;
 	}
-    
-    /**
-     * 设置模板列表中单个模板的状态
-     * */
-    private void setTemplateStatus(String templateUrl,String name,String status) {
-    	String templateGuid = MD5Utils.MD5(templateUrl);
-        JedisPool pool = null;
-        Jedis jedis = null;
-        TemplateModel templateModel=new TemplateModel();
-        templateModel.setTemplateId(templateGuid);
-        templateModel.setName(name);
-        templateModel.setDescription(name);
-        templateModel.setUrl(templateUrl);
-        templateModel.setStatus(status);
-        try {
-            StringBuilder str = new StringBuilder();
-            str.append(GetTemplateModelJSONString(templateModel));
-            pool = RedisUtils.getPool();
-            jedis = pool.getResource();
-            jedis.set(templateGuid + key_partern, str.toString());
-        } catch (Exception e) {
-            pool.returnBrokenResource(jedis);
-            e.printStackTrace();
-        } finally {
-            RedisUtils.returnResource(pool, jedis);
-        }
-	}
-    
-    /**
-     * 
-     * 根据JSON字符串,得到PAGE-MODEL对象
-     * */
-    private PageModel GetPageModelByJsonString(String json) {
-        PageModel pageModel = null;
-        try {
-            ObjectMapper objectmapper = new ObjectMapper();
-            pageModel = objectmapper.readValue(json, PageModel.class);
-        } catch (JsonParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return pageModel;
-    }
 
-    /**
-     * 
-     * 生成模板对象
-     * */
-    private TemplateResult GetTemplateResult(PageModel pageModel) {
-        TemplateResult template = new TemplateResult();
-        template.setType(Constants.TEMPLATE_LIST);
-        String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-        String templateGuid = MD5Utils.MD5(templateUrl);
-        template.setTemplateGuid(templateGuid);
-        template.setState(Constants.UN_FETCH);
-        
+	/**
+	 * JSON 字符转换为对象
+	 * */
+	private TemplateModel GetTemplateModel(String jsonString) {
+		TemplateModel templateModel = null;
+		try {
+			ObjectMapper objectmapper = new ObjectMapper();
+			templateModel = objectmapper.readValue(jsonString, TemplateModel.class);
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return templateModel;
+	}
+
+	/**
+	 * 
+	 * 从redis中获取ParseResult结果
+	 * */
+	private ParseResult GetParseResultFromRedis(PageModel pageModel) {
+		String guid = MD5Utils.MD5(pageModel.getBasicInfoViewModel().getUrl());
+		ParseResult parseResult = null;
+		TemplateResult templateResult = RedisUtils.getTemplateResult(guid);
+		String parseResultGuid = templateResult.getParseResultGuid(); // 获取中间结果
+		parseResult = RedisUtils.getParseResult(parseResultGuid);
+		return parseResult;
+	}
+
+	/**
+	 * 返回ParseResult
+	 * */
+	private ParseResult GetParseResultByLocalProcess(String encoding, String templateUrl, PageModel pageModel, String parseType) {
+		ParseResult parseResult = null;
+		TemplateResult templateResult = null;
+		byte[] input = DownloadHtml.getHtml(templateUrl);
+		try {
+			templateResult = GetTemplateResult(pageModel);
+			parseResult = TemplateFactory.localProcess(input, encoding, templateUrl, templateResult, parseType);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return parseResult;
+	}
+
+	/**
+	 * 
+	 * 同时保存[模板]和[中间结果]到redis
+	 * */
+	private ParseResult saveTemplateAndParseResult(PageModel pageModel) {
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		TemplateResult templateResult = GetTemplateResult(pageModel);
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		ParseResult parseResult = null;
+		byte[] input = DownloadHtml.getHtml(templateUrl);
+		String encoding = sniffCharacterEncoding(input);
+		RedisUtils.setTemplateResult(templateResult, templateGuid);
+		SaveTemplateToList(pageModel, "true");// 保存数据源列表所需要的key值
+		System.out.println("templateGuid=" + templateGuid);
+		parseResult = TemplateFactory.process(input, encoding, templateUrl);
+		return parseResult;
+	}
+
+	/**
+	 * 
+	 * 只保存[中间结果]到redis
+	 * */
+	private ParseResult saveParseResult(PageModel pageModel) {
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		ParseResult parseResult = null;
+		byte[] input = DownloadHtml.getHtml(templateUrl);
+		String encoding = sniffCharacterEncoding(input);
+		parseResult = TemplateFactory.process(input, encoding, templateUrl);
+		return parseResult;
+	}
+
+	/**
+	 * 
+	 * 只保存[模板配置]到redis
+	 * */
+	private void saveTemplateResultToRedis(PageModel pageModel) {
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		TemplateResult templateResult = GetTemplateResult(pageModel);
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		RedisUtils.setTemplateResult(templateResult, templateGuid);
+		// 保存数据源列表所需要的key值 模板默认为启用状态
+		SaveTemplateToList(pageModel, "true");
+	}
+
+	/**
+	 * 将redis中模板的id和数据源列表做关联
+	 * */
+	private void SaveTemplateToList(PageModel pageModel, String status) {
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		JedisPool pool = null;
+		Jedis jedis = null;
+		TemplateModel templateModel = setTemplateStatus(pageModel, status);
+		try {
+			StringBuilder str = new StringBuilder();
+			str.append(GetTemplateModelJSONString(templateModel));
+			pool = RedisUtils.getPool();
+			jedis = pool.getResource();
+			jedis.set(templateGuid + key_partern, str.toString());
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			e.printStackTrace();
+		} finally {
+			RedisUtils.returnResource(pool, jedis);
+		}
+	}
+
+	/**
+	 * 设置模板列表中单个模板的状态
+	 * */
+	private TemplateModel setTemplateStatus(PageModel pageModel, String status) {
+		TemplateModel templateModel = new TemplateModel();
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		templateModel.setTemplateId(templateGuid);
+		templateModel.setName(pageModel.getBasicInfoViewModel().getName());
+		templateModel.setDescription(pageModel.getBasicInfoViewModel().getName());
+		templateModel.setUrl(pageModel.getBasicInfoViewModel().getUrl());
+		templateModel.setStatus(status);
+		return templateModel;
+	}
+
+	/**
+	 * 设置模板列表中单个模板的状态
+	 * */
+	private void setTemplateStatus(String templateUrl, String name, String status) {
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		JedisPool pool = null;
+		Jedis jedis = null;
+		TemplateModel templateModel = new TemplateModel();
+		templateModel.setTemplateId(templateGuid);
+		templateModel.setName(name);
+		templateModel.setDescription(name);
+		templateModel.setUrl(templateUrl);
+		templateModel.setStatus(status);
+		try {
+			StringBuilder str = new StringBuilder();
+			str.append(GetTemplateModelJSONString(templateModel));
+			pool = RedisUtils.getPool();
+			jedis = pool.getResource();
+			jedis.set(templateGuid + key_partern, str.toString());
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			e.printStackTrace();
+		} finally {
+			RedisUtils.returnResource(pool, jedis);
+		}
+	}
+
+	/**
+	 * 
+	 * 根据JSON字符串,得到PAGE-MODEL对象
+	 * */
+	private PageModel GetPageModelByJsonString(String json) {
+		PageModel pageModel = null;
+		try {
+			ObjectMapper objectmapper = new ObjectMapper();
+			pageModel = objectmapper.readValue(json, PageModel.class);
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return pageModel;
+	}
+
+	/**
+	 * 
+	 * 生成模板对象
+	 * */
+	private TemplateResult GetTemplateResult(PageModel pageModel) {
+		TemplateResult template = new TemplateResult();
+		template.setType(Constants.TEMPLATE_LIST);
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		template.setTemplateGuid(templateGuid);
+		template.setState(Constants.UN_FETCH);
+
 		// 处理模板tag静态属性
-        HashMap<String, String> dictionary = new HashMap<String, String>();
-		List<TemplateTagModel> tempalteTags = pageModel
-				.getTemplateTagsViewModel();
+		HashMap<String, String> dictionary = new HashMap<String, String>();
+		List<TemplateTagModel> tempalteTags = pageModel.getTemplateTagsViewModel();
 		for (TemplateTagModel model : tempalteTags) {
 			dictionary.put(model.getTagKey(), model.getTagValue());
 		}
 		template.setTags(dictionary);
 
-        List<Selector> list = new ArrayList<Selector>();
-        List<Selector> news = new ArrayList<Selector>();
-        List<Selector> pagination = new ArrayList<Selector>();
+		List<Selector> list = new ArrayList<Selector>();
+		List<Selector> news = new ArrayList<Selector>();
+		List<Selector> pagination = new ArrayList<Selector>();
 
-        SelectorIndexer indexer = null;
-        Selector selector = null;
-        SelectorFilter filter = null;
-        SelectorFormat format = null;
+		SelectorIndexer indexer = null;
+		Selector selector = null;
+		SelectorFilter filter = null;
+		SelectorFormat format = null;
 
-        // list outlink
-        indexer = new SelectorIndexer();
-        selector = new Selector();
-        if (!pageModel.getListOutLinkViewModel().getSelector().equals("")) {
-            indexer.initJsoupIndexer(pageModel.getListOutLinkViewModel()
-                    .getSelector(), pageModel.getListOutLinkViewModel()
-                    .getSelectorAttr());
-            selector.initContentSelector(indexer, null);
-        }
+		// list outlink
+		indexer = new SelectorIndexer();
+		selector = new Selector();
+		if (!pageModel.getListOutLinkViewModel().getSelector().equals("")) {
+			indexer.initJsoupIndexer(pageModel.getListOutLinkViewModel().getSelector(), pageModel.getListOutLinkViewModel().getSelectorAttr());
+			selector.initContentSelector(indexer, null);
+		}
 
-        // 处理列表自定义属性 以时间为例
-        List<CustomerAttrModel> listCustomerAttrViewModel = pageModel
-                .getListCustomerAttrViewModel();
-        for (CustomerAttrModel model : listCustomerAttrViewModel) {
-            Selector label = new Selector();
-            label.setType(Constants.SELECTOR_LABEL);
-            indexer = new SelectorIndexer();
-            indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
-            filter = new SelectorFilter();
-            String filterString = model.getFilter();
-            String filterCategory = model.getFilterCategory();
-            //过滤字段为空时，直接将filter设置为null值
-            if(filterString.equals("")){
-            	filter=null;
-            }else{
-            	if (filterCategory.equals("匹配")) {
-                    filter.initMatchFilter(filterString);
-                } else if (filterCategory.equals("替换")) {
-                    filter.initReplaceFilter(filterString,
-                        model.getFilterReplaceTo());
-                } else if (filterCategory.equals("移除")) {
-                    filter.initRemoveFilter(filterString);
-                }
-            }            
-            label.initLabelSelector(model.getTarget(), "", indexer, filter,
-                null);
-            selector.setLabel(label);            
-        }
-        list.add(selector);
-        template.setList(list);
+		// 处理列表自定义属性 以时间为例
+		List<CustomerAttrModel> listCustomerAttrViewModel = pageModel.getListCustomerAttrViewModel();
+		for (CustomerAttrModel model : listCustomerAttrViewModel) {
+			Selector label = new Selector();
+			label.setType(Constants.SELECTOR_LABEL);
+			indexer = new SelectorIndexer();
+			indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
+			filter = new SelectorFilter();
+			String filterString = model.getFilter();
+			String filterCategory = model.getFilterCategory();
+			// 过滤字段为空时，直接将filter设置为null值
+			if (filterString.equals("")) {
+				filter = null;
+			} else {
+				if (filterCategory.equals("匹配")) {
+					filter.initMatchFilter(filterString);
+				} else if (filterCategory.equals("替换")) {
+					filter.initReplaceFilter(filterString, model.getFilterReplaceTo());
+				} else if (filterCategory.equals("移除")) {
+					filter.initRemoveFilter(filterString);
+				}
+			}
+			label.initLabelSelector(model.getTarget(), "", indexer, filter, null);
+			selector.setLabel(label);
+		}
+		list.add(selector);
+		template.setList(list);
 
-        // pagitation outlink js翻页无法处理
-        indexer = new SelectorIndexer();
-        selector = new Selector();
-        indexer.initJsoupIndexer(pageModel.getListPaginationViewModel()
-                .getSelector(), pageModel.getListPaginationViewModel()
-                .getSelectorAttr());
+		// pagitation outlink js翻页无法处理
+		indexer = new SelectorIndexer();
+		selector = new Selector();
+		indexer.initJsoupIndexer(pageModel.getListPaginationViewModel().getSelector(), pageModel.getListPaginationViewModel().getSelectorAttr());
 
-        filter = new SelectorFilter();
-        String paginationFilter = pageModel.getListPaginationViewModel()
-                .getFilter();
-        String paginationFilterCategory = pageModel
-                .getListPaginationViewModel().getFilterCategory();       
-        // 替换后
-        String filterReplaceToString = pageModel.getListPaginationViewModel()
-                .getFilterReplaceTo();
-        
-        //过滤器为空时，直接将filter设置为null
-        if(paginationFilter.equals("")){
-        	filter=null;
-        }else{
-        	if (paginationFilterCategory.equals("匹配")) {
-                filter.initMatchFilter(paginationFilter);
-            } else if (paginationFilterCategory.equals("替换")) {
-                filter.initReplaceFilter(paginationFilter, filterReplaceToString);
-            } else if (paginationFilterCategory.equals("移除")) {
-                filter.initRemoveFilter(paginationFilter);
-            }
-        }
+		filter = new SelectorFilter();
+		String paginationFilter = pageModel.getListPaginationViewModel().getFilter();
+		String paginationFilterCategory = pageModel.getListPaginationViewModel().getFilterCategory();
+		// 替换后
+		String filterReplaceToString = pageModel.getListPaginationViewModel().getFilterReplaceTo();
 
-        String paginationType = pageModel.getListPaginationViewModel()
-                .getPaginationType();
-        if (paginationType.equals("分页的末尾页数")) {
-            paginationType = Constants.PAGINATION_TYPE_PAGENUMBER;
-        } else if (paginationType.equals("分页步进数")) {
-            paginationType = Constants.PAGINATION_TYPE_PAGENUMBER_INTERVAL;
-        } else if (paginationType.equals("获取分页的记录数")) {
-            paginationType = Constants.PAGINATION_TYPE_PAGERECORD;
-        } else if (paginationType.equals("获取分页URL")) {
-            paginationType = Constants.PAGINATION_TYPE_PAGE;
-        } else {
-            paginationType = Constants.PAGINATION_TYPE_PAGENUMBER;
-        }
+		// 过滤器为空时，直接将filter设置为null
+		if (paginationFilter.equals("")) {
+			filter = null;
+		} else {
+			if (paginationFilterCategory.equals("匹配")) {
+				filter.initMatchFilter(paginationFilter);
+			} else if (paginationFilterCategory.equals("替换")) {
+				filter.initReplaceFilter(paginationFilter, filterReplaceToString);
+			} else if (paginationFilterCategory.equals("移除")) {
+				filter.initRemoveFilter(paginationFilter);
+			}
+		}
 
-        // 处理分页进步数
-        int paginationInterval = 0;
-        if (!pageModel.getListPaginationViewModel().getInterval().equals("")) {
-            try {
-                paginationInterval = Integer.parseInt(pageModel
-                        .getListPaginationViewModel().getInterval());
-            } catch (Exception e) {
-                // TODO: handle exception
-                e.printStackTrace();
-                paginationInterval = 0;
-            }
-        }
+		String paginationType = pageModel.getListPaginationViewModel().getPaginationType();
+		if (paginationType.equals("分页的末尾页数")) {
+			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER;
+		} else if (paginationType.equals("分页步进数")) {
+			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER_INTERVAL;
+		} else if (paginationType.equals("获取分页的记录数")) {
+			paginationType = Constants.PAGINATION_TYPE_PAGERECORD;
+		} else if (paginationType.equals("获取分页URL")) {
+			paginationType = Constants.PAGINATION_TYPE_PAGE;
+		} else {
+			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER;
+		}
 
-        // 按照是否使用分页进步数,调用不同的方法
-        if (paginationInterval != 0) {
-            selector.initPagitationSelector(paginationType, pageModel
-                    .getListPaginationViewModel().getCurrentString(), pageModel
-                    .getListPaginationViewModel().getReplaceTo(), pageModel
-                    .getListPaginationViewModel().getPaginationUrl(), pageModel
-                    .getListPaginationViewModel().getStart(), pageModel
-                    .getListPaginationViewModel().getRecords(),
-                paginationInterval, indexer, filter, null);
-        } else {
-            // Constants.PAGINATION_TYPE_PAGENUMBER 需要取值
-            selector.initPagitationSelector(paginationType, pageModel
-                    .getListPaginationViewModel().getCurrentString(), pageModel
-                    .getListPaginationViewModel().getReplaceTo(), pageModel
-                    .getListPaginationViewModel().getPaginationUrl(), pageModel
-                    .getListPaginationViewModel().getStart(), pageModel
-                    .getListPaginationViewModel().getRecords(), indexer,
-                filter, null);
-        }
+		// 处理分页进步数
+		int paginationInterval = 0;
+		if (!pageModel.getListPaginationViewModel().getInterval().equals("")) {
+			try {
+				paginationInterval = Integer.parseInt(pageModel.getListPaginationViewModel().getInterval());
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				paginationInterval = 0;
+			}
+		}
 
-        if (!pageModel.getListPaginationViewModel().getSelector().equals("")) {
-            pagination.add(selector);
-        }
-        template.setPagination(pagination);
+		// 按照是否使用分页进步数,调用不同的方法
+		if (paginationInterval != 0) {
+			selector.initPagitationSelector(paginationType, pageModel.getListPaginationViewModel().getCurrentString(), pageModel.getListPaginationViewModel().getReplaceTo(), pageModel.getListPaginationViewModel().getPaginationUrl(), pageModel.getListPaginationViewModel().getStart(), pageModel.getListPaginationViewModel().getRecords(), paginationInterval, indexer, filter, null);
+		} else {
+			// Constants.PAGINATION_TYPE_PAGENUMBER 需要取值
+			selector.initPagitationSelector(paginationType, pageModel.getListPaginationViewModel().getCurrentString(), pageModel.getListPaginationViewModel().getReplaceTo(), pageModel.getListPaginationViewModel().getPaginationUrl(), pageModel.getListPaginationViewModel().getStart(), pageModel.getListPaginationViewModel().getRecords(), indexer, filter, null);
+		}
 
-        // title
-        indexer = new SelectorIndexer();
-        selector = new Selector();
-        if (!pageModel.getNewsTitleViewModel().getSelector().equals("")) {
-            indexer.initJsoupIndexer(pageModel.getNewsTitleViewModel()
-                    .getSelector(), pageModel.getNewsTitleViewModel()
-                    .getSelectorAttr());
-            selector.initFieldSelector("title", "", indexer, null, null);
-            news.add(selector);
-        }
+		if (!pageModel.getListPaginationViewModel().getSelector().equals("")) {
+			pagination.add(selector);
+		}
+		template.setPagination(pagination);
 
-        // content
-        indexer = new SelectorIndexer();
-        selector = new Selector();
-        if (!pageModel.getNewsContentViewModel().getSelector().equals("")) {
-            indexer.initJsoupIndexer(pageModel.getNewsContentViewModel()
-                    .getSelector(), pageModel.getNewsContentViewModel()
-                    .getSelectorAttr());
-            selector.initFieldSelector("content", "", indexer, null, null);
-            news.add(selector);
-        }
+		// title
+		indexer = new SelectorIndexer();
+		selector = new Selector();
+		if (!pageModel.getNewsTitleViewModel().getSelector().equals("")) {
+			indexer.initJsoupIndexer(pageModel.getNewsTitleViewModel().getSelector(), pageModel.getNewsTitleViewModel().getSelectorAttr());
+			selector.initFieldSelector("title", "", indexer, null, null);
+			news.add(selector);
+		}
 
-        // public time
-        indexer = new SelectorIndexer();
-        selector = new Selector();           
-        if (!pageModel.getNewsPublishTimeViewModel().getSelector().equals("")) {
-        	filter = new SelectorFilter();
-    		filter.initMatchFilter(Constants.YYYYMMDD);
-            indexer.initJsoupIndexer(pageModel.getNewsPublishTimeViewModel()
-                    .getSelector(), pageModel.getNewsPublishTimeViewModel()
-                    .getSelectorAttr());
-            selector.initFieldSelector("publisTime", "", indexer, filter, null);
-            news.add(selector);
-        }
+		// content
+		indexer = new SelectorIndexer();
+		selector = new Selector();
+		if (!pageModel.getNewsContentViewModel().getSelector().equals("")) {
+			indexer.initJsoupIndexer(pageModel.getNewsContentViewModel().getSelector(), pageModel.getNewsContentViewModel().getSelectorAttr());
+			selector.initFieldSelector("content", "", indexer, null, null);
+			news.add(selector);
+		}
 
-        // source
-        indexer = new SelectorIndexer();
-        selector = new Selector();
-        if (!pageModel.getNewsSourceViewModel().getSelector().equals("")) {
-            indexer.initJsoupIndexer(pageModel.getNewsSourceViewModel()
-                    .getSelector(), pageModel.getNewsSourceViewModel()
-                    .getSelectorAttr());
-            selector.initFieldSelector("source", "", indexer, null, null);
-            news.add(selector);
-        }
+		// public time
+		indexer = new SelectorIndexer();
+		selector = new Selector();
+		if (!pageModel.getNewsPublishTimeViewModel().getSelector().equals("")) {
+			filter = new SelectorFilter();
+			filter.initMatchFilter(Constants.YYYYMMDD);
+			indexer.initJsoupIndexer(pageModel.getNewsPublishTimeViewModel().getSelector(), pageModel.getNewsPublishTimeViewModel().getSelectorAttr());
+			selector.initFieldSelector("publisTime", "", indexer, filter, null);
+			news.add(selector);
+		}
 
-        // 处理内容自定义属性 以时间为例
-        List<CustomerAttrModel> newsCustomerAttrViewModel = pageModel
-                .getNewsCustomerAttrViewModel();
-        for (CustomerAttrModel model : newsCustomerAttrViewModel) {
-            indexer = new SelectorIndexer();
-            selector = new Selector();
-            if (!model.getSelector().equals("")) {
-                indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
-                selector.initFieldSelector(model.getTarget(), "", indexer,
-                    null, null);
-                news.add(selector);
-            }
-        }
-        template.setNews(news);
-        //System.out.println("templateResult:"+template.toJSON());
-        return template;
-    }
-    
+		// source
+		indexer = new SelectorIndexer();
+		selector = new Selector();
+		if (!pageModel.getNewsSourceViewModel().getSelector().equals("")) {
+			indexer.initJsoupIndexer(pageModel.getNewsSourceViewModel().getSelector(), pageModel.getNewsSourceViewModel().getSelectorAttr());
+			selector.initFieldSelector("source", "", indexer, null, null);
+			news.add(selector);
+		}
+
+		// 处理内容自定义属性 以时间为例
+		List<CustomerAttrModel> newsCustomerAttrViewModel = pageModel.getNewsCustomerAttrViewModel();
+		for (CustomerAttrModel model : newsCustomerAttrViewModel) {
+			indexer = new SelectorIndexer();
+			selector = new Selector();
+			if (!model.getSelector().equals("")) {
+				indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
+				selector.initFieldSelector(model.getTarget(), "", indexer, null, null);
+				news.add(selector);
+			}
+		}
+		template.setNews(news);
+		// System.out.println("templateResult:"+template.toJSON());
+		return template;
+	}
+
 	// I used 1000 bytes at first, but found that some documents have
 	// meta tag well past the first 1000 bytes.
 	// (e.g. http://cn.promo.yahoo.com/customcare/music.html)
-	private static final int CHUNK_SIZE = 10000;
+	private static final int CHUNK_SIZE = 8000;
 	// NUTCH-1006 Meta equiv with single quotes not accepted
-	private static Pattern metaPattern = Pattern.compile(
-			"<meta\\s+([^>]*http-equiv=(\"|')?content-type(\"|')?[^>]*)>",
-			Pattern.CASE_INSENSITIVE);
-	private static Pattern charsetPattern = Pattern.compile(
-			"charset=\\s*([a-z][_\\-0-9a-z]*)", Pattern.CASE_INSENSITIVE);
-	private static Pattern charsetPatternHTML5 = Pattern.compile(
-			"<meta\\s+charset\\s*=\\s*[\"']?([a-z][_\\-0-9a-z]*)[^>]*>",
-			Pattern.CASE_INSENSITIVE);
+	private static Pattern metaPattern = Pattern.compile("<meta\\s+([^>]*http-equiv=(\"|')?content-type(\"|')?[^>]*)>", Pattern.CASE_INSENSITIVE);
+	private static Pattern charsetPattern = Pattern.compile("charset=\\s*([a-z][_\\-0-9a-z]*)", Pattern.CASE_INSENSITIVE);
+	private static Pattern charsetPatternHTML5 = Pattern.compile("<meta\\s+charset\\s*=\\s*[\"']?([a-z][_\\-0-9a-z]*)[^>]*>", Pattern.CASE_INSENSITIVE);
 
 	private static String sniffCharacterEncoding(byte[] content) {
 		int length = content.length < CHUNK_SIZE ? content.length : CHUNK_SIZE;
 		String str = "";
 		try {
 			// System.out.println("content:"+new String(content,"utf-8"));
-			str = new String(content, 0, length, Charset.forName("ASCII")
-					.toString());
+			str = new String(content, 0, length, Charset.forName("ASCII").toString());
 			// System.out.println("str:"+str);
 		} catch (UnsupportedEncodingException e) {
 			return null;
@@ -1069,8 +1002,7 @@ public class CrawlToolResource {
 		Matcher metaMatcher = metaPattern.matcher(str);
 		String encoding = null;
 		if (metaMatcher.find()) {
-			Matcher charsetMatcher = charsetPattern.matcher(metaMatcher
-					.group(1));
+			Matcher charsetMatcher = charsetPattern.matcher(metaMatcher.group(1));
 			if (charsetMatcher.find())
 				encoding = new String(charsetMatcher.group(1));
 		}
@@ -1082,15 +1014,19 @@ public class CrawlToolResource {
 			}
 		}
 		if (encoding == null) {
+			metaMatcher = charsetPattern.matcher(str);
+			if (metaMatcher.find()) {
+				encoding = new String(metaMatcher.group(1));
+			}
+		}
+		if (encoding == null) {
 			// check for BOM
-			if (content.length >= 3 && content[0] == (byte) 0xEF
-					&& content[1] == (byte) 0xBB && content[2] == (byte) 0xBF) {
+			if (content.length >= 3 && content[0] == (byte) 0xEF && content[1] == (byte) 0xBB && content[2] == (byte) 0xBF) {
 				encoding = "UTF-8";
 			} else if (content.length >= 2) {
 				if (content[0] == (byte) 0xFF && content[1] == (byte) 0xFE) {
 					encoding = "UTF-16LE";
-				} else if (content[0] == (byte) 0xFE
-						&& content[1] == (byte) 0xFF) {
+				} else if (content[0] == (byte) 0xFE && content[1] == (byte) 0xFF) {
 					encoding = "UTF-16BE";
 				} else {
 					encoding = "UTF-8";// ”尼玛“个别网站不设定编码
@@ -1100,14 +1036,14 @@ public class CrawlToolResource {
 		return encoding;
 	}
 
-    /**
-     * 
-     * 输出异常信息
-     * */
-    private static String getStackTrace(final Throwable throwable) {
-        final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw, true);
-        throwable.printStackTrace(pw);
-        return sw.getBuffer().toString();
-    }
+	/**
+	 * 
+	 * 输出异常信息
+	 * */
+	private static String getStackTrace(final Throwable throwable) {
+		final StringWriter sw = new StringWriter();
+		final PrintWriter pw = new PrintWriter(sw, true);
+		throwable.printStackTrace(pw);
+		return sw.getBuffer().toString();
+	}
 }
