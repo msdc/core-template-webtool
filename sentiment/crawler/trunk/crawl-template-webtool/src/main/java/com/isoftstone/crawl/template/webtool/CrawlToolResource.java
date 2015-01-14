@@ -1043,7 +1043,7 @@ public class CrawlToolResource {
 	// I used 1000 bytes at first, but found that some documents have
 	// meta tag well past the first 1000 bytes.
 	// (e.g. http://cn.promo.yahoo.com/customcare/music.html)
-	private static final int CHUNK_SIZE = 2000;
+	private static final int CHUNK_SIZE = 10000;
 	// NUTCH-1006 Meta equiv with single quotes not accepted
 	private static Pattern metaPattern = Pattern.compile(
 			"<meta\\s+([^>]*http-equiv=(\"|')?content-type(\"|')?[^>]*)>",
