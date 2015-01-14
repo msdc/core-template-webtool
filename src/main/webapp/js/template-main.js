@@ -5,6 +5,10 @@
 var virtualWebPath="/crawl-template-webtool";
 
 /**************Models****************/
+/**
+ *
+ * 自定义属性初始化model对象
+ * */
 function customerAttrModel(target,selector,attr,filter,filterCategory,replaceBefore,filterReplaceTo){
     //this.parseEngine=['jsoup','xpath'];
     //this.id=id;
@@ -19,7 +23,17 @@ function customerAttrModel(target,selector,attr,filter,filterCategory,replaceBef
     this.replaceBefore=replaceBefore;
     this.filterReplaceTo=filterReplaceTo;
 }
-/**************Models****************/
+
+/**
+ *
+ * 模板静态属性Tag Model对象
+ * */
+function templateTagModel(tagKey,tagValue){
+    this.tagKey=tagKey;
+    this.tagValue=tagValue;
+}
+ /**************Models****************/
+
 
 /**************View-Models****************/
 /**
@@ -74,6 +88,39 @@ function scheduleDispatchViewModel(){
     this.periods=ko.observable(['hour','day','week']);
     this.periodsSelected=ko.observable('hour');
     this.sequence=ko.observable();
+}
+
+/**
+ *
+ * 单个Tag的View-Model
+ * */
+function singleTemplateTagViewModel(){
+    this.tagKey=ko.observable();
+    this.tagValue=ko.observable();
+}
+
+/**
+ *
+ * 模板静态属性的View-Model
+ * */
+function templateTagsViewModel(){
+    this.tags=ko.observableArray();
+    this.addTag=function(){
+        this.tags.push(new singleTemplateTagViewModel());
+    }.bind(this);
+    this.removeTag=function(item){
+        this.tags.remove(item);
+    }.bind(this);
+}
+
+/**
+ *
+ * 增量配置的View-Model
+ * */
+function templateIncreaseViewModel(){
+    this.periods=ko.observable(['hour','day','week']);
+    this.periodsSelected=ko.observable('hour');
+    this.pageCounts=ko.observable();
 }
 
 /**
@@ -256,6 +303,8 @@ function loadPageContext(initData){
                 var masterVM = (function(){
                     this.basicInfoViewModel = new basicInfoViewModel();
                     this.scheduleDispatchViewModel=new scheduleDispatchViewModel();
+                    this.templateTagsViewModel=new templateTagsViewModel();
+                    this.templateIncreaseViewModel=new templateIncreaseViewModel();
 
                     this.newsCustomerAttrViewModel=new customerAttrViewModel();
                     this.newsTitleViewModel=new commonAttrViewMode();
@@ -298,6 +347,18 @@ function loadPageContext(initData){
                             var temp=new customerAttrModel(
                                 model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.replaceBefore(),model.filterReplaceTo()
                             );
+                            attrModels.push(temp);
+                        }
+                        return attrModels;
+                    };
+
+                    //模板静态属性列表
+                    this.templateTagModels=function(){
+                        var attrModels=[];
+                        var modelArray=this.templateTagsViewModel.tags();
+                        for(var i=0;i<modelArray.length;i++){
+                            var model=modelArray[i];
+                            var temp=new templateTagModel(model.tagKey(),model.tagValue());
                             attrModels.push(temp);
                         }
                         return attrModels;
@@ -562,6 +623,18 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
             }
         }
     }
+
+    //模板的静态属性tag
+    var templateTags=initData.tags;
+    if(templateTags!=null){
+        for(var tagKey in templateTags){
+            var tagValue=templateTags[tagKey];
+            var templateTagModel=new singleTemplateTagViewModel();
+            templateTagModel.tagKey(tagKey);
+            templateTagModel.tagValue(tagValue);
+            pageViewModel.templateTagsViewModel.tags.push(templateTagModel);
+        }
+    }
 }
 
 /**
@@ -673,6 +746,11 @@ function getJSONString(obj){
             domain:getDomainByUrl(obj.basicInfoViewModel.url()),
             period:obj.scheduleDispatchViewModel.periodsSelected(),
             sequence:obj.scheduleDispatchViewModel.sequence()
+        },
+        templateTagsViewModel:obj.templateTagModels(),
+        templateIncreaseViewModel:{
+            period:obj.templateIncreaseViewModel.periodsSelected(),
+            pageCounts:obj.templateIncreaseViewModel.pageCounts()
         }
     });
     return jsonString;

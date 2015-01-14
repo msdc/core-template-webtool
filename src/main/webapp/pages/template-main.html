@@ -96,6 +96,9 @@
                     <li role="presentation"><a href="#schedule_tab" aria-controls="schedule_tab" role="tab"
                                                data-toggle="tab">爬取调度配置</a>
                     </li>
+                    <li role="presentation"><a href="#templateTag_tab" aria-controls="templateTag_tab" role="tab"
+                                               data-toggle="tab">模板静态属性配置(Tags)</a>
+                    </li>
                 </ul>
 
                 <!-- Tab panes -->
@@ -103,6 +106,48 @@
                     <div role="tabpanel" class="tab-pane active" id="list_tab"></div>
                     <div role="tabpanel" class="tab-pane" id="news_tab"></div>
                     <div role="tabpanel" class="tab-pane" id="schedule_tab"></div>
+                    <div role="tabpanel" class="tab-pane" id="templateTag_tab">
+                        <div class="row addRowTopMargin" data-bind="with: templateTagsViewModel">
+                            <div class="col-md-12">
+                                <!--静态属性的Key和Value对-->
+                                <div class="row" data-bind="foreach: tags">
+                                    <div class="col-md-12">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <button type="button" data-bind="click: $parent.removeTag" class="close"><span
+                                                        aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                                                </button>
+                                                静态属性
+                                            </div>
+                                            <div class="panel-body">
+                                                <!--静态属性-->
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>键Key</label>
+                                                            <input type="text" data-bind="value: tagKey" class="form-control" placeholder="静态属性key">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>值Value</label>
+                                                            <input type="text" data-bind="value: tagValue" class="form-control" placeholder="静态属性value">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button class="btn btn-default" data-bind="click: addTag">添加静态属性</button>
+                                        <hr/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

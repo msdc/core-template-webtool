@@ -26,5 +26,31 @@
             </div>
         </div>
 
+        <!--增量配置-->
+        <div class="row" data-bind="with: templateIncreaseViewModel">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">增量配置</div>
+                    <div class="panel-body">
+                        <!--增量配置-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>周期</label>
+                                    <select class="form-control" data-bind="options: periods, value: periodsSelected"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>页数</label>
+                                    <input type="text" class="form-control" data-bind="value: pageCounts" placeholder="页数">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
