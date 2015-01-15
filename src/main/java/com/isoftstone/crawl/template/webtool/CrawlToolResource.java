@@ -569,7 +569,7 @@ public class CrawlToolResource {
 			BufferedWriter output = new BufferedWriter(new FileWriter(f));
 			output.write(content);
 			output.close();
-			System.out.println("导出模板文件保存路径:" + filePath);
+			//System.out.println("导出模板文件保存路径:" + filePath);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
