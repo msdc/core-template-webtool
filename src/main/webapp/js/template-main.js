@@ -490,6 +490,12 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
     if(templateModel!=null){
         pageViewModel.basicInfoViewModel.name(templateModel.name);
         pageViewModel.basicInfoViewModel.url(templateModel.url);
+        //调度配置信息
+        pageViewModel.scheduleDispatchViewModel.periodsSelected(templateModel.schedulePeriod);
+        pageViewModel.scheduleDispatchViewModel.sequence(templateModel.scheduleSequence);
+        //增量配置信息
+        pageViewModel.templateIncreaseViewModel.periodsSelected(templateModel.increasePeriod);
+        pageViewModel.templateIncreaseViewModel.pageCounts(templateModel.increasePageCounts);
     }
 
     //列表页外链接
