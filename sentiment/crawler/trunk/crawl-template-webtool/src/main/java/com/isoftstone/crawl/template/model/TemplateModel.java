@@ -10,6 +10,10 @@ public class TemplateModel {
    private String url="";
    private String status="";
    private String description="";
+   private String schedulePeriod="";
+   private String scheduleSequence="";
+   private String increasePeriod="";
+   private String increasePageCounts="";
    private String addedTime="";
    
 public String getTemplateId() {
@@ -50,5 +54,29 @@ public String getUrl() {
 }
 public void setUrl(String url) {
 	this.url = url;
+}
+public String getSchedulePeriod() {
+	return schedulePeriod;
+}
+public void setSchedulePeriod(String schedulePeriod) {
+	this.schedulePeriod = schedulePeriod;
+}
+public String getScheduleSequence() {
+	return scheduleSequence;
+}
+public void setScheduleSequence(String scheduleSequence) {
+	this.scheduleSequence = scheduleSequence;
+}
+public String getIncreasePeriod() {
+	return increasePeriod;
+}
+public void setIncreasePeriod(String increasePeriod) {
+	this.increasePeriod = increasePeriod;
+}
+public String getIncreasePageCounts() {
+	return increasePageCounts;
+}
+public void setIncreasePageCounts(String increasePageCounts) {
+	this.increasePageCounts = increasePageCounts;
 }
 }

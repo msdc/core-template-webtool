@@ -745,6 +745,10 @@ public class CrawlToolResource {
 		templateModel.setName(pageModel.getBasicInfoViewModel().getName());
 		templateModel.setDescription(pageModel.getBasicInfoViewModel().getName());
 		templateModel.setUrl(pageModel.getBasicInfoViewModel().getUrl());
+        templateModel.setSchedulePeriod(pageModel.getScheduleDispatchViewModel().getPeriod());
+        templateModel.setScheduleSequence(pageModel.getScheduleDispatchViewModel().getSequence());
+        templateModel.setIncreasePeriod(pageModel.getTemplateIncreaseViewModel().getPeriod());
+        templateModel.setIncreasePageCounts(pageModel.getTemplateIncreaseViewModel().getPageCounts());
 		templateModel.setStatus(status);
 		return templateModel;
 	}
@@ -763,11 +767,18 @@ public class CrawlToolResource {
 		templateModel.setUrl(templateUrl);
 		templateModel.setStatus(status);
 		try {
-			StringBuilder str = new StringBuilder();
-			str.append(GetTemplateModelJSONString(templateModel));
 			pool = RedisUtils.getPool();
-			jedis = pool.getResource();
-			jedis.set(templateGuid + key_partern, str.toString());
+            jedis = pool.getResource();            
+            String templateResult=jedis.get(templateGuid);
+            PageModel pageModel=GetPageModelByJsonString(templateResult);
+            templateModel.setSchedulePeriod(pageModel.getScheduleDispatchViewModel().getPeriod());
+            templateModel.setScheduleSequence(pageModel.getScheduleDispatchViewModel().getSequence());
+            templateModel.setIncreasePeriod(pageModel.getTemplateIncreaseViewModel().getPeriod());
+            templateModel.setIncreasePageCounts(pageModel.getTemplateIncreaseViewModel().getPageCounts());
+            
+            StringBuilder str = new StringBuilder();
+            str.append(GetTemplateModelJSONString(templateModel));
+            jedis.set(templateGuid + key_partern, str.toString());
 		} catch (Exception e) {
 			pool.returnBrokenResource(jedis);
 			e.printStackTrace();
