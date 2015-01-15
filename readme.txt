@@ -10,14 +10,9 @@
         1.5 安装Redis(开发环境依赖本地redis)
 
     2.部署环境步骤
-        2.1 部署前通过maven命令执行编译
-            2.1.1 maven编译的具体操作:切换到pom.xml所在的工程根目录,执行命令:mvn package. 如果命令行提示窗口中出现"BUILD SUCCESS",则表明编译成功.
-        2.2 maven编译成功后,将target目录下的网站文件拷贝到tomcat主目录下(默认为root目录).如果不通过这种方式也可以通过配置文件,手工
-            设置tomcat的主目录,具体操作可参考:http://blog.knowsky.com/188854.htm  或者 http://blog.csdn.net/songhuanren/article/details/3301615
-        2.3 手工拷贝maven依赖的本地文件(工程目录libs下面的所有jar包)到网站目录中的WEB-INF中的lib下面
-        2.4 启动Tomcat,输入http://localhost:8080/index.html访问,能够访问到界面,说明部署配置成功.
+        2.1 更新爬虫项目代码到最新，并切换到爬虫项目根目录，pom.xml文件所在目录后，执行maven命令：mvn clean install.
+        2.2 更新爬虫模板工具代码到最新，并切换到爬虫项目根目录，pom.xml文件所在目录后，执行命令:mvn clean package. 如果命令行提示窗口中出现"BUILD SUCCESS",则表明编译成功.
+        2.3 启动Tomcat,输入http://localhost:8080/crawl-template-webtool/index.html访问,能够访问到界面,说明部署配置成功.
 
-特别说明:
-    1.由于爬虫项目打包后,在读取配置文件中的redis地址的问题,一直找不到解决方法,所以项目中关于redis的配置信息是写在代码里的,
-      实际部署的时候需要手工更改代码中的redis地址.
-    2.在开发过程中,每次修改过文件都需要通过maven来重新编译才能生效!
+特别说明:    
+    1.在开发过程中,每次修改过文件都需要通过命令：mvn clean package 来重新编译，并启动tomcat才能生效!
