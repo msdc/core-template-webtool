@@ -189,7 +189,7 @@ public class CrawlToolResource {
 						temp = str.substring(1, str.length());
 					}
 					if (!seeds.contains(temp)) {
-						strBuf.append(str);
+						strBuf.append(str + System.getProperty("line.separator"));
 					}
 				}
 				input.close();
