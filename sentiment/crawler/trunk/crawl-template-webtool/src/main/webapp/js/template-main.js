@@ -241,11 +241,33 @@ function commonAttrViewMode(){
     this.selectorAttr=ko.observable(['href','text','src','html']);
     this.selectorAttrSelected=ko.observable('text');
     this.filter=ko.observable();
-    this.filterCategory=ko.observable(['匹配','移除']);
+    this.filterCategory=ko.observable([ '匹配','替换', '移除']);
     this.filterCategorySelected=ko.observable('匹配');
     this.formatter=ko.observable();
     this.formatCategory=ko.observable(['日期']);
     this.formatCategorySelected=ko.observable('日期');
+    this.showMatchFilter=ko.computed(function(){
+        if(this.filterCategorySelected()=='匹配'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
+    this.showRemoveFilter=ko.computed(function(){
+        if(this.filterCategorySelected()=='移除'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
+    this.showReplaceFilter=ko.computed(function(){
+        if(this.filterCategorySelected()=='替换'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
+    this.filterReplaceTo=ko.observable();
 }
 /**************View-Models****************/
 
@@ -602,6 +624,14 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
             }else if(newsFieldName=="tstamp"){
                 pageViewModel.newsPublishTimeViewModel.selector(newsFieldIndexer.value);
                 pageViewModel.newsPublishTimeViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
+                if(newsField.filters!=null){
+                    var newsPublishTimeViewModelFilter=newsField.filters[0];
+                    setViewModelFilter(pageViewModel.newsPublishTimeViewModel,newsPublishTimeViewModelFilter);
+                }
+                if(newsField.formats!=null){
+                    var newsPublishTimeViewModelFormatter=newsField.formats[0];
+                    setViewModelFormatter(pageViewModel.newsPublishTimeViewModel,newsPublishTimeViewModelFormatter);
+                }
             }else if(newsFieldName=="source"){
                 pageViewModel.newsSourceViewModel.selector(newsFieldIndexer.value);
                 pageViewModel.newsSourceViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
@@ -755,7 +785,12 @@ function getJSONString(obj){
         },
         newsPublishTimeViewModel:{
             selector:obj.newsPublishTimeViewModel.selector(),
-            selectorAttr:obj.newsPublishTimeViewModel.selectorAttrSelected()
+            selectorAttr:obj.newsPublishTimeViewModel.selectorAttrSelected(),
+            filterCategory:obj.newsPublishTimeViewModel.filterCategorySelected(),
+            filter:obj.newsPublishTimeViewModel.filter(),
+            filterReplaceTo:obj.newsPublishTimeViewModel.filterReplaceTo(),
+            formatter:obj.newsPublishTimeViewModel.formatter(),
+            formatCategory:obj.newsPublishTimeViewModel.formatCategorySelected()
         },
         newsSourceViewModel:{
             selector:obj.newsSourceViewModel.selector(),
