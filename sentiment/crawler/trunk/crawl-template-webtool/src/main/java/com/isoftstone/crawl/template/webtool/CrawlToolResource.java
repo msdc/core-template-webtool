@@ -971,7 +971,7 @@ public class CrawlToolResource {
 			filter = new SelectorFilter();
 			filter.initMatchFilter(Constants.YYYYMMDD);
 			indexer.initJsoupIndexer(pageModel.getNewsPublishTimeViewModel().getSelector(), pageModel.getNewsPublishTimeViewModel().getSelectorAttr());
-			selector.initFieldSelector("publisTime", "", indexer, filter, null);
+			selector.initFieldSelector("tstamp", "", indexer, filter, null);
 			news.add(selector);
 		}
 
@@ -1080,6 +1080,8 @@ public class CrawlToolResource {
 			}else{
 				if (!filePath.endsWith("\\")) {
 					tempPath=filePath+"\\";
+				}else{
+					tempPath=filePath;
 				}
 			}			
 		}else{
@@ -1088,6 +1090,8 @@ public class CrawlToolResource {
 			}else{
 				if (!filePath.endsWith("/")) {
 					tempPath=filePath+"/";
+				}else{
+					tempPath=filePath;
 				}
 			}	
 		}		
