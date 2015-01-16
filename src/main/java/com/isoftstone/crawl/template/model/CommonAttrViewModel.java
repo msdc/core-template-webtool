@@ -7,7 +7,11 @@ package com.isoftstone.crawl.template.model;
 public class CommonAttrViewModel {
 	private String selector="";
 	private String selectorAttr = "";
-	
+	private String filterCategory="";
+	private String filter = "";
+	private String filterReplaceTo="";
+	private String formatter = "";
+	private String formatCategory = "";
 	
 	public String getSelector() {
 		return selector;
@@ -22,5 +26,40 @@ public class CommonAttrViewModel {
 	}
 	public void setSelectorAttr(String selectorAttr) {
 		this.selectorAttr = selectorAttr;
+	}
+	
+	public String getFilterCategory() {
+		return filterCategory;
+	}
+	public void setFilterCategory(String filterCategory) {
+		this.filterCategory = filterCategory;
+	}
+	
+	public String getFilter() {
+		return filter;
+	}
+	public void setFilter(String filter) {
+		this.filter = filter;
+	}
+	
+	public String getFilterReplaceTo() {
+		return filterReplaceTo;
+	}
+	public void setFilterReplaceTo(String filterReplaceTo) {
+		this.filterReplaceTo = filterReplaceTo;
+	}
+	
+	public String getFormatter() {
+		return formatter;
+	}
+	public void setFormatter(String formatter) {
+		this.formatter = formatter;
+	}
+	
+	public String getFormatCategory() {
+		return formatCategory;
+	}
+	public void setFormatCategory(String formatCategory) {
+		this.formatCategory = formatCategory;
 	}
 }

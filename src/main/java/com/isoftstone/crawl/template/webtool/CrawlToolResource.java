@@ -881,7 +881,7 @@ public class CrawlToolResource {
 			String filterReplaceTo=model.getFilterReplaceTo();
 			filter=getFieldFilter(filterString, filterCategory, filterReplaceTo);
 			
-			//处理列表自定义属性式化器
+			//处理列表自定义属性格式化器
 			String formatString=model.getFormatter();
 			String formatCategory=model.getFormatCategory();
 			format=getFieldFormatter(formatString, formatCategory);
@@ -964,10 +964,19 @@ public class CrawlToolResource {
 		indexer = new SelectorIndexer();
 		selector = new Selector();
 		if (!pageModel.getNewsPublishTimeViewModel().getSelector().equals("")) {
-			filter = new SelectorFilter();
-			filter.initMatchFilter(Constants.YYYYMMDD);
+			//处理发布时间过滤器
+			String filterString = pageModel.getNewsPublishTimeViewModel().getFilter();
+			String filterCategory = pageModel.getNewsPublishTimeViewModel().getFilterCategory();
+			String filterReplaceTo=pageModel.getNewsPublishTimeViewModel().getFilterReplaceTo();						
+			filter =getFieldFilter(filterString, filterCategory, filterReplaceTo);
+			
+			//处理发布时间格式化器
+			String formatString=pageModel.getNewsPublishTimeViewModel().getFormatter();
+			String formatCategory=pageModel.getNewsPublishTimeViewModel().getFormatCategory();
+			format=getFieldFormatter(formatString, formatCategory);
+			
 			indexer.initJsoupIndexer(pageModel.getNewsPublishTimeViewModel().getSelector(), pageModel.getNewsPublishTimeViewModel().getSelectorAttr());
-			selector.initFieldSelector("tstamp", "", indexer, filter, null);
+			selector.initFieldSelector("tstamp", "", indexer, filter, format);
 			news.add(selector);
 		}
 
