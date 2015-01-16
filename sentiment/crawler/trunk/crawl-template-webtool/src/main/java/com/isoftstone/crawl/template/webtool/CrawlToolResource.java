@@ -790,6 +790,47 @@ public class CrawlToolResource {
 
 	/**
 	 * 
+	 * 产生过滤器
+	 * */
+	private SelectorFilter getFieldFilter(String filterString,String filterCategory,String filterReplaceTo) {
+		SelectorFilter filter = new SelectorFilter();
+		if (filterString.equals("")) {
+			filter = null;
+		} else {
+			if (filterCategory.equals("匹配")) {
+				filter.initMatchFilter(filterString);
+			} else if (filterCategory.equals("替换")) {
+				filter.initReplaceFilter(filterString, filterReplaceTo);
+			} else if (filterCategory.equals("移除")) {
+				filter.initRemoveFilter(filterString);
+			}else{
+				filter = null;
+			}
+		}
+		
+		return filter;
+	}
+	
+	/**
+	 * 
+	 * 产生格式化器
+	 * */
+	private SelectorFormat getFieldFormatter(String formatString,String formatCategory) {
+		SelectorFormat format = new SelectorFormat();
+		if(formatString.equals("")){
+			format=null;
+		}else{
+			if(formatCategory.equals("日期")){
+				format.initDateFormat(formatString);
+			}else{
+				format=null;
+			}
+		}
+		return format;
+	}
+	
+	/**
+	 * 
 	 * 生成模板对象
 	 * */
 	private TemplateResult GetTemplateResult(PageModel pageModel) {
@@ -831,38 +872,19 @@ public class CrawlToolResource {
 			Selector label = new Selector();
 			label.setType(Constants.SELECTOR_LABEL);
 			indexer = new SelectorIndexer();
-			indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
-			filter = new SelectorFilter();
-			format = new SelectorFormat();			
+			indexer.initJsoupIndexer(model.getSelector(), model.getAttr());			
+			format = new SelectorFormat();
+			
+			//处理列表自定义属性过滤器
 			String filterString = model.getFilter();
 			String filterCategory = model.getFilterCategory();
-			// 过滤字段为空时，直接将filter设置为null值
-			if (filterString.equals("")) {
-				filter = null;
-			} else {
-				if (filterCategory.equals("匹配")) {
-					filter.initMatchFilter(filterString);
-				} else if (filterCategory.equals("替换")) {
-					filter.initReplaceFilter(filterString, model.getFilterReplaceTo());
-				} else if (filterCategory.equals("移除")) {
-					filter.initRemoveFilter(filterString);
-				}else{
-					filter = null;
-				}
-			}
+			String filterReplaceTo=model.getFilterReplaceTo();
+			filter=getFieldFilter(filterString, filterCategory, filterReplaceTo);
 			
-			//处理格式化器
+			//处理列表自定义属性式化器
 			String formatString=model.getFormatter();
 			String formatCategory=model.getFormatCategory();
-			if(formatString.equals("")){
-				format=null;
-			}else{
-				if(formatCategory.equals("日期")){
-					format.initDateFormat(formatString);
-				}else{
-					format=null;
-				}
-			}
+			format=getFieldFormatter(formatString, formatCategory);
 			
 			label.initLabelSelector(model.getTarget(), "", indexer, filter, format);
 			selector.setLabel(label);
@@ -874,28 +896,14 @@ public class CrawlToolResource {
 		indexer = new SelectorIndexer();
 		selector = new Selector();
 		indexer.initJsoupIndexer(pageModel.getListPaginationViewModel().getSelector(), pageModel.getListPaginationViewModel().getSelectorAttr());
-
-		filter = new SelectorFilter();
+		
+		//处理分页过滤器
 		String paginationFilter = pageModel.getListPaginationViewModel().getFilter();
-		String paginationFilterCategory = pageModel.getListPaginationViewModel().getFilterCategory();
-		// 替换后
+		String paginationFilterCategory = pageModel.getListPaginationViewModel().getFilterCategory();		
 		String filterReplaceToString = pageModel.getListPaginationViewModel().getFilterReplaceTo();
+		filter = getFieldFilter(paginationFilter, paginationFilterCategory, filterReplaceToString);
 
-		// 过滤器为空时，直接将filter设置为null
-		if (paginationFilter.equals("")) {
-			filter = null;
-		} else {
-			if (paginationFilterCategory.equals("匹配")) {
-				filter.initMatchFilter(paginationFilter);
-			} else if (paginationFilterCategory.equals("替换")) {
-				filter.initReplaceFilter(paginationFilter, filterReplaceToString);
-			} else if (paginationFilterCategory.equals("移除")) {
-				filter.initRemoveFilter(paginationFilter);
-			}else{
-				filter = null;
-			}
-		}
-
+		//处理分页类型
 		String paginationType = pageModel.getListPaginationViewModel().getPaginationType();
 		if (paginationType.equals("分页的末尾页数")) {
 			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER;
@@ -976,40 +984,19 @@ public class CrawlToolResource {
 		List<CustomerAttrModel> newsCustomerAttrViewModel = pageModel.getNewsCustomerAttrViewModel();
 		for (CustomerAttrModel model : newsCustomerAttrViewModel) {
 			indexer = new SelectorIndexer();
-			filter = new SelectorFilter();
-			format = new SelectorFormat();		
 			selector = new Selector();
 			
+			//处理内容自定义属性过滤器
 			String filterString = model.getFilter();
 			String filterCategory = model.getFilterCategory();
-			// 过滤字段为空时，直接将filter设置为null值
-			if (filterString.equals("")) {
-				filter = null;
-			} else {
-				if (filterCategory.equals("匹配")) {
-					filter.initMatchFilter(filterString);
-				} else if (filterCategory.equals("替换")) {
-					filter.initReplaceFilter(filterString, model.getFilterReplaceTo());
-				} else if (filterCategory.equals("移除")) {
-					filter.initRemoveFilter(filterString);
-				}else{
-					filter = null;
-				}
-			}
-			
-			//处理格式化器
+			String filterReplaceTo=model.getFilterReplaceTo();
+			filter=getFieldFilter(filterString, filterCategory, filterReplaceTo);
+						
+			//处理内容自定义属性格式化器
 			String formatString=model.getFormatter();
 			String formatCategory=model.getFormatCategory();
-			if(formatString.equals("")){
-				format=null;
-			}else{
-				if(formatCategory.equals("日期")){
-					format.initDateFormat(formatString);
-				}else{
-					format=null;
-				}
-			}
-			
+			format=getFieldFormatter(formatString, formatCategory);
+						
 			if (!model.getSelector().equals("")) {
 				indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
 				selector.initFieldSelector(model.getTarget(), "", indexer, filter, format);
