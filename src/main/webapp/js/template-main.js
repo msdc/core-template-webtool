@@ -621,7 +621,7 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
             }else if(newsFieldName=="content"){
                 pageViewModel.newsContentViewModel.selector(newsFieldIndexer.value);
                 pageViewModel.newsContentViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
-            }else if(newsFieldName=="publisTime"){
+            }else if(newsFieldName=="tstamp"){
                 pageViewModel.newsPublishTimeViewModel.selector(newsFieldIndexer.value);
                 pageViewModel.newsPublishTimeViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
             }else if(newsFieldName=="source"){
@@ -634,6 +634,37 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
                 customerViewModel.target(newsField.name);
                 customerViewModel.selector(newsFieldIndexer.value);
                 customerViewModel.attrSelected(newsFieldIndexer.attribute);
+
+                //内容页自定义属性过滤器
+                if(newsField.filters!=null){
+                    var customerViewModelFilter=newsField.filters[0];
+                    var filterCategory=customerViewModelFilter.type;
+                    if(filterCategory=="match"){
+                        customerViewModel.filterCategorySelected('匹配');
+                        customerViewModel.filter(customerViewModelFilter.value);
+                    }
+                    if(filterCategory=="remove"){
+                        customerViewModel.filterCategorySelected('移除');
+                        customerViewModel.filter(customerViewModelFilter.value);
+                    }
+                    if(filterCategory=="replace"){
+                        customerViewModel.filterCategorySelected('替换');
+                        customerViewModel.filter(customerViewModelFilter.value);
+                        customerViewModel.replaceBefore(customerViewModelFilter.value);
+                        customerViewModel.filterReplaceTo(customerViewModelFilter.replaceTo);
+                    }
+                }
+
+                //内容页自定义属性格式化器
+                if(newsField.formats!=null){
+                    var customerViewModelFormatter=newsField.formats[0];
+                    var formatterCategory=customerViewModelFormatter.type;
+                    if(formatterCategory=="date"){
+                        customerViewModel.formatCategorySelected('日期');
+                        customerViewModel.formatter(customerViewModelFormatter.value);
+                    }
+                }
+
                 pageViewModel.newsCustomerAttrViewModel.regions.push(customerViewModel);
             }
         }
