@@ -251,8 +251,7 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String VerifyNewContent(@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = GetPageModelByJsonString(data);
-		ParseResult parseResult = saveParseResult(pageModel);
-		// ParseResult parseResult = GetParseResultFromRedis(pageModel);
+		ParseResult parseResult = saveParseResult(pageModel);		
 		if (parseResult == null) {
 			return "请先保存模板!再执行此操作!";
 		}
@@ -649,36 +648,6 @@ public class CrawlToolResource {
 
 	/**
 	 * 
-	 * 从redis中获取ParseResult结果
-	 * */
-	private ParseResult GetParseResultFromRedis(PageModel pageModel) {
-		String guid = MD5Utils.MD5(pageModel.getBasicInfoViewModel().getUrl());
-		ParseResult parseResult = null;
-		TemplateResult templateResult = RedisUtils.getTemplateResult(guid);
-		String parseResultGuid = templateResult.getParseResultGuid(); // 获取中间结果
-		parseResult = RedisUtils.getParseResult(parseResultGuid);
-		return parseResult;
-	}
-
-	/**
-	 * 返回ParseResult
-	 * */
-	private ParseResult GetParseResultByLocalProcess(String encoding, String templateUrl, PageModel pageModel, String parseType) {
-		ParseResult parseResult = null;
-		TemplateResult templateResult = null;
-		byte[] input = DownloadHtml.getHtml(templateUrl);
-		try {
-			templateResult = GetTemplateResult(pageModel);
-			parseResult = TemplateFactory.localProcess(input, encoding, templateUrl, templateResult, parseType);
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-		return parseResult;
-	}
-
-	/**
-	 * 
 	 * 同时保存[模板]和[中间结果]到redis
 	 * */
 	private ParseResult saveTemplateAndParseResult(PageModel pageModel) {
@@ -864,6 +833,7 @@ public class CrawlToolResource {
 			indexer = new SelectorIndexer();
 			indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
 			filter = new SelectorFilter();
+			format = new SelectorFormat();			
 			String filterString = model.getFilter();
 			String filterCategory = model.getFilterCategory();
 			// 过滤字段为空时，直接将filter设置为null值
@@ -876,9 +846,25 @@ public class CrawlToolResource {
 					filter.initReplaceFilter(filterString, model.getFilterReplaceTo());
 				} else if (filterCategory.equals("移除")) {
 					filter.initRemoveFilter(filterString);
+				}else{
+					filter = null;
 				}
 			}
-			label.initLabelSelector(model.getTarget(), "", indexer, filter, null);
+			
+			//处理格式化器
+			String formatString=model.getFormatter();
+			String formatCategory=model.getFormatCategory();
+			if(formatString.equals("")){
+				format=null;
+			}else{
+				if(formatCategory.equals("日期")){
+					format.initDateFormat(formatString);
+				}else{
+					format=null;
+				}
+			}
+			
+			label.initLabelSelector(model.getTarget(), "", indexer, filter, format);
 			selector.setLabel(label);
 		}
 		list.add(selector);
@@ -905,6 +891,8 @@ public class CrawlToolResource {
 				filter.initReplaceFilter(paginationFilter, filterReplaceToString);
 			} else if (paginationFilterCategory.equals("移除")) {
 				filter.initRemoveFilter(paginationFilter);
+			}else{
+				filter = null;
 			}
 		}
 
