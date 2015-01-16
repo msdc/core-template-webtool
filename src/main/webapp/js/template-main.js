@@ -9,17 +9,14 @@ var virtualWebPath="/crawl-template-webtool";
  *
  * 自定义属性初始化model对象
  * */
-function customerAttrModel(target,selector,attr,filter,filterCategory,replaceBefore,filterReplaceTo){
-    //this.parseEngine=['jsoup','xpath'];
-    //this.id=id;
+function customerAttrModel(target,selector,attr,filter,filterCategory,formatCategory,formatter,replaceBefore,filterReplaceTo){
     this.target=target;
-    //this.selectorFunction=selectorFunction;
     this.selector=selector;
     this.attr=attr;
     this.filter=filter;
     this.filterCategory=filterCategory;
-    //this.formater=formater;
-    //this.formatCategory=formatCategory;
+    this.formatCategory=formatCategory;
+    this.formatter=formatter;
     this.replaceBefore=replaceBefore;
     this.filterReplaceTo=filterReplaceTo;
 }
@@ -44,14 +41,15 @@ function singleCustomerViewModel() {
     this.parseEngine = ko.observableArray(['jsoup', 'xpath']);
     this.id = ko.observable();
     this.target = ko.observable();
-    this.selectorFunction = ko.observableArray(['label','field','content', 'pagination']);
-    this.selectorFunctionSelected=ko.observable('label');
     this.selector = ko.observable();
     this.attr = ko.observableArray(['href', 'text', 'src', 'html']);
     this.attrSelected = ko.observable('text');
     this.filterCategory = ko.observableArray([ '匹配','替换', '移除']);
     this.filterCategorySelected=ko.observable('匹配');
     this.filter = ko.observable();
+    this.formatter=ko.observable();
+    this.formatCategory=ko.observableArray(['日期']);
+    this.formatCategorySelected=ko.observable('日期');
     this.showMatchFilter=ko.computed(function(){
         if(this.filterCategorySelected()=='匹配'){
             return true;
@@ -75,9 +73,6 @@ function singleCustomerViewModel() {
     },this);
     this.replaceBefore=ko.observable();
     this.filterReplaceTo=ko.observable();
-    this.formater = ko.observable();
-    this.formatCategory = ko.observableArray([]);
-    this.formatCategorySelected = ko.observable();
 }
 
 /**
@@ -204,7 +199,7 @@ function paginationViewModel(){
             return false;
         }
     },this);
-    this.formater=ko.observable();
+    this.formatter=ko.observable();
     this.formatCategory=ko.observableArray([]);
     this.paginationType=ko.observableArray(['分页的末尾页数','分页步进数','获取分页的记录数','获取分页URL']);
     this.paginationTypeSelected=ko.observable('分页的末尾页数');
@@ -251,8 +246,9 @@ function commonAttrViewMode(){
     this.filter=ko.observable();
     this.filterCategory=ko.observable(['匹配','移除']);
     this.filterCategorySelected=ko.observable('匹配');
-    this.formater=ko.observable();
-    this.formatCategory=ko.observable(['时间','日期']);
+    this.formatter=ko.observable();
+    this.formatCategory=ko.observable(['日期']);
+    this.formatCategorySelected=ko.observable('日期');
 }
 /**************View-Models****************/
 
@@ -331,7 +327,7 @@ function loadPageContext(initData){
                         for(var i=0;i<modelArray.length;i++){
                             var model=modelArray[i];
                             var temp=new customerAttrModel(
-                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.replaceBefore(),model.filterReplaceTo()
+                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.formatCategorySelected(),model.formatter(),model.replaceBefore(),model.filterReplaceTo()
                             );
                             attrModels.push(temp);
                         }
@@ -345,7 +341,7 @@ function loadPageContext(initData){
                         for(var i=0;i<modelArray.length;i++){
                             var model=modelArray[i];
                             var temp=new customerAttrModel(
-                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.replaceBefore(),model.filterReplaceTo()
+                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.formatCategorySelected(),model.formatter(),model.replaceBefore(),model.filterReplaceTo()
                             );
                             attrModels.push(temp);
                         }
@@ -524,7 +520,7 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
                     customerViewModel.attrSelected(customerViewModelIndexer.attribute);
                 }
 
-                //自定义属性过滤器
+                //列表自定义属性过滤器
                 if(listCustomerAttrObj.filters!=null){
                     var customerViewModelFilter=listCustomerAttrObj.filters[0];
                     var filterCategory=customerViewModelFilter.type;
@@ -538,10 +534,22 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
                     }
                     if(filterCategory=="replace"){
                         customerViewModel.filterCategorySelected('替换');
+                        customerViewModel.filter(customerViewModelFilter.value);
                         customerViewModel.replaceBefore(customerViewModelFilter.value);
                         customerViewModel.filterReplaceTo(customerViewModelFilter.replaceTo);
                     }
                 }
+
+                //列表自定义属性格式化器
+                if(listCustomerAttrObj.formats!=null){
+                    var customerViewModelFormatter=listCustomerAttrObj.formats[0];
+                    var formatterCategory=customerViewModelFormatter.type;
+                    if(formatterCategory=="date"){
+                        customerViewModel.formatCategorySelected('日期');
+                        customerViewModel.formatter(customerViewModelFormatter.value);
+                    }
+                }
+
                 pageViewModel.listCustomerAttrViewModel.regions.push(customerViewModel);
             }
         }
@@ -573,6 +581,7 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
             }
             if(listPaginationFilterCategory=="replace"){
                 pageViewModel.listPaginationViewModel.filterCategorySelected('替换');
+                pageViewModel.listPaginationViewModel.filter(listPaginationFilter.value);
                 pageViewModel.listPaginationViewModel.replaceBefore(listPaginationFilter.value);
                 pageViewModel.listPaginationViewModel.filterReplaceTo(listPaginationFilter.replaceTo);
             }

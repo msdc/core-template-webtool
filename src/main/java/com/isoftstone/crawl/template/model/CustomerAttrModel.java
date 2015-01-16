@@ -9,7 +9,9 @@ public class CustomerAttrModel {
 	private String selector="";
 	private String attr = "";
 	private String filter="";
-	private String filterCategory = "";
+	private String filterCategory = "";	
+	private String formatter="";
+	private String formatCategory = "";
 	private String replaceBefore = "";
 	private String filterReplaceTo = "";
 	
@@ -59,6 +61,20 @@ public class CustomerAttrModel {
 	}
 	public void setFilterReplaceTo(String filterReplaceTo) {
 		this.filterReplaceTo = filterReplaceTo;
+	}
+	
+	public String getFormatCategory() {
+		return formatCategory;
+	}
+	public void setFormatCategory(String formatCategory) {
+		this.formatCategory = formatCategory;
+	}
+	
+	public String getFormatter() {
+		return formatter;
+	}
+	public void setFormatter(String formatter) {
+		this.formatter = formatter;
 	}
 	
 	
