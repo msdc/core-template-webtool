@@ -520,30 +520,13 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
                 //列表自定义属性过滤器
                 if(listCustomerAttrObj.filters!=null){
                     var customerViewModelFilter=listCustomerAttrObj.filters[0];
-                    var filterCategory=customerViewModelFilter.type;
-                    if(filterCategory=="match"){
-                        customerViewModel.filterCategorySelected('匹配');
-                        customerViewModel.filter(customerViewModelFilter.value);
-                    }
-                    if(filterCategory=="remove"){
-                        customerViewModel.filterCategorySelected('移除');
-                        customerViewModel.filter(customerViewModelFilter.value);
-                    }
-                    if(filterCategory=="replace"){
-                        customerViewModel.filterCategorySelected('替换');
-                        customerViewModel.filter(customerViewModelFilter.value);
-                        customerViewModel.filterReplaceTo(customerViewModelFilter.replaceTo);
-                    }
+                    setViewModelFilter(customerViewModel,customerViewModelFilter);
                 }
 
                 //列表自定义属性格式化器
                 if(listCustomerAttrObj.formats!=null){
                     var customerViewModelFormatter=listCustomerAttrObj.formats[0];
-                    var formatterCategory=customerViewModelFormatter.type;
-                    if(formatterCategory=="date"){
-                        customerViewModel.formatCategorySelected('日期');
-                        customerViewModel.formatter(customerViewModelFormatter.value);
-                    }
+                    setViewModelFormatter(customerViewModel,customerViewModelFormatter);
                 }
 
                 pageViewModel.listCustomerAttrViewModel.regions.push(customerViewModel);
@@ -633,30 +616,13 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
                 //内容页自定义属性过滤器
                 if(newsField.filters!=null){
                     var customerViewModelFilter=newsField.filters[0];
-                    var filterCategory=customerViewModelFilter.type;
-                    if(filterCategory=="match"){
-                        customerViewModel.filterCategorySelected('匹配');
-                        customerViewModel.filter(customerViewModelFilter.value);
-                    }
-                    if(filterCategory=="remove"){
-                        customerViewModel.filterCategorySelected('移除');
-                        customerViewModel.filter(customerViewModelFilter.value);
-                    }
-                    if(filterCategory=="replace"){
-                        customerViewModel.filterCategorySelected('替换');
-                        customerViewModel.filter(customerViewModelFilter.value);
-                        customerViewModel.filterReplaceTo(customerViewModelFilter.replaceTo);
-                    }
+                    setViewModelFilter(customerViewModel,customerViewModelFilter);
                 }
 
                 //内容页自定义属性格式化器
                 if(newsField.formats!=null){
                     var customerViewModelFormatter=newsField.formats[0];
-                    var formatterCategory=customerViewModelFormatter.type;
-                    if(formatterCategory=="date"){
-                        customerViewModel.formatCategorySelected('日期');
-                        customerViewModel.formatter(customerViewModelFormatter.value);
-                    }
+                    setViewModelFormatter(customerViewModel,customerViewModelFormatter);
                 }
 
                 pageViewModel.newsCustomerAttrViewModel.regions.push(customerViewModel);
@@ -674,6 +640,43 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
             templateTagModel.tagValue(tagValue);
             pageViewModel.templateTagsViewModel.tags.push(templateTagModel);
         }
+    }
+}
+
+/**
+ *
+ * 设置View-Model的过滤器
+ * @param {Object} viewModel view-model 对象
+ * @param {Object} viewModelFilter viewModel的过滤器
+ * */
+function setViewModelFilter(viewModel,viewModelFilter){
+    var filterCategory=viewModelFilter.type;
+    if(filterCategory=="match"){
+        viewModel.filterCategorySelected('匹配');
+        viewModel.filter(viewModelFilter.value);
+    }
+    if(filterCategory=="remove"){
+        viewModel.filterCategorySelected('移除');
+        viewModel.filter(viewModelFilter.value);
+    }
+    if(filterCategory=="replace"){
+        viewModel.filterCategorySelected('替换');
+        viewModel.filter(viewModelFilter.value);
+        viewModel.filterReplaceTo(viewModelFilter.replaceTo);
+    }
+}
+
+/**
+ *
+ * 设置View-Model的格式化器
+ * @param {Object} viewModel view-model 对象
+ * @param {Object} viewModelFormatter viewModel的格式化器
+ * */
+function setViewModelFormatter(viewModel,viewModelFormatter){
+    var formatterCategory=viewModelFormatter.type;
+    if(formatterCategory=="date"){
+        viewModel.formatCategorySelected('日期');
+        viewModel.formatter(viewModelFormatter.value);
     }
 }
 
