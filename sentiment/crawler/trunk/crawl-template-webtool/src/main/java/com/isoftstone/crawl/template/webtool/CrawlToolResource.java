@@ -468,8 +468,15 @@ public class CrawlToolResource {
 	@Path("/exportAllTemplates")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String exportAllTemplates(@DefaultValue("") @FormParam("filePath") String filePath) {
+		String newFilePath="";
+		try{
+			newFilePath=getFilePathByOSPlatForm(filePath);
+		}catch(Exception e){
+			return "pathInvalid";
+		}
+				
 		JedisPool pool = null;
-		Jedis jedis = null;
+		Jedis jedis = null;	
 		String resultStatus = "true";
 		try {
 			pool = RedisUtils.getPool();
@@ -483,9 +490,9 @@ public class CrawlToolResource {
 				String templateFileName = templateGuid + file_extensionName;
 				String templateListName = key + file_extensionName;
 				// 保存模板
-				exportTemplateJSONStringToFile(filePath + templateFileName, templateJsonString);
+				exportTemplateJSONStringToFile(newFilePath + templateFileName, templateJsonString);
 				// 保存模板列表
-				exportTemplateJSONStringToFile(filePath + templateListName, templateString);
+				exportTemplateJSONStringToFile(newFilePath + templateListName, templateString);
 			}
 		} catch (Exception e) {
 			resultStatus = "false";
@@ -505,18 +512,25 @@ public class CrawlToolResource {
 	@Path("/importAllTemplates")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String importAllTemplates(@DefaultValue("") @FormParam("filePath") String dirPath) {
+		String newFilePath="";
+		try {
+			newFilePath=getFilePathByOSPlatForm(dirPath);
+		} catch (Exception e) {
+			return "pathInvalid";
+		}
+		
 		JedisPool pool = null;
 		Jedis jedis = null;
 		String resultStatus = "true";
 		try {
 			pool = RedisUtils.getPool();
 			jedis = pool.getResource();
-			File file = new File(dirPath);
+			File file = new File(newFilePath);
 			File[] files = file.listFiles();
 			for (File f : files) {
 				if (f.isFile()) {
 					String fileName = f.getName();
-					String templateString = readTemplateFile(dirPath + fileName);
+					String templateString = importTemplateJSONString(newFilePath + fileName);
 					String templateGuid = fileName.substring(0, fileName.lastIndexOf("."));
 					jedis.set(templateGuid, templateString);
 				}
@@ -536,7 +550,7 @@ public class CrawlToolResource {
 	 * 
 	 * 读取文件
 	 * */
-	public String readTemplateFile(String path) throws IOException {
+	private String importTemplateJSONString(String path) throws IOException {
 		File file = new File(path);
 		if (!file.exists() || file.isDirectory()) {
 			throw new FileNotFoundException();
@@ -556,23 +570,19 @@ public class CrawlToolResource {
 	 * 
 	 * 保存内容到文件
 	 * */
-	private void exportTemplateJSONStringToFile(String filePath, String content) {
-		try {
-			File f = new File(filePath);
-			File parentDir = f.getParentFile();
-			if (parentDir != null && !parentDir.exists()) {
-				parentDir.mkdirs();
-			}
-			if (!f.exists()) {
-				f.createNewFile();// 不存在则创建
-			}
-			BufferedWriter output = new BufferedWriter(new FileWriter(f));
-			output.write(content);
-			output.close();
-			//System.out.println("导出模板文件保存路径:" + filePath);
-		} catch (Exception e) {
-			e.printStackTrace();
+	private void exportTemplateJSONStringToFile(String filePath, String content) throws Exception {
+		File f = new File(filePath);		 
+		File parentDir = f.getParentFile();
+		if (parentDir != null && !parentDir.exists()) {
+			parentDir.mkdirs();
 		}
+		if (!f.exists()) {
+			f.createNewFile();// 不存在则创建
+		}
+		BufferedWriter output = new BufferedWriter(new FileWriter(f));
+		output.write(content);
+		output.close();
+		//System.out.println("导出模板文件保存路径:" + filePath);
 	}
 
 	/**
@@ -1056,5 +1066,31 @@ public class CrawlToolResource {
 		final PrintWriter pw = new PrintWriter(sw, true);
 		throwable.printStackTrace(pw);
 		return sw.getBuffer().toString();
+	}
+	
+	/**
+	 * 
+	 * 根据操作系统类型生成正确的文件系统路径
+	 * */
+	private String getFilePathByOSPlatForm(String filePath) throws Exception{
+		String tempPath="";
+		if (System.getProperty("os.name").indexOf("Windows") > -1) {
+			if(filePath.indexOf("\\")<0){
+				throw new Exception("输入文件路径不合法");  
+			}else{
+				if (!filePath.endsWith("\\")) {
+					tempPath=filePath+"\\";
+				}
+			}			
+		}else{
+			if(filePath.indexOf("/")<0){
+				throw new Exception("输入文件路径不合法");  
+			}else{
+				if (!filePath.endsWith("/")) {
+					tempPath=filePath+"/";
+				}
+			}	
+		}		
+		return tempPath;
 	}
 }
