@@ -11,8 +11,7 @@ public class CustomerAttrModel {
 	private String filter="";
 	private String filterCategory = "";	
 	private String formatter="";
-	private String formatCategory = "";
-	private String replaceBefore = "";
+	private String formatCategory = "";	
 	private String filterReplaceTo = "";
 	
 	public String getSelector() {
@@ -47,13 +46,6 @@ public class CustomerAttrModel {
 	}
 	public void setTarget(String target) {
 		this.target = target;
-	}
-	
-	public String getReplaceBefore() {
-		return replaceBefore;
-	}
-	public void setReplaceBefore(String replaceBefore) {
-		this.replaceBefore = replaceBefore;
 	}
 	
 	public String getFilterReplaceTo() {

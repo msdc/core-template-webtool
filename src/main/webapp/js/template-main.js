@@ -9,7 +9,7 @@ var virtualWebPath="/crawl-template-webtool";
  *
  * 自定义属性初始化model对象
  * */
-function customerAttrModel(target,selector,attr,filter,filterCategory,formatCategory,formatter,replaceBefore,filterReplaceTo){
+function customerAttrModel(target,selector,attr,filter,filterCategory,formatCategory,formatter,filterReplaceTo){
     this.target=target;
     this.selector=selector;
     this.attr=attr;
@@ -17,7 +17,6 @@ function customerAttrModel(target,selector,attr,filter,filterCategory,formatCate
     this.filterCategory=filterCategory;
     this.formatCategory=formatCategory;
     this.formatter=formatter;
-    this.replaceBefore=replaceBefore;
     this.filterReplaceTo=filterReplaceTo;
 }
 
@@ -71,7 +70,6 @@ function singleCustomerViewModel() {
             return false;
         }
     },this);
-    this.replaceBefore=ko.observable();
     this.filterReplaceTo=ko.observable();
 }
 
@@ -206,7 +204,6 @@ function paginationViewModel(){
     this.paginationUrl=ko.observable();
     this.currentString=ko.observable();
     this.replaceTo=ko.observable();
-    this.replaceBefore=ko.observable();
     this.filterReplaceTo=ko.observable();
     this.start=ko.observable();
     this.showStart=ko.computed(function(){
@@ -327,7 +324,7 @@ function loadPageContext(initData){
                         for(var i=0;i<modelArray.length;i++){
                             var model=modelArray[i];
                             var temp=new customerAttrModel(
-                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.formatCategorySelected(),model.formatter(),model.replaceBefore(),model.filterReplaceTo()
+                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.formatCategorySelected(),model.formatter(),model.filterReplaceTo()
                             );
                             attrModels.push(temp);
                         }
@@ -341,7 +338,7 @@ function loadPageContext(initData){
                         for(var i=0;i<modelArray.length;i++){
                             var model=modelArray[i];
                             var temp=new customerAttrModel(
-                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.formatCategorySelected(),model.formatter(),model.replaceBefore(),model.filterReplaceTo()
+                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.formatCategorySelected(),model.formatter(),model.filterReplaceTo()
                             );
                             attrModels.push(temp);
                         }
@@ -535,7 +532,6 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
                     if(filterCategory=="replace"){
                         customerViewModel.filterCategorySelected('替换');
                         customerViewModel.filter(customerViewModelFilter.value);
-                        customerViewModel.replaceBefore(customerViewModelFilter.value);
                         customerViewModel.filterReplaceTo(customerViewModelFilter.replaceTo);
                     }
                 }
@@ -582,7 +578,6 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
             if(listPaginationFilterCategory=="replace"){
                 pageViewModel.listPaginationViewModel.filterCategorySelected('替换');
                 pageViewModel.listPaginationViewModel.filter(listPaginationFilter.value);
-                pageViewModel.listPaginationViewModel.replaceBefore(listPaginationFilter.value);
                 pageViewModel.listPaginationViewModel.filterReplaceTo(listPaginationFilter.replaceTo);
             }
 
@@ -650,7 +645,6 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
                     if(filterCategory=="replace"){
                         customerViewModel.filterCategorySelected('替换');
                         customerViewModel.filter(customerViewModelFilter.value);
-                        customerViewModel.replaceBefore(customerViewModelFilter.value);
                         customerViewModel.filterReplaceTo(customerViewModelFilter.replaceTo);
                     }
                 }
@@ -782,7 +776,6 @@ function getJSONString(obj){
             paginationUrl:obj.listPaginationViewModel.paginationUrl(),
             currentString:obj.listPaginationViewModel.currentString(),
             replaceTo:obj.listPaginationViewModel.replaceTo(),
-            replaceBefore:obj.listPaginationViewModel.replaceBefore(),
             filterReplaceTo:obj.listPaginationViewModel.filterReplaceTo(),
             start:obj.listPaginationViewModel.start(),
             records:obj.listPaginationViewModel.records(),
