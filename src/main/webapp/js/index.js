@@ -72,8 +72,11 @@ function btnModalImportConfirmHandler(){
         success: function (data) {
             if(data =="true"){
                 optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作成功！请刷新该页面！");
-            }else{
-                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作失败！请刷新该页面！");
+            }else if(data=="pathInvalid"){
+                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作失败！导入文件路径无效！");
+            }
+            else{
+                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作失败！");
             }
             $('#model_export').modal('hide');
         },
@@ -95,7 +98,10 @@ function btnModalExportConfirmHandler(){
         success: function (data) {
             if(data =="true"){
                 optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作成功！");
-            }else{
+            }else if(data=="pathInvalid"){
+                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作失败！导出文件路径无效！");
+            }
+            else{
                 optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作失败！");
             }
             $('#model_export').modal('hide');
