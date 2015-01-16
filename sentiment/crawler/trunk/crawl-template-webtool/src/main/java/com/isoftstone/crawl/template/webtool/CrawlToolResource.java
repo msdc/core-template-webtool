@@ -976,10 +976,43 @@ public class CrawlToolResource {
 		List<CustomerAttrModel> newsCustomerAttrViewModel = pageModel.getNewsCustomerAttrViewModel();
 		for (CustomerAttrModel model : newsCustomerAttrViewModel) {
 			indexer = new SelectorIndexer();
+			filter = new SelectorFilter();
+			format = new SelectorFormat();		
 			selector = new Selector();
+			
+			String filterString = model.getFilter();
+			String filterCategory = model.getFilterCategory();
+			// 过滤字段为空时，直接将filter设置为null值
+			if (filterString.equals("")) {
+				filter = null;
+			} else {
+				if (filterCategory.equals("匹配")) {
+					filter.initMatchFilter(filterString);
+				} else if (filterCategory.equals("替换")) {
+					filter.initReplaceFilter(filterString, model.getFilterReplaceTo());
+				} else if (filterCategory.equals("移除")) {
+					filter.initRemoveFilter(filterString);
+				}else{
+					filter = null;
+				}
+			}
+			
+			//处理格式化器
+			String formatString=model.getFormatter();
+			String formatCategory=model.getFormatCategory();
+			if(formatString.equals("")){
+				format=null;
+			}else{
+				if(formatCategory.equals("日期")){
+					format.initDateFormat(formatString);
+				}else{
+					format=null;
+				}
+			}
+			
 			if (!model.getSelector().equals("")) {
 				indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
-				selector.initFieldSelector(model.getTarget(), "", indexer, null, null);
+				selector.initFieldSelector(model.getTarget(), "", indexer, filter, format);
 				news.add(selector);
 			}
 		}
