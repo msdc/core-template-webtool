@@ -748,12 +748,13 @@ public class CrawlToolResource {
 		try {
 			pool = RedisUtils.getPool();
             jedis = pool.getResource();            
-            String templateResult=jedis.get(templateGuid);
-            PageModel pageModel=GetPageModelByJsonString(templateResult);
-            templateModel.setSchedulePeriod(pageModel.getScheduleDispatchViewModel().getPeriod());
-            templateModel.setScheduleSequence(pageModel.getScheduleDispatchViewModel().getSequence());
-            templateModel.setIncreasePeriod(pageModel.getTemplateIncreaseViewModel().getPeriod());
-            templateModel.setIncreasePageCounts(pageModel.getTemplateIncreaseViewModel().getPageCounts());
+            //先取之前的模板列表JSON字符串
+            String singleTemplateListModel=jedis.get(templateGuid+key_partern);
+            TemplateModel singleTemplateModel=GetTemplateModel(singleTemplateListModel);
+            templateModel.setSchedulePeriod(singleTemplateModel.getSchedulePeriod());
+            templateModel.setScheduleSequence(singleTemplateModel.getScheduleSequence());
+            templateModel.setIncreasePeriod(singleTemplateModel.getIncreasePeriod());
+            templateModel.setIncreasePageCounts(singleTemplateModel.getIncreasePageCounts());
             
             StringBuilder str = new StringBuilder();
             str.append(GetTemplateModelJSONString(templateModel));
