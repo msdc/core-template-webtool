@@ -3,6 +3,8 @@
  */
 //web网站的虚拟路径
 var virtualWebPath="/crawl-template-webtool";
+//列表中每页显示记录数
+var paginationItemCounts=10;
 
 $(function(){
     $.ajax({
@@ -122,11 +124,17 @@ function loadPaginationComponent(listViewModel) {
     var totalCount = listViewModel.urls().length;
     $('#data_pagination').pagination({
         items: totalCount,
-        itemsOnPage: 100,
+        itemsOnPage: paginationItemCounts,
         cssStyle: 'light-theme',
         prevText: '上一页',
         nextText: '下一页',
-        onPageClick: function (pageNumber, eTarget) {}
+        onPageClick: function (pageNumber, eTarget) {
+            var originalUrls=listViewModel.urls();
+            var dataIndex=(pageNumber-1)*paginationItemCounts;
+            var itemsCounts=dataIndex+paginationItemCounts;
+            var nextPageUrls=originalUrls.slice(dataIndex,itemsCounts);
+            listViewModel.paginationUrls(nextPageUrls);
+        }
     });
 }
 
@@ -153,6 +161,8 @@ function templateViewModel(templateList){
     var self=this;
     var templateListInitData=updateTemplateListInitData(templateList);
     self.urls=ko.observableArray(templateListInitData);
+    //分页显示的url列表
+    self.paginationUrls=ko.observableArray(templateListInitData.slice(0,paginationItemCounts));
     self.addNew=function(){
         window.location.href="pages/template-main.html";
     };
