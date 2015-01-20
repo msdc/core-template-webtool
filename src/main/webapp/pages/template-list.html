@@ -57,14 +57,14 @@
                         </div>
 
                         <!--Jsoup选择器内容-->
-                        <div class="row">
-                            <div class="col-md-6">
+                        <div class="row" data-bind="visible: showSelector">
+                            <div class="col-md-6" data-bind="if: showSelector">
                                 <div class="form-group">
                                     <label>选择器</label>
                                     <input type="text" data-bind="value: selector" class="form-control" placeholder="选择器">
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" data-bind="if: showSelector">
                                 <div class="form-group">
                                     <label>选择器属性</label>
                                     <select class="form-control" data-bind="options: selectorAttr, value:selectorAttrSelected"></select>
@@ -73,8 +73,8 @@
                         </div>
 
                         <!--过滤器内容 格式化器内容-->
-                        <div class="row">
-                            <div class="col-md-6">
+                        <div class="row" data-bind="visible: showFilter">
+                            <div class="col-md-6" data-bind="if: showFilter">
                                 <div class="form-group">
                                     <label>过滤器类别</label>
                                     <select class="form-control" data-bind="options: filterCategory, value:filterCategorySelected"></select>
@@ -113,6 +113,12 @@
                                     <input type="text" data-bind="value: start" class="form-control" placeholder="分页开始编号">
                                 </div>
                             </div>
+                            <div class="col-md-6" data-bind="visible: showLastNumber">
+                                <div class="form-group" data-bind="if: showLastNumber">
+                                    <label>分页结束编号</label>
+                                    <input type="text" data-bind="value: lastNumber" class="form-control" placeholder="分页开始编号">
+                                </div>
+                            </div>
                             <div class="col-md-6" data-bind="visible: showInterval">
                                 <div class="form-group" data-bind="if: showInterval">
                                     <label>分页进步数值</label>
@@ -131,8 +137,8 @@
                                     <input type="text" data-bind="value: currentString" class="form-control" placeholder="分页链接中动态变化字符">
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
+                            <div class="col-md-6" data-bind="visible: showFilter">
+                                <div class="form-group" data-bind="if: showFilter">
                                     <label>替换分页链接中动态变化字符为</label>
                                     <input type="text" data-bind="value: replaceTo" class="form-control" placeholder="替换分页链接中动态变化字符为">
                                 </div>

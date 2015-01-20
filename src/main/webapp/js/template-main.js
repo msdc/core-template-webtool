@@ -178,6 +178,60 @@ function paginationViewModel(){
     this.filter=ko.observable();
     this.filterCategory=ko.observableArray(['匹配','替换','移除']);
     this.filterCategorySelected=ko.observable('匹配');
+    this.formatter=ko.observable();
+    this.formatCategory=ko.observableArray([]);
+    this.paginationType=ko.observableArray(['分页的末尾页数','分页步进数','获取分页的记录数','获取分页URL','自定义分页']);
+    this.paginationTypeSelected=ko.observable('分页的末尾页数');
+    this.paginationUrl=ko.observable();
+    this.currentString=ko.observable();
+    this.replaceTo=ko.observable();
+    this.filterReplaceTo=ko.observable();
+    this.start=ko.observable();
+    this.records=ko.observable();
+    this.interval=ko.observable();
+    this.lastNumber=ko.observable();
+    this.showStart=ko.computed(function(){
+        if(this.paginationTypeSelected()=='分页的末尾页数'||this.paginationTypeSelected()=='获取分页的记录数'||this.paginationTypeSelected()=='自定义分页'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
+    this.showInterval=ko.computed(function(){
+        if(this.paginationTypeSelected()=='分页步进数'||this.paginationTypeSelected()=='自定义分页'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
+    this.showRecords=ko.computed(function(){
+        if(this.paginationTypeSelected()=='获取分页的记录数'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
+    this.showLastNumber=ko.computed(function(){
+        if(this.paginationTypeSelected()=='自定义分页'){
+            return true;
+        }else{
+            return false;
+        }
+    },this);
+    this.showSelector=ko.computed(function(){
+        if(this.paginationTypeSelected()=='自定义分页'){
+            return false;
+        }else{
+            return true;
+        }
+    },this);
+    this.showFilter=ko.computed(function(){
+        if(this.paginationTypeSelected()=='自定义分页'){
+            return false;
+        }else{
+            return true;
+        }
+    },this);
     this.showMatchFilter=ko.computed(function(){
         if(this.filterCategorySelected()=='匹配'){
             return true;
@@ -194,38 +248,6 @@ function paginationViewModel(){
     },this);
     this.showReplaceFilter=ko.computed(function(){
         if(this.filterCategorySelected()=='替换'){
-            return true;
-        }else{
-            return false;
-        }
-    },this);
-    this.formatter=ko.observable();
-    this.formatCategory=ko.observableArray([]);
-    this.paginationType=ko.observableArray(['分页的末尾页数','分页步进数','获取分页的记录数','获取分页URL']);
-    this.paginationTypeSelected=ko.observable('分页的末尾页数');
-    this.paginationUrl=ko.observable();
-    this.currentString=ko.observable();
-    this.replaceTo=ko.observable();
-    this.filterReplaceTo=ko.observable();
-    this.start=ko.observable();
-    this.showStart=ko.computed(function(){
-        if(this.paginationTypeSelected()=='分页的末尾页数'||this.paginationTypeSelected()=='获取分页的记录数'){
-            return true;
-        }else{
-            return false;
-        }
-    },this);
-    this.interval=ko.observable();
-    this.showInterval=ko.computed(function(){
-        if(this.paginationTypeSelected()=='分页步进数'){
-            return true;
-        }else{
-            return false;
-        }
-    },this);
-    this.records=ko.observable();
-    this.showRecords=ko.computed(function(){
-        if(this.paginationTypeSelected()=='获取分页的记录数'){
             return true;
         }else{
             return false;
@@ -602,6 +624,10 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
             pageViewModel.listPaginationViewModel.records(listPagination.recordNumber);
         }else if(paginationType=="page"){//获取分页URL
             pageViewModel.listPaginationViewModel.paginationTypeSelected('获取分页URL');
+        }else if(paginationType=="custom"){//自定义分页
+            pageViewModel.listPaginationViewModel.paginationTypeSelected('自定义分页');
+            pageViewModel.listPaginationViewModel.interval(listPagination.interval);
+            pageViewModel.listPaginationViewModel.lastNumber(listPagination.lastNumber);
         }
         pageViewModel.listPaginationViewModel.currentString(listPagination.current);
         pageViewModel.listPaginationViewModel.replaceTo(listPagination.replaceTo);
@@ -820,7 +846,8 @@ function getJSONString(obj){
             filterReplaceTo:obj.listPaginationViewModel.filterReplaceTo(),
             start:obj.listPaginationViewModel.start(),
             records:obj.listPaginationViewModel.records(),
-            interval:obj.listPaginationViewModel.interval()
+            interval:obj.listPaginationViewModel.interval(),
+            lastNumber:obj.listPaginationViewModel.lastNumber()
         },
         scheduleDispatchViewModel:{
             domain:getDomainByUrl(obj.basicInfoViewModel.url()),
