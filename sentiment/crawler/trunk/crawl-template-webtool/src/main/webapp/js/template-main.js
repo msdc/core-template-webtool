@@ -199,6 +199,12 @@ function paginationViewModel(){
     },this);
     this.showInterval=ko.computed(function(){
         if(this.paginationTypeSelected()=='分页步进数'||this.paginationTypeSelected()=='自定义分页'){
+            //进步数默认值
+            if(this.paginationTypeSelected()=='分页步进数'){
+                this.interval(2);
+            }else if(this.paginationTypeSelected()=='自定义分页'){
+                this.interval(1);
+            }
             return true;
         }else{
             return false;
