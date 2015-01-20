@@ -14,6 +14,7 @@ public class TemplateModel {
    private String scheduleSequence="";
    private String increasePeriod="";
    private String increasePageCounts="";
+   private String increasePageSort="";
    private String addedTime="";
    
 public String getTemplateId() {
@@ -78,5 +79,11 @@ public String getIncreasePageCounts() {
 }
 public void setIncreasePageCounts(String increasePageCounts) {
 	this.increasePageCounts = increasePageCounts;
+}
+public String getIncreasePageSort() {
+	return increasePageSort;
+}
+public void setIncreasePageSort(String increasePageSort) {
+	this.increasePageSort = increasePageSort;
 }
 }

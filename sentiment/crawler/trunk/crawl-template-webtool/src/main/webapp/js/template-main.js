@@ -78,7 +78,7 @@ function singleCustomerViewModel() {
  * 调度任务的View-Model
  * */
 function scheduleDispatchViewModel(){
-    this.periods=ko.observable(['hour','day','week']);
+    this.periods=ko.observableArray(['hour','day','week']);
     this.periodsSelected=ko.observable('hour');
     this.sequence=ko.observable();
 }
@@ -111,9 +111,11 @@ function templateTagsViewModel(){
  * 增量配置的View-Model
  * */
 function templateIncreaseViewModel(){
-    this.periods=ko.observable(['hour','day','week']);
+    this.periods=ko.observableArray(['hour','day','week']);
     this.periodsSelected=ko.observable('hour');
     this.pageCounts=ko.observable();
+    this.pageSort=ko.observableArray(['升序','倒序']);
+    this.pageSortSelected=ko.observable('升序');
 }
 
 /**
@@ -501,7 +503,7 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
     if(singleTemplateListJSON!=''&&singleTemplateListJSON!=undefined&&singleTemplateListJSON!=null){
         templateModel=JSON.parse(singleTemplateListJSON);
     }
-    //基本信息
+    //基本信息、调度配置信息、增量配置信息
     if(templateModel!=null){
         pageViewModel.basicInfoViewModel.name(templateModel.name);
         pageViewModel.basicInfoViewModel.url(templateModel.url);
@@ -511,6 +513,7 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
         //增量配置信息
         pageViewModel.templateIncreaseViewModel.periodsSelected(templateModel.increasePeriod);
         pageViewModel.templateIncreaseViewModel.pageCounts(templateModel.increasePageCounts);
+        pageViewModel.templateIncreaseViewModel.pageSortSelected(templateModel.increasePageSort);
     }
 
     //列表页外链接
@@ -827,7 +830,8 @@ function getJSONString(obj){
         templateTagsViewModel:obj.templateTagModels(),
         templateIncreaseViewModel:{
             period:obj.templateIncreaseViewModel.periodsSelected(),
-            pageCounts:obj.templateIncreaseViewModel.pageCounts()
+            pageCounts:obj.templateIncreaseViewModel.pageCounts(),
+            pageSort:obj.templateIncreaseViewModel.pageSortSelected()
         }
     });
     return jsonString;
