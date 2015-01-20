@@ -1005,6 +1005,11 @@ public class CrawlToolResource {
 
 		if (!pageModel.getListPaginationViewModel().getSelector().equals("")) {
 			pagination.add(selector);
+		}else{
+			//当选择自定义分页时，选择器可以为空
+			if(paginationType==Constants.PAGINATION_TYPE_CUSTOM){
+				pagination.add(selector);
+			}
 		}
 		template.setPagination(pagination);
 
