@@ -993,7 +993,7 @@ public class CrawlToolResource {
 		// 按照是否使用分页进步数,调用不同的方法
 		if (paginationInterval != 0) {
 			if(paginationType==Constants.PAGINATION_TYPE_CUSTOM){
-				selector.initPagitationSelector(paginationType,pageModel.getListPaginationViewModel().getCurrentString(),pageModel.getListPaginationViewModel().getPaginationUrl(),pageModel.getListPaginationViewModel().getStart(),pageModel.getListPaginationViewModel().getLastNumber(),paginationInterval);
+				selector.initPagitationSelector(paginationType,pageModel.getListPaginationViewModel().getCurrentString(),pageModel.getListPaginationViewModel().getReplaceTo(),pageModel.getListPaginationViewModel().getPaginationUrl(),pageModel.getListPaginationViewModel().getStart(),pageModel.getListPaginationViewModel().getLastNumber(),paginationInterval);
 			}else if(paginationType==Constants.PAGINATION_TYPE_PAGENUMBER_INTERVAL){
 				// Constants.PAGINATION_TYPE_PAGENUMBER 分页步进数
 				selector.initPagitationSelector(paginationType, pageModel.getListPaginationViewModel().getCurrentString(), pageModel.getListPaginationViewModel().getReplaceTo(), pageModel.getListPaginationViewModel().getPaginationUrl(), pageModel.getListPaginationViewModel().getStart(), pageModel.getListPaginationViewModel().getRecords(), paginationInterval, indexer, filter, null);
