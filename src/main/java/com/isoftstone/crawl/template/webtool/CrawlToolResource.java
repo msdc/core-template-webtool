@@ -728,7 +728,8 @@ public class CrawlToolResource {
         templateModel.setScheduleSequence(pageModel.getScheduleDispatchViewModel().getSequence());
         templateModel.setIncreasePeriod(pageModel.getTemplateIncreaseViewModel().getPeriod());
         templateModel.setIncreasePageCounts(pageModel.getTemplateIncreaseViewModel().getPageCounts());
-		templateModel.setStatus(status);
+        templateModel.setIncreasePageSort(pageModel.getTemplateIncreaseViewModel().getPageSort());
+        templateModel.setStatus(status);
 		return templateModel;
 	}
 
@@ -755,6 +756,7 @@ public class CrawlToolResource {
             templateModel.setScheduleSequence(singleTemplateModel.getScheduleSequence());
             templateModel.setIncreasePeriod(singleTemplateModel.getIncreasePeriod());
             templateModel.setIncreasePageCounts(singleTemplateModel.getIncreasePageCounts());
+            templateModel.setIncreasePageSort(singleTemplateModel.getIncreasePageSort());
             
             StringBuilder str = new StringBuilder();
             str.append(GetTemplateModelJSONString(templateModel));
