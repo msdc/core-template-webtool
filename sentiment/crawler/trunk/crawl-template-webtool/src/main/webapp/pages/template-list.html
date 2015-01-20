@@ -106,6 +106,7 @@
                             </div>
                         </div>
 
+                        <!--分页选择器对应功能-->
                         <div class="row">
                             <div class="col-md-6" data-bind="visible: showStart">
                                 <div class="form-group" data-bind="if: showStart">
@@ -137,8 +138,8 @@
                                     <input type="text" data-bind="value: currentString" class="form-control" placeholder="分页链接中动态变化字符">
                                 </div>
                             </div>
-                            <div class="col-md-6" data-bind="visible: showFilter">
-                                <div class="form-group" data-bind="if: showFilter">
+                            <div class="col-md-6">
+                                <div class="form-group">
                                     <label>替换分页链接中动态变化字符为</label>
                                     <input type="text" data-bind="value: replaceTo" class="form-control" placeholder="替换分页链接中动态变化字符为">
                                 </div>
