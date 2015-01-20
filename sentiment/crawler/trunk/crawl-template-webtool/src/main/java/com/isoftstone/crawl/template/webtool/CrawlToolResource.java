@@ -108,10 +108,17 @@ public class CrawlToolResource {
 		    return "保存失败，请输入增量需要爬取的页数";
 		}
 		int incrementPageCount = Integer.valueOf(incrementPageCountStr);
+		String pageSort = pageModel.getTemplateIncreaseViewModel().getPageSort();
         ArrayList<String> seedsTemp = TemplateFactory.getPaginationOutlink(parseResult);
         ArrayList<String> seeds = new ArrayList<String>();
-        for(int i = 0; i < incrementPageCount; i++) {
-            seeds.add(seedsTemp.get(i));
+        if("升序".equals(pageSort)) {
+            for(int i = 0; i < incrementPageCount && i < seedsTemp.size(); i++) {
+                seeds.add(seedsTemp.get(i));
+            }
+        }else {
+            for(int i = seedsTemp.size(); i > 0 && incrementPageCount > 0; i--, incrementPageCount--) {
+                seeds.add(seedsTemp.get(i));
+            }
         }
 		saveSeedsValueToFile(folderName, incrementFolderName, templateUrl, seeds, status);
 		return "文件保存成功!";
