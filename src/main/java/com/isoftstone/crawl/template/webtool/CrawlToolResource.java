@@ -138,9 +138,16 @@ public class CrawlToolResource {
 
 		// --2.保存到redis中.
 		String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
-		DispatchVo dispatchVo = new DispatchVo();
+		
+		DispatchVo dispatchVo = getDispatchResult(redisKey);
+		if(dispatchVo == null) {
+		    dispatchVo = new DispatchVo();
+		}
 		dispatchVo.setStatus(WebtoolConstants.DISPATCH_STATIS_START);
-		List<Seed> seedList = new ArrayList<Seed>();
+		List<Seed> seedList = dispatchVo.getSeed();
+		if(seedList == null) {
+		    seedList = new ArrayList<Seed>();
+		}
 		for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
 			String seedStr = it.next();
 			Seed seed = new Seed(seedStr, status);
@@ -150,6 +157,24 @@ public class CrawlToolResource {
 		//FIXME:此处需要判断是否本来已经存在这个key，如果存在，则需要追加种子，而不是覆盖.
 		setDispatchResult(dispatchVo, redisKey);
 	}
+
+    public DispatchVo getDispatchResult(String guid) {
+        JedisPool pool = null;
+        Jedis jedis = null;
+        try {
+            pool = RedisUtils.getPool();
+            jedis = pool.getResource();
+            String json = jedis.get(guid);
+            if (json != null)
+                return JSON.parseObject(json, DispatchVo.class);
+        } catch (Exception e) {
+            pool.returnBrokenResource(jedis);
+            LOG.error("", e);
+        } finally {
+            RedisUtils.returnResource(pool, jedis);
+        }
+        return null;
+    }
 
 	private void setDispatchResult(DispatchVo dispatchVo, String guid) {
 		JedisPool pool = null;
