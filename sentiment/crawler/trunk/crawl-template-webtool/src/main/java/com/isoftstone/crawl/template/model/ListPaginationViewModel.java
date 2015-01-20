@@ -16,6 +16,7 @@ public class ListPaginationViewModel {
 	private String filterReplaceTo = "";
 	private String start="";
 	private String records = "";
+	private String lastNumber="";
 	private String interval="";
 	
 	public String getSelector() {
@@ -100,5 +101,11 @@ public class ListPaginationViewModel {
 	}
 	public void setReplaceTo(String replaceTo) {
 		this.replaceTo = replaceTo;
+	}
+	public String getLastNumber() {
+		return lastNumber;
+	}
+	public void setLastNumber(String lastNumber) {
+		this.lastNumber = lastNumber;
 	}
 }

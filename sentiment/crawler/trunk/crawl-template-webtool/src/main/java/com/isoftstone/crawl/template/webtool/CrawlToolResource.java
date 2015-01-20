@@ -70,6 +70,10 @@ public class CrawlToolResource {
 	public static final String key_partern = "_templatelist";
 	// 文件扩展名
 	public static final String file_extensionName = ".txt";
+	//增量模板库
+	public static final int INCREASE_DBINDEX = 1;
+	//常规模板库
+	public static final int NORMAL_DBINDEX = 0;
 	//-- 增量文件夹命名标识.
 	public static final String INCREMENT_FILENAME_SIGN = "increment";
 	
@@ -315,7 +319,7 @@ public class CrawlToolResource {
 		byte[] input = DownloadHtml.getHtml(contentOutLink);
 		String encoding = sniffCharacterEncoding(input);
 		try {
-			parseResult = TemplateFactory.process(input, encoding, contentOutLink);
+			parseResult = TemplateFactory.process(input, encoding, contentOutLink,NORMAL_DBINDEX);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -413,7 +417,7 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String UpdateTemplate(@DefaultValue("") @FormParam("templateGuid") String templateGuid) {
 		String json = "";
-		TemplateResult templateResult = RedisUtils.getTemplateResult(templateGuid);
+		TemplateResult templateResult = RedisUtils.getTemplateResult(templateGuid,NORMAL_DBINDEX);
 		json = templateResult.toJSON();
 		return json;
 	}
@@ -708,10 +712,10 @@ public class CrawlToolResource {
 		ParseResult parseResult = null;
 		byte[] input = DownloadHtml.getHtml(templateUrl);
 		String encoding = sniffCharacterEncoding(input);
-		RedisUtils.setTemplateResult(templateResult, templateGuid);
+		RedisUtils.setTemplateResult(templateResult, templateGuid,NORMAL_DBINDEX);
 		SaveTemplateToList(pageModel, "true");// 保存数据源列表所需要的key值
 		System.out.println("templateGuid=" + templateGuid);
-		parseResult = TemplateFactory.process(input, encoding, templateUrl);
+		parseResult = TemplateFactory.process(input, encoding, templateUrl,NORMAL_DBINDEX);
 		return parseResult;
 	}
 
@@ -724,7 +728,7 @@ public class CrawlToolResource {
 		ParseResult parseResult = null;
 		byte[] input = DownloadHtml.getHtml(templateUrl);
 		String encoding = sniffCharacterEncoding(input);
-		parseResult = TemplateFactory.process(input, encoding, templateUrl);
+		parseResult = TemplateFactory.process(input, encoding, templateUrl,NORMAL_DBINDEX);
 		return parseResult;
 	}
 
@@ -736,7 +740,7 @@ public class CrawlToolResource {
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		TemplateResult templateResult = GetTemplateResult(pageModel);
 		String templateGuid = MD5Utils.MD5(templateUrl);
-		RedisUtils.setTemplateResult(templateResult, templateGuid);
+		RedisUtils.setTemplateResult(templateResult, templateGuid,NORMAL_DBINDEX);
 		// 保存数据源列表所需要的key值 模板默认为启用状态
 		SaveTemplateToList(pageModel, "true");
 	}
@@ -967,7 +971,10 @@ public class CrawlToolResource {
 			paginationType = Constants.PAGINATION_TYPE_PAGERECORD;
 		} else if (paginationType.equals("获取分页URL")) {
 			paginationType = Constants.PAGINATION_TYPE_PAGE;
-		} else {
+		}else if(paginationType.equals("自定义分页")){
+			paginationType = Constants.PAGINATION_TYPE_CUSTOM;
+		} 
+		else {
 			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER;
 		}
 
@@ -985,9 +992,14 @@ public class CrawlToolResource {
 
 		// 按照是否使用分页进步数,调用不同的方法
 		if (paginationInterval != 0) {
-			selector.initPagitationSelector(paginationType, pageModel.getListPaginationViewModel().getCurrentString(), pageModel.getListPaginationViewModel().getReplaceTo(), pageModel.getListPaginationViewModel().getPaginationUrl(), pageModel.getListPaginationViewModel().getStart(), pageModel.getListPaginationViewModel().getRecords(), paginationInterval, indexer, filter, null);
-		} else {
-			// Constants.PAGINATION_TYPE_PAGENUMBER 需要取值
+			if(paginationType==Constants.PAGINATION_TYPE_CUSTOM){
+				selector.initPagitationSelector(paginationType,pageModel.getListPaginationViewModel().getCurrentString(),pageModel.getListPaginationViewModel().getPaginationUrl(),pageModel.getListPaginationViewModel().getStart(),pageModel.getListPaginationViewModel().getLastNumber(),paginationInterval);
+			}else if(paginationType==Constants.PAGINATION_TYPE_PAGENUMBER_INTERVAL){
+				// Constants.PAGINATION_TYPE_PAGENUMBER 分页步进数
+				selector.initPagitationSelector(paginationType, pageModel.getListPaginationViewModel().getCurrentString(), pageModel.getListPaginationViewModel().getReplaceTo(), pageModel.getListPaginationViewModel().getPaginationUrl(), pageModel.getListPaginationViewModel().getStart(), pageModel.getListPaginationViewModel().getRecords(), paginationInterval, indexer, filter, null);
+			}
+		}
+		else {//调用分页进步数方法或分页URL方法			
 			selector.initPagitationSelector(paginationType, pageModel.getListPaginationViewModel().getCurrentString(), pageModel.getListPaginationViewModel().getReplaceTo(), pageModel.getListPaginationViewModel().getPaginationUrl(), pageModel.getListPaginationViewModel().getStart(), pageModel.getListPaginationViewModel().getRecords(), indexer, filter, null);
 		}
 
