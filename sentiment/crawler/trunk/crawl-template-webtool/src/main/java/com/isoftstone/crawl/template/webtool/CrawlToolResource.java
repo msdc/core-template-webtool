@@ -70,7 +70,9 @@ public class CrawlToolResource {
 	public static final String key_partern = "_templatelist";
 	// 文件扩展名
 	public static final String file_extensionName = ".txt";
-
+	//-- 增量文件夹命名标识.
+	public static final String INCREMENT_FILENAME_SIGN = "increment";
+	
 	private static final Log LOG = LogFactory.getLog(CrawlToolResource.class);
 
 	/**
@@ -82,12 +84,14 @@ public class CrawlToolResource {
 	public String saveToLocalFile(@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = GetPageModelByJsonString(data);
 		String domain = pageModel.getScheduleDispatchViewModel().getDomain();
-		String period = pageModel.getScheduleDispatchViewModel().getPeriod();
+//		String period = pageModel.getScheduleDispatchViewModel().getPeriod();
+		String period = pageModel.getTemplateIncreaseViewModel().getPeriod();
 		String sequence = pageModel.getScheduleDispatchViewModel().getSequence();
 		if (sequence == null || sequence.equals("")) {
 			return "保存失败，请输入时序.";
 		}
 		String folderName = domain + "_" + "1" + period + "_" + sequence;
+		String incrementFolderName = domain + "_" + "1" + period + "_" + INCREMENT_FILENAME_SIGN + "_" + sequence;
 		ParseResult parseResult = saveTemplateAndParseResult(pageModel);
 		if (parseResult == null) {
 			return "请先保存模板!再执行此操作!";
@@ -97,19 +101,33 @@ public class CrawlToolResource {
 		String redisKey = templateGuid + key_partern;
 		TemplateModel templateModel = getTemplateModel(redisKey);
 		String status = templateModel.getStatus();
-		// ArrayList<String> seeds = TemplateFactory.getOutlink(parseResult);
-		ArrayList<String> seeds = new ArrayList<String>();
-		seeds.add(templateUrl);
-		saveSeedsValueToFile(folderName, seeds, status);
+		
+		//--增量相关.
+		String incrementPageCountStr = pageModel.getTemplateIncreaseViewModel().getPageCounts();
+		if(incrementPageCountStr == null || "".equals(incrementPageCountStr)) {
+		    return "保存失败，请输入增量需要爬取的页数";
+		}
+		int incrementPageCount = Integer.valueOf(incrementPageCountStr);
+        ArrayList<String> seedsTemp = TemplateFactory.getPaginationOutlink(parseResult);
+        ArrayList<String> seeds = new ArrayList<String>();
+        for(int i = 0; i < incrementPageCount; i++) {
+            seeds.add(seedsTemp.get(i));
+        }
+		saveSeedsValueToFile(folderName, incrementFolderName, templateUrl, seeds, status);
 		return "文件保存成功!";
 	}
 
 	/**
 	 * 保存种子到本地文件. 并将文件夹相关信息存入redis.
 	 */
-	private void saveSeedsValueToFile(String folderName, List<String> seeds, String status) {
-		// --1.保存到本地文件.
-		contentToTxt(folderName, seeds, status);
+	private void saveSeedsValueToFile(String folderName, String incrementFolderName, 
+	        String templateUrl, List<String> seeds, String status) {
+		// --1.1 保存模板url到本地文件.
+	    List<String> templateList = new ArrayList<String>();
+	    templateList.add(templateUrl);
+		contentToTxt(folderName, templateList, status);
+		// --1.2 保存增量种子到本地文件.
+		contentToTxt(incrementFolderName, seeds, status);
 
 		// --2.保存到redis中.
 		String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
@@ -122,6 +140,7 @@ public class CrawlToolResource {
 			seedList.add(seed);
 		}
 		dispatchVo.setSeed(seedList);
+		//FIXME:此处需要判断是否本来已经存在这个key，如果存在，则需要追加种子，而不是覆盖.
 		setDispatchResult(dispatchVo, redisKey);
 	}
 
