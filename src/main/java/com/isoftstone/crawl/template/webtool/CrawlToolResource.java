@@ -155,10 +155,13 @@ public class CrawlToolResource {
 		for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
 			String seedStr = it.next();
 			Seed seed = new Seed(seedStr, status);
-			seedList.add(seed);
+			if(!seedList.contains(seed)) {
+			    //-- 更新seed的status.
+			    seedList.remove(seed);
+			    seedList.add(seed);
+			}
 		}
 		dispatchVo.setSeed(seedList);
-		//FIXME:此处需要判断是否本来已经存在这个key，如果存在，则需要追加种子，而不是覆盖.
 		setDispatchResult(dispatchVo, redisKey);
 	}
 
@@ -1245,4 +1248,5 @@ public class CrawlToolResource {
 		}		
 		return tempPath;
 	}
+	
 }
