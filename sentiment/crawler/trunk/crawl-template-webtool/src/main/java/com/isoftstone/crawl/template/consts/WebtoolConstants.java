@@ -25,4 +25,6 @@ public class WebtoolConstants {
     public static final String DISPATCH_STATIS_START = "start";
     
     public static final String SEED_FILE_NAME = "seed.txt";
+    
+    public static final Integer DISPATCH_REDIS_DBINDEX = 2;
 }
