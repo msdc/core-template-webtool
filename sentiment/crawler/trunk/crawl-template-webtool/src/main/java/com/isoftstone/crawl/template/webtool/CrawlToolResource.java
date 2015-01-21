@@ -54,6 +54,7 @@ import com.isoftstone.crawl.template.model.TemplateTagModel;
 import com.isoftstone.crawl.template.utils.Config;
 import com.isoftstone.crawl.template.utils.DownloadHtml;
 import com.isoftstone.crawl.template.utils.MD5Utils;
+import com.isoftstone.crawl.template.utils.RedisOperator;
 import com.isoftstone.crawl.template.utils.RedisUtils;
 import com.isoftstone.crawl.template.utils.ShellUtils;
 import com.isoftstone.crawl.template.vo.DispatchVo;
@@ -70,10 +71,6 @@ public class CrawlToolResource {
 	public static final String key_partern = "_templatelist";
 	// 文件扩展名
 	public static final String file_extensionName = ".txt";
-	//增量模板库
-	public static final int INCREASE_DBINDEX = 1;
-	//常规模板库
-	public static final int NORMAL_DBINDEX = 0;
 	//-- 增量文件夹命名标识.
 	public static final String INCREMENT_FILENAME_SIGN = "increment";
 	
@@ -324,7 +321,7 @@ public class CrawlToolResource {
 		byte[] input = DownloadHtml.getHtml(contentOutLink);
 		String encoding = sniffCharacterEncoding(input);
 		try {
-			parseResult = TemplateFactory.process(input, encoding, contentOutLink,NORMAL_DBINDEX);
+			parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, contentOutLink);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -408,20 +405,11 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public Boolean DeleteTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl) {
 		String templateGuid = MD5Utils.MD5(templateUrl);
-		JedisPool pool = null;
-		Jedis jedis = null;
 		Boolean executeResult = true;
-		try {
-			pool = RedisUtils.getPool();
-			jedis = pool.getResource();
-			jedis.del(templateGuid + key_partern);
-			jedis.del(templateGuid);
-		} catch (Exception e) {
-			pool.returnBrokenResource(jedis);
-			e.printStackTrace();
+		long effectCounts = RedisOperator.delFromDefaultDB(
+				(templateGuid + key_partern), templateGuid);
+		if (effectCounts < 0) {
 			executeResult = false;
-		} finally {
-			RedisUtils.returnResource(pool, jedis);
 		}
 		return executeResult;
 	}
@@ -435,7 +423,7 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String UpdateTemplate(@DefaultValue("") @FormParam("templateGuid") String templateGuid) {
 		String json = "";
-		TemplateResult templateResult = RedisUtils.getTemplateResult(templateGuid,NORMAL_DBINDEX);
+		TemplateResult templateResult =RedisOperator.getTemplateResultFromDefaultDB(templateGuid);
 		json = templateResult.toJSON();
 		return json;
 	}
@@ -515,20 +503,8 @@ public class CrawlToolResource {
 	@POST
 	@Path("/getSingleTemplateModel")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String getSingleTemplateModel(@DefaultValue("") @FormParam("templateGuid") String templateGuid) {
-		JedisPool pool = null;
-		Jedis jedis = null;
-		String json = "";
-		try {
-			pool = RedisUtils.getPool();
-			jedis = pool.getResource();
-			json = jedis.get(templateGuid + key_partern);
-		} catch (Exception e) {
-			pool.returnBrokenResource(jedis);
-			e.printStackTrace();
-		} finally {
-			RedisUtils.returnResource(pool, jedis);
-		}
+	public String getSingleTemplateModel(@DefaultValue("") @FormParam("templateGuid") String templateGuid) {	
+		String json = RedisOperator.getFromDefaultDB(templateGuid + key_partern);
 		return json;
 	}
 
@@ -730,10 +706,10 @@ public class CrawlToolResource {
 		ParseResult parseResult = null;
 		byte[] input = DownloadHtml.getHtml(templateUrl);
 		String encoding = sniffCharacterEncoding(input);
-		RedisUtils.setTemplateResult(templateResult, templateGuid,NORMAL_DBINDEX);
+		RedisOperator.saveTemplateToDefaultDB(templateResult, templateGuid);		
 		SaveTemplateToList(pageModel, "true");// 保存数据源列表所需要的key值
 		System.out.println("templateGuid=" + templateGuid);
-		parseResult = TemplateFactory.process(input, encoding, templateUrl,NORMAL_DBINDEX);
+		parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);		
 		return parseResult;
 	}
 
@@ -746,7 +722,7 @@ public class CrawlToolResource {
 		ParseResult parseResult = null;
 		byte[] input = DownloadHtml.getHtml(templateUrl);
 		String encoding = sniffCharacterEncoding(input);
-		parseResult = TemplateFactory.process(input, encoding, templateUrl,NORMAL_DBINDEX);
+		parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);		
 		return parseResult;
 	}
 
@@ -758,7 +734,7 @@ public class CrawlToolResource {
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		TemplateResult templateResult = GetTemplateResult(pageModel);
 		String templateGuid = MD5Utils.MD5(templateUrl);
-		RedisUtils.setTemplateResult(templateResult, templateGuid,NORMAL_DBINDEX);
+		RedisOperator.saveTemplateToDefaultDB(templateResult, templateGuid);		
 		// 保存数据源列表所需要的key值 模板默认为启用状态
 		SaveTemplateToList(pageModel, "true");
 	}
@@ -775,7 +751,7 @@ public class CrawlToolResource {
 		String encoding = sniffCharacterEncoding(input);		
 		//保存增量模板 不需要保存列表文件
 		//SaveTemplateToList(pageModel, "true");// 保存数据源列表所需要的key值
-		parseResult = TemplateFactory.process(input, encoding, templateUrl,NORMAL_DBINDEX);
+		parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
 		if(parseResult==null){
 			return;
 		}		
@@ -794,14 +770,14 @@ public class CrawlToolResource {
 				if(pageSort.equals("升序")){
 					for (int i = 0; i < counts; i++) {
 						String paginationUrl=paginationOutlinkArray.get(i);
-						String paginationUrlGuid=MD5Utils.MD5(paginationUrl);						
-						RedisUtils.setTemplateResult(templateResult, paginationUrlGuid,INCREASE_DBINDEX);
+						String paginationUrlGuid=MD5Utils.MD5(paginationUrl);	
+						RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);						
 					}
 				}else{
 					for (int i = 0; i < counts; i++) {
 						String paginationUrl=paginationOutlinkArray.get(paginationOutlinkArray.size()-(i+1));
-						String paginationUrlGuid=MD5Utils.MD5(paginationUrl);						
-						RedisUtils.setTemplateResult(templateResult, paginationUrlGuid,INCREASE_DBINDEX);
+						String paginationUrlGuid=MD5Utils.MD5(paginationUrl);	
+						RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);
 					}
 				}
 			}
@@ -815,21 +791,10 @@ public class CrawlToolResource {
 	private void SaveTemplateToList(PageModel pageModel, String status) {
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		String templateGuid = MD5Utils.MD5(templateUrl);
-		JedisPool pool = null;
-		Jedis jedis = null;
 		TemplateModel templateModel = setTemplateStatus(pageModel, status);
-		try {
-			StringBuilder str = new StringBuilder();
-			str.append(GetTemplateModelJSONString(templateModel));
-			pool = RedisUtils.getPool();
-			jedis = pool.getResource();
-			jedis.set(templateGuid + key_partern, str.toString());
-		} catch (Exception e) {
-			pool.returnBrokenResource(jedis);
-			e.printStackTrace();
-		} finally {
-			RedisUtils.returnResource(pool, jedis);
-		}
+		StringBuilder str = new StringBuilder();
+		str.append(GetTemplateModelJSONString(templateModel));
+		RedisOperator.setToDefaultDB(templateGuid + key_partern, str.toString());
 	}
 
 	/**
@@ -856,36 +821,27 @@ public class CrawlToolResource {
 	 * 设置模板列表中单个模板的状态
 	 * */
 	private void setTemplateStatus(String templateUrl, String name, String status) {
-		String templateGuid = MD5Utils.MD5(templateUrl);
-		JedisPool pool = null;
-		Jedis jedis = null;
+		String templateGuid = MD5Utils.MD5(templateUrl);		
 		TemplateModel templateModel = new TemplateModel();
 		templateModel.setTemplateId(templateGuid);
 		templateModel.setName(name);
 		templateModel.setDescription(name);
 		templateModel.setUrl(templateUrl);
 		templateModel.setStatus(status);
-		try {
-			pool = RedisUtils.getPool();
-            jedis = pool.getResource();            
-            //先取之前的模板列表JSON字符串
-            String singleTemplateListModel=jedis.get(templateGuid+key_partern);
-            TemplateModel singleTemplateModel=GetTemplateModel(singleTemplateListModel);
-            templateModel.setSchedulePeriod(singleTemplateModel.getSchedulePeriod());
-            templateModel.setScheduleSequence(singleTemplateModel.getScheduleSequence());
-            templateModel.setIncreasePeriod(singleTemplateModel.getIncreasePeriod());
-            templateModel.setIncreasePageCounts(singleTemplateModel.getIncreasePageCounts());
-            templateModel.setIncreasePageSort(singleTemplateModel.getIncreasePageSort());
-            
-            StringBuilder str = new StringBuilder();
-            str.append(GetTemplateModelJSONString(templateModel));
-            jedis.set(templateGuid + key_partern, str.toString());
-		} catch (Exception e) {
-			pool.returnBrokenResource(jedis);
-			e.printStackTrace();
-		} finally {
-			RedisUtils.returnResource(pool, jedis);
-		}
+		
+		 //先取之前的模板列表JSON字符串           
+        String singleTemplateListModel=RedisOperator.getFromDefaultDB(templateGuid+key_partern);        
+        TemplateModel singleTemplateModel=GetTemplateModel(singleTemplateListModel);
+        
+        templateModel.setSchedulePeriod(singleTemplateModel.getSchedulePeriod());
+        templateModel.setScheduleSequence(singleTemplateModel.getScheduleSequence());
+        templateModel.setIncreasePeriod(singleTemplateModel.getIncreasePeriod());
+        templateModel.setIncreasePageCounts(singleTemplateModel.getIncreasePageCounts());
+        templateModel.setIncreasePageSort(singleTemplateModel.getIncreasePageSort());
+        
+        StringBuilder str = new StringBuilder();
+        str.append(GetTemplateModelJSONString(templateModel));
+        RedisOperator.setToDefaultDB(templateGuid + key_partern, str.toString());        
 	}
 
 	/**
