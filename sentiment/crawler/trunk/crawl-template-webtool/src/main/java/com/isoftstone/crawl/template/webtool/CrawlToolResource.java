@@ -744,6 +744,19 @@ public class CrawlToolResource {
 		// 保存数据源列表所需要的key值 模板默认为启用状态
 		SaveTemplateToList(pageModel, "true");
 	}
+	
+	/**
+	 * 
+	 * 只保存【增量】模板到redis
+	 * */
+//	private void saveIncreaseTemplateResult(PageModel pageModel){
+//		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+//		TemplateResult templateResult = GetTemplateResult(pageModel);
+//		String pageSort=pageModel.getTemplateIncreaseViewModel().getPageSort();
+//		String pageCounts=pageModel.getTemplateIncreaseViewModel().getPageCounts();
+//		
+//		RedisUtils.setTemplateResult(templateResult, xxxxxx,INCREASE_DBINDEX);
+//	}
 
 	/**
 	 * 将redis中模板的id和数据源列表做关联

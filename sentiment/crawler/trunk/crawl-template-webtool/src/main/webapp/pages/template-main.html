@@ -12,6 +12,78 @@
 </head>
 <body>
 
+<!--常用信息的帮助页面-->
+<div class="modal fade bs-example-modal-lg" id="modal-contentHelp" tabindex="-1" role="dialog"
+     aria-labelledby="modalContentHelpTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="modalContentHelpTitle">常用正则表达式</h4>
+            </div>
+            <div class="modal-body" id="modal-contentHelp-body">
+                <!--时间过滤器帮助-->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading"><mark>时间过滤器</mark>常用表达式</div>
+                            <div class="panel-body">
+                                <dl class="dl-horizontal">
+                                    <dt>年月日时分秒</dt>
+                                    <dd>(20\d{2}[-|/|年](?:0[1-9]|1[012])[-|/|月](?:0[1-9]|[12][0-9]|3[01])日?\s+\d{1,2}:\d{1,2}:\d{1,2})</dd>
+                                    <dt>年月日时分</dt>
+                                    <dd>(20\d{2}[-|/|年](?:0[1-9]|1[012])[-|/|月](?:0[1-9]|[12][0-9]|3[01])日?\s+\d{1,2}:\d{1,2})</dd>
+                                    <dt> 年月日</dt>
+                                    <dd>(20\d{2}[-|/|年](?:0[1-9]|1[012])[-|/|月](?:0[1-9]|[12][0-9]|3[01])日?)</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--时间格式化器帮助-->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading"><mark>时间格式化器</mark>常用表达式</div>
+                            <div class="panel-body">
+                                <dl class="dl-horizontal">
+                                    <dt>年-月-日</dt>
+                                    <dd>yyyy-MM-dd</dd>
+                                    <dt>年-月-日 时:分</dt>
+                                    <dd>yyyy-MM-dd HH:mm</dd>
+                                    <dt>年-月-日 时:分:秒</dt>
+                                    <dd>yyyy-MM-dd HH:mm:ss</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--列表分页过滤器-->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading"><mark>列表分页过滤器</mark>常用表达式</div>
+                            <div class="panel-body">
+                                <dl class="dl-horizontal">
+                                    <dt>分页末尾页数</dt>
+                                    <dd>\d+</dd>
+                                    <dd>/(\d+)页</dd>
+                                    <dd>共(\d+)页</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!--显示html内容-->
 <div class="modal fade bs-example-modal-lg" id="modal-viewHtml" tabindex="-1" role="dialog"
      aria-labelledby="modalHtmlTitle"
@@ -194,7 +266,7 @@
                     <div class="row text-right">
                         <div class="col-md-12">
                             <button type="button" data-bind="click: saveToLocalFile" class="btn btn-primary">保存到文件</button>
-                            <button type="button" data-bind="click: templateTest" class="btn btn-primary">测试模板</button>
+                            <button type="button" data-bind="click: templateTest" class="btn btn-primary">查看模板JSON</button>
                             <button type="button" data-bind="click: saveTemplate" class="btn btn-primary">保存模板</button>
                         </div>
                     </div>
