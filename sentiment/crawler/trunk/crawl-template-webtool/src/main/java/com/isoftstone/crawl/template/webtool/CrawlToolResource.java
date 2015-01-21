@@ -767,13 +767,12 @@ public class CrawlToolResource {
 	 * */
 	private void saveIncreaseTemplateResult(PageModel pageModel){	
 		TemplateResult templateResult = GetTemplateResult(pageModel);
-		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();		
-		String templateGuid = MD5Utils.MD5(templateUrl);
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		ParseResult parseResult = null;
 		byte[] input = DownloadHtml.getHtml(templateUrl);
-		String encoding = sniffCharacterEncoding(input);
-		RedisUtils.setTemplateResult(templateResult, templateGuid,NORMAL_DBINDEX);
-		SaveTemplateToList(pageModel, "true");// 保存数据源列表所需要的key值
+		String encoding = sniffCharacterEncoding(input);		
+		//保存增量模板 不需要保存列表文件
+		//SaveTemplateToList(pageModel, "true");// 保存数据源列表所需要的key值
 		parseResult = TemplateFactory.process(input, encoding, templateUrl,NORMAL_DBINDEX);
 		if(parseResult==null){
 			return;
