@@ -423,9 +423,9 @@ function loadPageContext(initData){
                         ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyListContent', this, showResultInTextArea, showErrorsInTextArea);
                     };
 
-                    /*测试模板配置*/
+                    /*查看模板JSON*/
                     this.templateTest=function(){
-                        $('#lbl_result_title').text('模板测试结果');
+                        $('#lbl_result_title').text('查看模板JSON');
                         $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red'});
                         ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/getJSONString', this, showResultInTextArea, showErrorsInTextArea);
                     }.bind(this);
