@@ -368,6 +368,19 @@ public class CrawlToolResource {
 		saveTemplateResultToRedis(pageModel);
 		return "模板保存成功!";
 	}
+	
+	/**
+	 * 
+	 * 保存增量模板
+	 * */
+	@POST
+	@Path("/saveIncreaseTemplate")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String SaveIncreaseTemplate(@DefaultValue("") @FormParam("data") String data){
+		PageModel pageModel = GetPageModelByJsonString(data);
+		saveIncreaseTemplateResult(pageModel);
+		return "增量模板保存成功!";
+	}
 
 	/**
 	 * 
@@ -747,16 +760,50 @@ public class CrawlToolResource {
 	
 	/**
 	 * 
-	 * 只保存【增量】模板到redis
+	 * 保存【增量】模板到redis
 	 * */
-//	private void saveIncreaseTemplateResult(PageModel pageModel){
-//		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-//		TemplateResult templateResult = GetTemplateResult(pageModel);
-//		String pageSort=pageModel.getTemplateIncreaseViewModel().getPageSort();
-//		String pageCounts=pageModel.getTemplateIncreaseViewModel().getPageCounts();
-//		
-//		RedisUtils.setTemplateResult(templateResult, xxxxxx,INCREASE_DBINDEX);
-//	}
+	private void saveIncreaseTemplateResult(PageModel pageModel){	
+		TemplateResult templateResult = GetTemplateResult(pageModel);
+		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();		
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		ParseResult parseResult = null;
+		byte[] input = DownloadHtml.getHtml(templateUrl);
+		String encoding = sniffCharacterEncoding(input);
+		RedisUtils.setTemplateResult(templateResult, templateGuid,NORMAL_DBINDEX);
+		SaveTemplateToList(pageModel, "true");// 保存数据源列表所需要的key值
+		parseResult = TemplateFactory.process(input, encoding, templateUrl,NORMAL_DBINDEX);
+		if(parseResult==null){
+			return;
+		}		
+		String pageSort=pageModel.getTemplateIncreaseViewModel().getPageSort();
+		String pageCounts=pageModel.getTemplateIncreaseViewModel().getPageCounts();	
+		
+		ArrayList<String> paginationOutlinkArray = TemplateFactory.getPaginationOutlink(parseResult);
+		
+		if(pageCounts.equals("")){
+			return;
+		}else{
+			int counts=Integer.parseInt(pageCounts);	
+			//增量模板移除分页
+			templateResult.setPagination(null);
+			if(paginationOutlinkArray.size()>=counts){
+				if(pageSort.equals("升序")){
+					for (int i = 0; i < counts; i++) {
+						String paginationUrl=paginationOutlinkArray.get(i);
+						String paginationUrlGuid=MD5Utils.MD5(paginationUrl);						
+						RedisUtils.setTemplateResult(templateResult, paginationUrlGuid,INCREASE_DBINDEX);
+					}
+				}else{
+					for (int i = 0; i < counts; i++) {
+						String paginationUrl=paginationOutlinkArray.get(paginationOutlinkArray.size()-(i+1));
+						String paginationUrlGuid=MD5Utils.MD5(paginationUrl);						
+						RedisUtils.setTemplateResult(templateResult, paginationUrlGuid,INCREASE_DBINDEX);
+					}
+				}
+			}
+		}
+	}	
+
 
 	/**
 	 * 将redis中模板的id和数据源列表做关联

@@ -437,6 +437,13 @@ function loadPageContext(initData){
                         ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveTemplate', this, showResultInModal, showResultInModal);
                     }.bind(this);
 
+                    /*保存增量模板*/
+                    this.saveIncreaseTemplate=function(){
+                        $('#modalHtmlTitle').text('保存结果');
+                        $('#modal-viewHtml').modal('show');
+                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveIncreaseTemplate', this, showResultInModal, showResultInModal);
+                    }.bind(this);
+
                     /*保存到本地文件*/
                     this.saveToLocalFile=function(){
                         $('#modalHtmlTitle').text('保存结果');
