@@ -107,6 +107,25 @@
     </div>
 </div>
 
+<!--显示错误信息-->
+<div class="modal fade" id="modal_showErrorMessage" tabindex="-1" role="dialog" aria-labelledby="modal_showErrorTitle" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="modal_showErrorTitle">错误信息</h4>
+            </div>
+            <div class="modal-body">
+                <div id="modal_body_showError"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container">
 
     <!--标题-->
@@ -256,7 +275,8 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label id="lbl_result_title">验证及测试结果</label>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<a href="../index.html">返回列表页</a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<a href="../index.html">返回列表页</a> &nbsp;&nbsp;&nbsp;&nbsp;
+                        <button  id="btn_showErrorMessage" data-target="#modal_showErrorMessage" data-toggle="modal" class="btn btn-link" style="display: none">错误信息格式化显示</button >
                         <textarea id="txt_testResult" class="form-control" rows="15"></textarea>
                     </div>
                 </div>
