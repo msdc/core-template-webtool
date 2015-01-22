@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -317,7 +318,8 @@ public class CrawlToolResource {
 		if (contentOutLinkArrayList.size() == 0) {
 			return "列表外链接配置信息不正确！";
 		}
-		String contentOutLink = contentOutLinkArrayList.get(0);
+		int contentOutLinkIndex=getRandomNumber(0, contentOutLinkArrayList.size()-1);
+		String contentOutLink = contentOutLinkArrayList.get(contentOutLinkIndex);
 		byte[] input = DownloadHtml.getHtml(contentOutLink);
 		String encoding = sniffCharacterEncoding(input);
 		try {
@@ -1204,6 +1206,16 @@ public class CrawlToolResource {
 			}	
 		}		
 		return tempPath;
+	}
+	
+	/**
+	 * 
+	 * 产生指定范围内的随机数
+	 * */
+	private int getRandomNumber(int min, int max) {
+		Random random = new Random();
+		int s = random.nextInt(max) % (max - min + 1) + min;
+		return s;
 	}
 	
 }
