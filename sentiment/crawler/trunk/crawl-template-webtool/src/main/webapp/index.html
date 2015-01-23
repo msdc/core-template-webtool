@@ -76,10 +76,18 @@
         <h1 class="text-center">数据源列表</h1>
     </div>
     <div class="row addRowTopMargin">
-        <div class="col-md-12">
+        <div class="col-md-8">
             <button type="button" class="btn btn-primary" data-bind="click: addNew">添加</button>
             <button type="button" class="btn btn-primary" data-optiontype="file_export" data-toggle="modal" data-target="#model_export">批量导出模板</button>
             <button type="button" class="btn btn-primary" data-optiontype="file_import" data-toggle="modal" data-target="#model_export">批量导入模板</button>
+        </div>
+        <div class="col-md-4 text-right">
+            <div class="input-group">
+                <input type="text" class="form-control" data-bind="value: searchString" placeholder="搜索...名称、描述、数据源地址、状态">
+                  <span class="input-group-btn">
+                    <button class="btn btn-primary" type="button" data-bind="click: search">搜一下</button>
+                  </span>
+            </div>
         </div>
     </div>
     <div class="row addRowTopMargin">

@@ -155,16 +155,59 @@ var sortTemplateList = function(name,minor)
     }
 };
 
+/**
+ *
+ *处理查询字符串
+ * */
+function getSearchString(listViewModel){
+    var searchString=listViewModel.searchString();
+    if(searchString=="启用"){
+        searchString="true";
+    }else if(searchString=="停用"){
+        searchString="false";
+    }
+    return searchString;
+}
+
 /*****************View-Model***********************/
 function templateViewModel(templateList){
     templateList.sort(sortTemplateList('name',sortTemplateList('name')));
     var self=this;
     var templateListInitData=updateTemplateListInitData(templateList);
     self.urls=ko.observableArray(templateListInitData);
+    self.searchString=ko.observable();
     //分页显示的url列表
     self.paginationUrls=ko.observableArray(templateListInitData.slice(0,paginationItemCounts));
     self.addNew=function(){
         window.location.href="pages/template-main.html";
+    };
+    //搜索
+    self.search=function(){
+        $.ajax({
+            url:virtualWebPath + '/webapi/crawlToolResource/searchTemplateList',
+            type:'POST',
+            data:{
+                searchString:getSearchString(self)
+            },
+            success:function(data){
+                var json=JSON.parse(data);
+                if(json.templateList!=null){
+                    var templateLists=json.templateList;
+                    templateLists.sort(sortTemplateList('name',sortTemplateList('name')));
+                    var searchData=updateTemplateListInitData(templateLists);
+                    self.urls(searchData);
+                    self.paginationUrls(searchData.slice(0,paginationItemCounts));
+                    //重新加载分页组件
+                    loadPaginationComponent(self);
+                }
+            },
+            error:function(error){
+                self.urls([]);
+                if(error){
+                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;搜索操作执行失败！");
+                }
+            }
+        });
     };
 
     //删除对话框中的【确定】按钮
