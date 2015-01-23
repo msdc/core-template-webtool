@@ -113,21 +113,22 @@
                     <td>
                         <button type="button" class="btn btn-primary" data-bind="click: $parent.enableTemplate, disable:status">启用</button>
                         <button type="button" class="btn btn-primary" data-bind="click: $parent.disableTemplate, enable:status">停用</button>
-                        <button type="button" class="btn btn-primary" data-bind="click: $parent.updateItem">修改</button>
-                        <button type="button" class="btn btn-primary" data-bind="click: $parent.showDeleteModal">删除</button>
-                    </td>
-                </tr>
-                </tbody>
-                <tfoot>
-                <tr>
-                    <td colspan="6">
-                        <div id="data_pagination"></div>
-                    </td>
-                </tr>
-                </tfoot>
-            </table>
-        </div>
-    </div>
+                        <!--<button type="button" class="btn btn-primary" data-bind="click: $parent.updateItem">修改</button>-->
+                        <a role="button" class="btn btn-primary" data-bind="attr: {href:updateUrl,target:targetWindow}">修改</a>
+                       <button type="button" class="btn btn-primary" data-bind="click: $parent.showDeleteModal">删除</button>
+                   </td>
+               </tr>
+               </tbody>
+               <tfoot>
+               <tr>
+                   <td colspan="6">
+                       <div id="data_pagination"></div>
+                   </td>
+               </tr>
+               </tfoot>
+           </table>
+       </div>
+   </div>
 </div>
 </body>
 </html>
