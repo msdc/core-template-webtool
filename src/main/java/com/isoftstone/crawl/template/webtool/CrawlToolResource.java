@@ -480,15 +480,13 @@ public class CrawlToolResource {
 	
 	/**
 	 * 
-	 * 获取所有的模板列表
+	 * 搜索模板
 	 * */
 	@POST
-	@Path("/getTemplateListByCounts")
+	@Path("/searchTemplateList")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String GetTemplateListByCounts(
-			@DefaultValue("") @FormParam("pageIndex") String pageIndex,
-			@DefaultValue("") @FormParam("pageSize") String pageSize,
-			@DefaultValue("") @FormParam("sort") String sort) {
+	public String SearchTemplateList(
+			@DefaultValue("") @FormParam("searchString") String searchString) {
 		JedisPool pool = null;
 		Jedis jedis = null;
 		String templateListJSONString="";
@@ -500,22 +498,20 @@ public class CrawlToolResource {
 			Set<String> listKeys = jedis.keys("*" + key_partern);
 			for (String key : listKeys) {
 				String templateString = jedis.get(key);
-				TemplateModel templateModel = GetTemplateModel(templateString);
-				templateListArrayList.add(templateModel);
+				if(templateString.contains(searchString)){
+					TemplateModel templateModel = GetTemplateModel(templateString);
+					templateListArrayList.add(templateModel);
+				}
 			}
 		} catch (Exception e) {
 			pool.returnBrokenResource(jedis);
 			e.printStackTrace();
 		} finally {
 			RedisUtils.returnResource(pool, jedis);
-		}
-		
-		//List<TemplateModel> templateListSubList=templateListArrayList.subList(pageIndex, pageSize*pageIndex);
-		
+		}		
 		templateList.setTemplateList(templateListArrayList);		
-		templateListJSONString = GetTemplateListJSONString(templateList);
-		
-		return "{\"data\":\""+templateListJSONString+"\",\"totalCounts\":\""+templateListArrayList.size()+"\"}";
+		templateListJSONString = GetTemplateListJSONString(templateList);		
+		return templateListJSONString;
 	}
 	/**
 	 * 
