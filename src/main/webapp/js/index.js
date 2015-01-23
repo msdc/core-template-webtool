@@ -333,6 +333,8 @@ function updateTemplateListInitData(templateList){
                 model.statusText=ko.observable("停用");
                 model.status=ko.observable(false);
             }
+            model.updateUrl="pages/template-main.html?templateGuid="+model.templateId;
+            model.targetWindow="_blank";
             templateListInitData.push(model);
         }
     }
