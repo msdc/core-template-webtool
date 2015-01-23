@@ -157,11 +157,11 @@ public class CrawlToolResource {
 		for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
 			String seedStr = it.next();
 			Seed seed = new Seed(seedStr, status);
-			if(!seedList.contains(seed)) {
+			if(seedList.contains(seed)) {
 			    //-- 更新seed的status.
 			    seedList.remove(seed);
-			    seedList.add(seed);
 			}
+			seedList.add(seed);
 		}
 		dispatchVo.setSeed(seedList);
 		setDispatchResult(dispatchVo, redisKey, WebtoolConstants.DISPATCH_REDIS_DBINDEX);
