@@ -543,12 +543,12 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
         pageViewModel.basicInfoViewModel.name(templateModel.name);
         pageViewModel.basicInfoViewModel.url(templateModel.url);
         //调度配置信息
-        pageViewModel.scheduleDispatchViewModel.periodsSelected(templateModel.schedulePeriod);
-        pageViewModel.scheduleDispatchViewModel.sequence(templateModel.scheduleSequence);
+        pageViewModel.scheduleDispatchViewModel.periodsSelected(templateModel.scheduleDispatchViewModel.period);
+        pageViewModel.scheduleDispatchViewModel.sequence(templateModel.scheduleDispatchViewModel.sequence);
         //增量配置信息
-        pageViewModel.templateIncreaseViewModel.periodsSelected(templateModel.increasePeriod);
-        pageViewModel.templateIncreaseViewModel.pageCounts(templateModel.increasePageCounts);
-        pageViewModel.templateIncreaseViewModel.pageSortSelected(templateModel.increasePageSort);
+        pageViewModel.templateIncreaseViewModel.periodsSelected(templateModel.templateIncreaseViewModel.period);
+        pageViewModel.templateIncreaseViewModel.pageCounts(templateModel.templateIncreaseViewModel.pageCounts);
+        pageViewModel.templateIncreaseViewModel.pageSortSelected(templateModel.templateIncreaseViewModel.pageSort);
     }
 
     //列表页外链接

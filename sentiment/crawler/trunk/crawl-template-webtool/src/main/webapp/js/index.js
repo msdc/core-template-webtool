@@ -223,6 +223,7 @@ function templateViewModel(templateList){
                 },
                 success: function (data) {
                     if(data=="true"){
+                        self.paginationUrls.remove(item);
                         self.urls.remove(item);
                         optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;删除成功！");
                     }else{

@@ -1,5 +1,7 @@
 package com.isoftstone.crawl.template.model;
 
+import java.util.List;
+
 /**
  * 
  * 模板列表实体
@@ -10,11 +12,9 @@ public class TemplateModel {
    private String url="";
    private String status="";
    private String description="";
-   private String schedulePeriod="";
-   private String scheduleSequence="";
-   private String increasePeriod="";
-   private String increasePageCounts="";
-   private String increasePageSort="";
+   private ScheduleDispatchViewModel scheduleDispatchViewModel;
+   private TemplateIncreaseViewModel templateIncreaseViewModel;
+   private List<String> templateIncreaseIdList;
    private String addedTime="";
    
 public String getTemplateId() {
@@ -56,34 +56,24 @@ public String getUrl() {
 public void setUrl(String url) {
 	this.url = url;
 }
-public String getSchedulePeriod() {
-	return schedulePeriod;
+
+public ScheduleDispatchViewModel getScheduleDispatchViewModel() {
+	return scheduleDispatchViewModel;
 }
-public void setSchedulePeriod(String schedulePeriod) {
-	this.schedulePeriod = schedulePeriod;
+public void setScheduleDispatchViewModel(ScheduleDispatchViewModel scheduleDispatchViewModel) {
+	this.scheduleDispatchViewModel = scheduleDispatchViewModel;
 }
-public String getScheduleSequence() {
-	return scheduleSequence;
+
+public TemplateIncreaseViewModel getTemplateIncreaseViewModel() {
+	return templateIncreaseViewModel;
 }
-public void setScheduleSequence(String scheduleSequence) {
-	this.scheduleSequence = scheduleSequence;
+public void setTemplateIncreaseViewModel(TemplateIncreaseViewModel templateIncreaseViewModel) {
+	this.templateIncreaseViewModel = templateIncreaseViewModel;
 }
-public String getIncreasePeriod() {
-	return increasePeriod;
+public List<String> getTemplateIncreaseIdList() {
+	return templateIncreaseIdList;
 }
-public void setIncreasePeriod(String increasePeriod) {
-	this.increasePeriod = increasePeriod;
-}
-public String getIncreasePageCounts() {
-	return increasePageCounts;
-}
-public void setIncreasePageCounts(String increasePageCounts) {
-	this.increasePageCounts = increasePageCounts;
-}
-public String getIncreasePageSort() {
-	return increasePageSort;
-}
-public void setIncreasePageSort(String increasePageSort) {
-	this.increasePageSort = increasePageSort;
+public void setTemplateIncreaseIdList(List<String> templateIncreaseIdList) {
+	this.templateIncreaseIdList = templateIncreaseIdList;
 }
 }
