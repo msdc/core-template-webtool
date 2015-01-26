@@ -607,6 +607,16 @@ public class CrawlToolResource {
 				exportTemplateJSONStringToFile(newFilePath + templateFileName, templateJsonString);
 				// 保存模板列表
 				exportTemplateJSONStringToFile(newFilePath + templateListName, templateString);
+				//增量模板
+				List<String> increaseTemplateIdList=templateModel.getTemplateIncreaseIdList();
+				if(increaseTemplateIdList!=null){
+					for(String increaseTemplateId:increaseTemplateIdList){
+						String increaseTemplateJsonString=jedis.get(increaseTemplateId);
+						String increaseTemplateFileName=increaseTemplateId+WebtoolConstants.INCREASE_TEMPLATE_PARTERN+file_extensionName;
+						//导出增量模板
+						exportTemplateJSONStringToFile(newFilePath + increaseTemplateFileName,increaseTemplateJsonString);
+					}
+				}
 			}
 		} catch (Exception e) {
 			resultStatus = "false";
@@ -645,8 +655,14 @@ public class CrawlToolResource {
 				if (f.isFile()) {
 					String fileName = f.getName();
 					String templateString = importTemplateJSONString(newFilePath + fileName);
-					String templateGuid = fileName.substring(0, fileName.lastIndexOf("."));
-					jedis.select(RedisOperator.DEFAULT_DBINDEX);
+					String templateGuid=null;
+					if(fileName.contains(WebtoolConstants.INCREASE_TEMPLATE_PARTERN)){
+						templateGuid = fileName.substring(0, fileName.lastIndexOf(WebtoolConstants.INCREASE_TEMPLATE_PARTERN));
+						jedis.select(RedisOperator.INCREASE_DBINDEX);	
+					}else{
+						templateGuid = fileName.substring(0, fileName.lastIndexOf("."));
+						jedis.select(RedisOperator.DEFAULT_DBINDEX);						
+					}
 					jedis.set(templateGuid, templateString);
 				}
 			}
