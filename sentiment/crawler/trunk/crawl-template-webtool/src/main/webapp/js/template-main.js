@@ -540,6 +540,9 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
     }
     //基本信息、调度配置信息、增量配置信息
     if(templateModel!=null){
+        //页面标题
+        $('title').text(templateModel.name);
+        $('#title_config').text(templateModel.name);
         pageViewModel.basicInfoViewModel.name(templateModel.name);
         pageViewModel.basicInfoViewModel.url(templateModel.url);
         //调度配置信息
