@@ -841,6 +841,8 @@ public class CrawlToolResource {
 						String paginationUrl=paginationOutlinkArray.get(i);
 						String paginationUrlGuid=MD5Utils.MD5(paginationUrl);						
 						increaseTemplateIdList.add(paginationUrlGuid);
+						//修改模板的guid
+						templateResult.setTemplateGuid(paginationUrlGuid);
 						RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);						
 					}
 				}else{
@@ -848,6 +850,8 @@ public class CrawlToolResource {
 						String paginationUrl=paginationOutlinkArray.get(paginationOutlinkArray.size()-(i+1));
 						String paginationUrlGuid=MD5Utils.MD5(paginationUrl);	
 						increaseTemplateIdList.add(paginationUrlGuid);
+						//修改模板的guid
+						templateResult.setTemplateGuid(paginationUrlGuid);
 						RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);
 					}
 				}
