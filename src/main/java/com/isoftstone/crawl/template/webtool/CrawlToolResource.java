@@ -12,6 +12,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -55,6 +56,7 @@ import com.isoftstone.crawl.template.model.TemplateIncreaseViewModel;
 import com.isoftstone.crawl.template.model.TemplateModel;
 import com.isoftstone.crawl.template.model.TemplateTagModel;
 import com.isoftstone.crawl.template.utils.Config;
+import com.isoftstone.crawl.template.utils.TemplateModelComparator;
 import com.isoftstone.crawl.template.utils.DownloadHtml;
 import com.isoftstone.crawl.template.utils.MD5Utils;
 import com.isoftstone.crawl.template.utils.RedisOperator;
@@ -498,6 +500,8 @@ public class CrawlToolResource {
 		} finally {
 			RedisUtils.returnResource(pool, jedis);
 		}
+		//列表按名称排序
+        Collections.sort(templateListArrayList, new TemplateModelComparator());		 
 		templateList.setTemplateList(templateListArrayList);
 		String templateListJSONString = GetTemplateListJSONString(templateList);
 		return templateListJSONString;
@@ -541,7 +545,9 @@ public class CrawlToolResource {
 			e.printStackTrace();
 		} finally {
 			RedisUtils.returnResource(pool, jedis);
-		}		
+		}	
+		//列表按名称排序
+		Collections.sort(templateListArrayList, new TemplateModelComparator());	
 		templateList.setTemplateList(templateListArrayList);		
 		templateListJSONString = GetTemplateListJSONString(templateList);		
 		return templateListJSONString;
