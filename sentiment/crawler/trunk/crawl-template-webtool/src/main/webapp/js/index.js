@@ -138,26 +138,8 @@ function loadPaginationComponent(listViewModel) {
     });
 }
 
-var sortTemplateList = function(name,minor)
-{
-    return function(o, p)
-    {
-        var a, b;
-        if (typeof o === "object" && typeof p === "object" && o && p)
-        {
-            a = o[name];
-            b = p[name];
-            if (a === b) {return typeof minor==='function' ?minor(o,p):0;}
-            if (typeof a === typeof b) { return a < b ? -1 : 1;}
-            return typeof a < typeof b ? -1 : 1;
-        }
-        else {throw ("error"); }
-    }
-};
-
 /*****************View-Model***********************/
 function templateViewModel(templateList){
-    templateList.sort(sortTemplateList('name',sortTemplateList('name')));
     var self=this;
     var templateListInitData=updateTemplateListInitData(templateList);
     self.urls=ko.observableArray(templateListInitData);
@@ -179,7 +161,6 @@ function templateViewModel(templateList){
                 var json=JSON.parse(data);
                 if(json.templateList!=null){
                     var templateLists=json.templateList;
-                    templateLists.sort(sortTemplateList('name',sortTemplateList('name')));
                     var searchData=updateTemplateListInitData(templateLists);
                     self.urls(searchData);
                     self.paginationUrls(searchData.slice(0,paginationItemCounts));
