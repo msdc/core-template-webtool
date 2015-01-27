@@ -333,6 +333,10 @@ $(function(){
 
     //模态对话框事件
     registerModalViewContentEvent();
+
+    //$('#modal_showErrorMessage').on('hidden.bs.modal', function (e) {
+       // $('#modal_body_showError').html('');//清空错误信息
+    //});
 });
 
 /**
@@ -760,8 +764,8 @@ function setViewModelFormatter(viewModel,viewModelFormatter){
  * 在textArea 中显示请求的结果
  * */
 function showResultInTextArea(data){
-    $('#modal_body_showError').html('');
-    $('#btn_showErrorMessage').hide();
+    //$('#modal_body_showError').html('');
+    //$('#btn_showErrorMessage').hide();
     var jsonString="";
     try{
         jsonString=JSON.parse(data);
@@ -778,8 +782,8 @@ function showResultInTextArea(data){
  * */
 function showErrorsInTextArea(error){
 	$('#txt_testResult').val("错误信息:"+error.responseText).css({color:'#000000',fontSize:'14px'});
-    $('#modal_body_showError').html(error.responseText);
-    $('#btn_showErrorMessage').show();
+    //$('#modal_body_showError').html(error.responseText);
+    //$('#btn_showErrorMessage').show();
 }
 
 /**
