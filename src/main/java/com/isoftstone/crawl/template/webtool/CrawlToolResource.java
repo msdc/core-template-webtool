@@ -510,6 +510,11 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String SearchTemplateList(
 			@DefaultValue("") @FormParam("searchString") String searchString) {
+		if(searchString.equals("启用")){
+			searchString="true";
+		}else if(searchString.equals("停用")){
+			searchString="false";
+		}
 		JedisPool pool = null;
 		Jedis jedis = null;
 		String templateListJSONString="";
