@@ -155,20 +155,6 @@ var sortTemplateList = function(name,minor)
     }
 };
 
-/**
- *
- *处理查询字符串
- * */
-function getSearchString(listViewModel){
-    var searchString=listViewModel.searchString();
-    if(searchString=="启用"){
-        searchString="true";
-    }else if(searchString=="停用"){
-        searchString="false";
-    }
-    return searchString;
-}
-
 /*****************View-Model***********************/
 function templateViewModel(templateList){
     templateList.sort(sortTemplateList('name',sortTemplateList('name')));
@@ -187,7 +173,7 @@ function templateViewModel(templateList){
             url:virtualWebPath + '/webapi/crawlToolResource/searchTemplateList',
             type:'POST',
             data:{
-                searchString:getSearchString(self)
+                searchString:self.searchString()
             },
             success:function(data){
                 var json=JSON.parse(data);
