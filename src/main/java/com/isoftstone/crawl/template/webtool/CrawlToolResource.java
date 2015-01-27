@@ -350,7 +350,8 @@ public class CrawlToolResource {
 			jsonProvider.setSuccess(true);
 			jsonProvider.setData(parseResult);
 		} catch (Exception e) {
-			// TODO: handle exception
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("redis操作异常！");
 			e.printStackTrace();
 		}			
 		
@@ -418,10 +419,7 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String SaveIncreaseTemplate(@DefaultValue("") @FormParam("data") String data){
 		PageModel pageModel = GetPageModelByJsonString(data);
-		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
-		String result=saveIncreaseTemplateResult(pageModel);
-		jsonProvider.setSuccess(true);
-		jsonProvider.setData(result);
+		ResponseJSONProvider<String> jsonProvider=saveIncreaseTemplateResult(pageModel);
 		return jsonProvider.toJSON();
 	}
 
@@ -715,7 +713,7 @@ public class CrawlToolResource {
 			}			
 		} catch (Exception e) {		
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("导入模板操作失败！");
+			jsonProvider.setErrorMsg("导出模板操作失败！");
 			jsonProvider.setData(null);
 			pool.returnBrokenResource(jedis);
 			e.printStackTrace();
@@ -770,7 +768,7 @@ public class CrawlToolResource {
 			}
 		} catch (Exception e) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("导出模板操作失败！");
+			jsonProvider.setErrorMsg("导入模板操作失败！");
 			jsonProvider.setData(null);			
 			e.printStackTrace();
 			pool.returnBrokenResource(jedis);
@@ -930,7 +928,9 @@ public class CrawlToolResource {
 	 * 
 	 * 保存【增量】模板到redis
 	 * */
-	private String saveIncreaseTemplateResult(PageModel pageModel){	
+	private ResponseJSONProvider<String> saveIncreaseTemplateResult(PageModel pageModel){	
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
+		jsonProvider.setSuccess(true);
 		TemplateResult templateResult = GetTemplateResult(pageModel);
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		ParseResult parseResult = null;
@@ -940,7 +940,9 @@ public class CrawlToolResource {
 		//SaveTemplateToList(pageModel, "true");// 保存数据源列表所需要的key值
 		parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
 		if(parseResult==null){
-			return "请先保存常规模板！";
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("请先保存常规模板！");
+			return jsonProvider;
 		}		
 		String pageSort=pageModel.getTemplateIncreaseViewModel().getPageSort();
 		String pageCounts=pageModel.getTemplateIncreaseViewModel().getPageCounts();	
@@ -948,7 +950,9 @@ public class CrawlToolResource {
 		ArrayList<String> paginationOutlinkArray = TemplateFactory.getPaginationOutlink(parseResult);
 		
 		if(pageCounts.equals("")){
-			return "增量配置的中页数值不能为空！";
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("增量配置的中页数值不能为空！");
+			return jsonProvider;
 		}else{
 			int counts=Integer.parseInt(pageCounts);	
 			//增量模板移除分页
@@ -982,11 +986,13 @@ public class CrawlToolResource {
 		        singleTemplateModel.setTemplateIncreaseIdList(increaseTemplateIdList);
 		        RedisOperator.setToDefaultDB(templateGuid+key_partern, GetTemplateModelJSONString(singleTemplateModel));
 			}else{
-				return "请检查列表分页配置，未能解析到pagination_outlink！";
+				jsonProvider.setSuccess(false);
+				jsonProvider.setErrorMsg("请检查列表分页配置，未能解析到pagination_outlink！");
+				return jsonProvider;
 			}
 		}
-		
-		return "增量模板保存成功!";
+		jsonProvider.setData("增量模板保存成功!");
+		return jsonProvider;
 	}	
 
 
