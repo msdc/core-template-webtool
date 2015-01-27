@@ -485,11 +485,13 @@ public class CrawlToolResource {
 			jedis = pool.getResource();
 			jedis.select(RedisOperator.DEFAULT_DBINDEX);
 			Set<String> listKeys = jedis.keys("*" + key_partern);
-			for (String key : listKeys) {
-				String templateString = jedis.get(key);
-				TemplateModel templateModel = GetTemplateModel(templateString);
-				templateListArrayList.add(templateModel);
-			}
+			if(listKeys!=null){
+				for (String key : listKeys) {
+					String templateString = jedis.get(key);
+					TemplateModel templateModel = GetTemplateModel(templateString);
+					templateListArrayList.add(templateModel);
+				}
+			}			
 		} catch (Exception e) {
 			pool.returnBrokenResource(jedis);
 			e.printStackTrace();
@@ -525,13 +527,15 @@ public class CrawlToolResource {
 			jedis = pool.getResource();
 			jedis.select(RedisOperator.DEFAULT_DBINDEX);
 			Set<String> listKeys = jedis.keys("*" + key_partern);
-			for (String key : listKeys) {
-				String templateString = jedis.get(key);
-				if(templateString.contains(searchString)){
-					TemplateModel templateModel = GetTemplateModel(templateString);
-					templateListArrayList.add(templateModel);
+			if(listKeys!=null){
+				for (String key : listKeys) {
+					String templateString = jedis.get(key);
+					if(templateString.contains(searchString)){
+						TemplateModel templateModel = GetTemplateModel(templateString);
+						templateListArrayList.add(templateModel);
+					}
 				}
-			}
+			}			
 		} catch (Exception e) {
 			pool.returnBrokenResource(jedis);
 			e.printStackTrace();
@@ -601,28 +605,30 @@ public class CrawlToolResource {
 			jedis = pool.getResource();
 			jedis.select(RedisOperator.DEFAULT_DBINDEX);
 			Set<String> listKeys = jedis.keys("*" + key_partern);
-			for (String key : listKeys) {
-				String templateString = jedis.get(key);
-				TemplateModel templateModel = GetTemplateModel(templateString);
-				String templateGuid = templateModel.getTemplateId();
-				String templateJsonString = jedis.get(templateGuid);
-				String templateFileName = templateGuid + file_extensionName;
-				String templateListName = key + file_extensionName;
-				// 保存模板
-				exportTemplateJSONStringToFile(newFilePath + templateFileName, templateJsonString);
-				// 保存模板列表
-				exportTemplateJSONStringToFile(newFilePath + templateListName, templateString);
-				//增量模板
-				List<String> increaseTemplateIdList=templateModel.getTemplateIncreaseIdList();
-				if(increaseTemplateIdList!=null){
-					for(String increaseTemplateId:increaseTemplateIdList){
-						String increaseTemplateJsonString=jedis.get(increaseTemplateId);
-						String increaseTemplateFileName=increaseTemplateId+WebtoolConstants.INCREASE_TEMPLATE_PARTERN+file_extensionName;
-						//导出增量模板
-						exportTemplateJSONStringToFile(newFilePath + increaseTemplateFileName,increaseTemplateJsonString);
+			if(listKeys!=null){
+				for (String key : listKeys) {
+					String templateString = jedis.get(key);
+					TemplateModel templateModel = GetTemplateModel(templateString);
+					String templateGuid = templateModel.getTemplateId();
+					String templateJsonString = jedis.get(templateGuid);
+					String templateFileName = templateGuid + file_extensionName;
+					String templateListName = key + file_extensionName;
+					// 保存模板
+					exportTemplateJSONStringToFile(newFilePath + templateFileName, templateJsonString);
+					// 保存模板列表
+					exportTemplateJSONStringToFile(newFilePath + templateListName, templateString);
+					//增量模板
+					List<String> increaseTemplateIdList=templateModel.getTemplateIncreaseIdList();
+					if(increaseTemplateIdList!=null){
+						for(String increaseTemplateId:increaseTemplateIdList){
+							String increaseTemplateJsonString=jedis.get(increaseTemplateId);
+							String increaseTemplateFileName=increaseTemplateId+WebtoolConstants.INCREASE_TEMPLATE_PARTERN+file_extensionName;
+							//导出增量模板
+							exportTemplateJSONStringToFile(newFilePath + increaseTemplateFileName,increaseTemplateJsonString);
+						}
 					}
 				}
-			}
+			}			
 		} catch (Exception e) {
 			resultStatus = "false";
 			pool.returnBrokenResource(jedis);
