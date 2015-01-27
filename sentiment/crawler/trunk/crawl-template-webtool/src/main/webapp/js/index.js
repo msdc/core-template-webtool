@@ -281,6 +281,16 @@ function templateViewModel(templateList){
 }
 /*****************View-Model***********************/
 
+function ajaxPostRequest(url,postData,successHandler,errorHandler){
+    $.ajax({
+        url: virtualWebPath + url,
+        type: 'POST',
+        data:postData,
+        success: successHandler(result),
+        error: errorHandler(error)
+    });
+}
+
 /**
  *
  * 初始化模板列表数据
