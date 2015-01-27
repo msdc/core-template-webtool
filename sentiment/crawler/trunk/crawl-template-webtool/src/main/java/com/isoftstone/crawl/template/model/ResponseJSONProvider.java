@@ -2,8 +2,6 @@ package com.isoftstone.crawl.template.model;
 
 import java.io.IOException;
 
-import javax.validation.constraints.Null;
-
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -14,7 +12,7 @@ import org.codehaus.jackson.map.ObjectMapper;
  * restful接口响应对象
  * */
 public class ResponseJSONProvider<T> {
-	private boolean status;
+	private boolean success;
 	private String errorMsg;
 	private String errorCode;
 	private Integer total;  
@@ -60,14 +58,6 @@ public class ResponseJSONProvider<T> {
 		this.data = data;
 	}
 
-	public boolean getStatus() {
-		return status;
-	}
-
-	public void setStatus(boolean status) {
-		this.status = status;
-	}
-
 	public Integer getTotal() {
 		return total;
 	}
@@ -75,4 +65,13 @@ public class ResponseJSONProvider<T> {
 	public void setTotal(Integer total) {
 		this.total = total;
 	}
+
+	public boolean getSuccess() {
+		return success;
+	}
+
+	public void setSuccess(boolean success) {
+		this.success = success;
+	}
+
 }
