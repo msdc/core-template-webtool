@@ -2,6 +2,8 @@ package com.isoftstone.crawl.template.model;
 
 import java.io.IOException;
 
+import javax.validation.constraints.Null;
+
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -11,12 +13,12 @@ import org.codehaus.jackson.map.ObjectMapper;
  * 
  * restful接口响应对象
  * */
-public class ResponseJSONProvider {
-	private String status="";
-	private String errorMsg="";
-	private String errorCode="";
-	private String total="";
-    private String data="";	
+public class ResponseJSONProvider<T> {
+	private boolean status;
+	private String errorMsg;
+	private String errorCode;
+	private Integer total;  
+    private T data;
 	
 	public String toJSON() {
 		String json = null;
@@ -32,14 +34,6 @@ public class ResponseJSONProvider {
 		}
 
 		return json;		
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
 	}
 
 	public String getErrorMsg() {
@@ -58,19 +52,27 @@ public class ResponseJSONProvider {
 		this.errorCode = errorCode;
 	}
 
-	public String getTotal() {
-		return total;
-	}
-
-	public void setTotal(String total) {
-		this.total = total;
-	}
-
-	public String getData() {
+	public T getData() {
 		return data;
 	}
 
-	public void setData(String data) {
+	public void setData(T data) {
 		this.data = data;
+	}
+
+	public boolean getStatus() {
+		return status;
+	}
+
+	public void setStatus(boolean status) {
+		this.status = status;
+	}
+
+	public Integer getTotal() {
+		return total;
+	}
+
+	public void setTotal(Integer total) {
+		this.total = total;
 	}
 }
