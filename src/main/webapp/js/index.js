@@ -12,8 +12,12 @@ $(function(){
         type: 'GET',
         success: function (data) {
             var json=JSON.parse(data);
-            if(json.templateList!=null){
-                pageInit(json.templateList);
+            if(json.success){
+                if(json.data.templateList!=null){
+                    pageInit(json.data.templateList);
+                }else{
+                    pageInit([]);
+                }
             }else{
                 pageInit([]);
             }
@@ -72,13 +76,15 @@ function btnModalImportConfirmHandler(){
             filePath:filePath
         },
         success: function (data) {
-            if(data =="true"){
+            var json=JSON.parse(data);
+            if(json.success){
                 optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作成功！请刷新该页面！");
-            }else if(data=="pathInvalid"){
-                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作失败！导入文件路径无效！");
-            }
-            else{
-                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作失败！");
+            }else{
+                if(json.errorMsg=="pathInvalid"){
+                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作失败！导入文件路径无效！");
+                }else{
+                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作失败！");
+                }
             }
             $('#model_export').modal('hide');
         },
@@ -98,13 +104,15 @@ function btnModalExportConfirmHandler(){
             filePath:filePath
         },
         success: function (data) {
-            if(data =="true"){
+            var json=JSON.parse(data);
+            if(json.success){
                 optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作成功！");
-            }else if(data=="pathInvalid"){
-                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作失败！导出文件路径无效！");
-            }
-            else{
-                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作失败！");
+            }else{
+                if(json.errorMsg=="pathInvalid"){
+                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作失败！导出文件路径无效！");
+                }else{
+                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作失败！");
+                }
             }
             $('#model_export').modal('hide');
         },
@@ -159,13 +167,15 @@ function templateViewModel(templateList){
             },
             success:function(data){
                 var json=JSON.parse(data);
-                if(json.templateList!=null){
-                    var templateLists=json.templateList;
-                    var searchData=updateTemplateListInitData(templateLists);
-                    self.urls(searchData);
-                    self.paginationUrls(searchData.slice(0,paginationItemCounts));
-                    //重新加载分页组件
-                    loadPaginationComponent(self);
+                if(json.success){
+                    if(json.data.templateList!=null){
+                        var templateLists=json.data.templateList;
+                        var searchData=updateTemplateListInitData(templateLists);
+                        self.urls(searchData);
+                        self.paginationUrls(searchData.slice(0,paginationItemCounts));
+                        //重新加载分页组件
+                        loadPaginationComponent(self);
+                    }
                 }
             },
             error:function(error){
@@ -189,7 +199,8 @@ function templateViewModel(templateList){
                     templateUrl:templateUrl
                 },
                 success: function (data) {
-                    if(data=="true"){
+                    var json=JSON.parse(data);
+                    if(json.success){
                         self.paginationUrls.remove(item);
                         self.urls.remove(item);
                         optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;删除成功！");
@@ -225,7 +236,12 @@ function templateViewModel(templateList){
                 templateUrl:templateUrl
             },
             success: function (data) {
-                window.location.href="pages/template-main.html?templateGuid="+data;
+                var json=JSON.parse(data);
+                if(json.success){
+                    window.location.href="pages/template-main.html?templateGuid="+json.data;
+                }else{
+                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;修改操作失败！");
+                }
             },
             error: function (error) {
                 if(error){

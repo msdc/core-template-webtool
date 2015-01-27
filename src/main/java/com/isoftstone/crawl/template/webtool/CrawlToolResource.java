@@ -51,6 +51,7 @@ import com.isoftstone.crawl.template.impl.TemplateFactory;
 import com.isoftstone.crawl.template.impl.TemplateResult;
 import com.isoftstone.crawl.template.model.CustomerAttrModel;
 import com.isoftstone.crawl.template.model.PageModel;
+import com.isoftstone.crawl.template.model.ResponseJSONProvider;
 import com.isoftstone.crawl.template.model.ScheduleDispatchViewModel;
 import com.isoftstone.crawl.template.model.TemplateIncreaseViewModel;
 import com.isoftstone.crawl.template.model.TemplateModel;
@@ -88,19 +89,24 @@ public class CrawlToolResource {
 	@Path("/saveToLocalFile")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String saveToLocalFile(@DefaultValue("") @FormParam("data") String data) {
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
 		PageModel pageModel = GetPageModelByJsonString(data);
 		String domain = pageModel.getScheduleDispatchViewModel().getDomain();
 //		String period = pageModel.getScheduleDispatchViewModel().getPeriod();
 		String period = pageModel.getTemplateIncreaseViewModel().getPeriod();
 		String sequence = pageModel.getScheduleDispatchViewModel().getSequence();
 		if (sequence == null || sequence.equals("")) {
-			return "保存失败，请输入时序.";
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("保存失败，请输入时序.");	
+			return jsonProvider.toJSON();
 		}
 		String folderName = domain + "_" + "1" + period + "_" + sequence;
 		String incrementFolderName = domain + "_" + "1" + period + "_" + INCREMENT_FILENAME_SIGN + "_" + sequence;
 		ParseResult parseResult = saveTemplateAndParseResult(pageModel);
 		if (parseResult == null) {
-			return "请先保存模板!再执行此操作!";
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("请先保存模板!再执行此操作!");
+			return jsonProvider.toJSON();
 		}
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		String templateGuid = MD5Utils.MD5(templateUrl);
@@ -111,7 +117,9 @@ public class CrawlToolResource {
 		//--增量相关.
 		String incrementPageCountStr = pageModel.getTemplateIncreaseViewModel().getPageCounts();
 		if(incrementPageCountStr == null || "".equals(incrementPageCountStr)) {
-		    return "保存失败，请输入增量需要爬取的页数";
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("保存失败，请输入增量需要爬取的页数");
+			return jsonProvider.toJSON();			
 		}
 		int incrementPageCount = Integer.valueOf(incrementPageCountStr);
 		if(incrementPageCount > 0) {
@@ -131,7 +139,9 @@ public class CrawlToolResource {
             }
         }
 		saveSeedsValueToFile(folderName, incrementFolderName, templateUrl, seeds, status);
-		return "文件保存成功!";
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData("文件保存成功!");
+		return jsonProvider.toJSON();
 	}
 
 	/**
@@ -316,15 +326,20 @@ public class CrawlToolResource {
 	@Path("/verifyNewContent")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String VerifyNewContent(@DefaultValue("") @FormParam("data") String data) {
+		ResponseJSONProvider<ParseResult> jsonProvider=new ResponseJSONProvider<ParseResult>();
 		PageModel pageModel = GetPageModelByJsonString(data);
 		ParseResult parseResult = saveParseResult(pageModel);		
 		if (parseResult == null) {
-			return "请先保存模板!再执行此操作!";
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("请先保存模板!再执行此操作!");		
+			return jsonProvider.toJSON();
 		}
 		// 获取内容页链接
 		ArrayList<String> contentOutLinkArrayList = TemplateFactory.getContentOutlink(parseResult);
 		if (contentOutLinkArrayList.size() == 0) {
-			return "列表外链接配置信息不正确！";
+			jsonProvider.setSuccess(false);
+		 	jsonProvider.setErrorMsg("列表外链接配置信息不正确！");
+		 	return jsonProvider.toJSON();
 		}
 		int contentOutLinkIndex=getRandomNumber(0, contentOutLinkArrayList.size()-1);
 		String contentOutLink = contentOutLinkArrayList.get(contentOutLinkIndex);
@@ -332,12 +347,14 @@ public class CrawlToolResource {
 		String encoding = sniffCharacterEncoding(input);
 		try {
 			parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, contentOutLink);
+			jsonProvider.setSuccess(true);
+			jsonProvider.setData(parseResult);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
-		}
-
-		return parseResult.toJSON();
+		}			
+		
+		return jsonProvider.toJSON();
 	}
 
 	/**
@@ -348,11 +365,16 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String VerifyListContent(@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = GetPageModelByJsonString(data);
+		ResponseJSONProvider<ParseResult> jsonProvider=new ResponseJSONProvider<ParseResult>();
 		ParseResult parseResult = saveParseResult(pageModel);
 		if (parseResult == null) {
-			return "请先保存模板!再执行此操作!";
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("请先保存模板!再执行此操作!");			
+		}else{
+			jsonProvider.setSuccess(true);
+			jsonProvider.setData(parseResult);
 		}
-		return parseResult.toJSON();
+		return jsonProvider.toJSON();
 	}
 
 	/**
@@ -364,8 +386,11 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String GetJSONString(@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = GetPageModelByJsonString(data);
+		ResponseJSONProvider<TemplateResult> jsonProvider=new ResponseJSONProvider<TemplateResult>();
 		TemplateResult templateResult = GetTemplateResult(pageModel);
-		return templateResult.toJSON();
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData(templateResult);
+		return jsonProvider.toJSON();
 	}
 
 	/**
@@ -377,8 +402,11 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String SaveTemplate(@DefaultValue("") @FormParam("data") String data) {
 		PageModel pageModel = GetPageModelByJsonString(data);
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
 		saveTemplateResultToRedis(pageModel);
-		return "模板保存成功!";
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData("模板保存成功!");
+		return jsonProvider.toJSON();
 	}
 	
 	/**
@@ -390,8 +418,11 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String SaveIncreaseTemplate(@DefaultValue("") @FormParam("data") String data){
 		PageModel pageModel = GetPageModelByJsonString(data);
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
 		String result=saveIncreaseTemplateResult(pageModel);
-		return result;
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData(result);
+		return jsonProvider.toJSON();
 	}
 
 	/**
@@ -402,8 +433,21 @@ public class CrawlToolResource {
 	@Path("/viewHtmlContent")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String viewHtmlContent(@DefaultValue("") @FormParam("webUrl") String webUrl) {
-		String htmlContent = DownloadHtml.getHtml(webUrl, "UTF-8");
-		return htmlContent;
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
+		String htmlContent="";
+		try {
+			byte[] input = DownloadHtml.getHtml(webUrl);
+			String encoding = sniffCharacterEncoding(input);
+			htmlContent = DownloadHtml.getHtml(webUrl, encoding);	
+			jsonProvider.setSuccess(true);
+			jsonProvider.setData(htmlContent);
+		} catch (Exception e) {
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("无法打开此网站！");
+			e.printStackTrace();
+		}
+			
+		return jsonProvider.toJSON();
 	}
 
 	/**
@@ -413,10 +457,11 @@ public class CrawlToolResource {
 	@POST
 	@Path("/deleteTemplate")
 	@Produces(MediaType.TEXT_PLAIN)
-	public Boolean DeleteTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl) {
+	public String DeleteTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl) {
 		String templateGuid = MD5Utils.MD5(templateUrl);
-		Boolean executeResult = true;
-
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData("删除成功！");
 		long effectCounts = -1;
 		
 		//先删除增量模板
@@ -429,7 +474,9 @@ public class CrawlToolResource {
 				effectCounts = RedisOperator
 						.delFromIncreaseDB(increaseTemplateId);
 				if (effectCounts < 0) {
-					executeResult = false;
+					jsonProvider.setSuccess(false);
+					jsonProvider.setErrorMsg("删除模板失败");
+					jsonProvider.setData(null);
 				}
 			}
 		}
@@ -438,10 +485,14 @@ public class CrawlToolResource {
 		effectCounts = RedisOperator.delFromDefaultDB(
 				(templateGuid + key_partern), templateGuid);
 		if (effectCounts < 0) {
-			executeResult = false;			
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("删除模板失败");
+			jsonProvider.setData("");
 		}	
 		
-		return executeResult;
+		
+		
+		return jsonProvider.toJSON();
 	}
 
 	/**
@@ -452,10 +503,11 @@ public class CrawlToolResource {
 	@Path("/updateTemplate")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String UpdateTemplate(@DefaultValue("") @FormParam("templateGuid") String templateGuid) {
-		String json = "";
+	    ResponseJSONProvider<TemplateResult> jsonProvider=new ResponseJSONProvider<TemplateResult>();
 		TemplateResult templateResult =RedisOperator.getTemplateResultFromDefaultDB(templateGuid);
-		json = templateResult.toJSON();
-		return json;
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData(templateResult);		
+		return jsonProvider.toJSON();
 	}
 
 	/**
@@ -467,7 +519,10 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getTemplateGuid(@DefaultValue("") @FormParam("templateUrl") String templateUrl) {
 		String templateGuid = MD5Utils.MD5(templateUrl);
-		return templateGuid;
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData(templateGuid);
+		return jsonProvider.toJSON();
 	}
 
 	/**
@@ -478,6 +533,8 @@ public class CrawlToolResource {
 	@Path("/getTemplateList")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String GetTemplateList() {
+		ResponseJSONProvider<TemplateList> jsonProvider=new ResponseJSONProvider<TemplateList>();
+		jsonProvider.setSuccess(true);
 		JedisPool pool = null;
 		Jedis jedis = null;
 		TemplateList templateList = new TemplateList();
@@ -495,6 +552,8 @@ public class CrawlToolResource {
 				}
 			}			
 		} catch (Exception e) {
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("Redis操作异常！");
 			pool.returnBrokenResource(jedis);
 			e.printStackTrace();
 		} finally {
@@ -503,8 +562,9 @@ public class CrawlToolResource {
 		//列表按名称排序
         Collections.sort(templateListArrayList, new TemplateModelComparator());		 
 		templateList.setTemplateList(templateListArrayList);
-		String templateListJSONString = GetTemplateListJSONString(templateList);
-		return templateListJSONString;
+		jsonProvider.setData(templateList);	
+		jsonProvider.setTotal(templateListArrayList.size());
+		return jsonProvider.toJSON();
 	}
 	
 	/**
@@ -516,14 +576,15 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String SearchTemplateList(
 			@DefaultValue("") @FormParam("searchString") String searchString) {
+		ResponseJSONProvider<TemplateList> jsonProvider=new ResponseJSONProvider<TemplateList>();
+		jsonProvider.setSuccess(true);
 		if(searchString.equals("启用")){
 			searchString="true";
 		}else if(searchString.equals("停用")){
 			searchString="false";
 		}
 		JedisPool pool = null;
-		Jedis jedis = null;
-		String templateListJSONString="";
+		Jedis jedis = null;		
 		TemplateList templateList = new TemplateList();
 		List<TemplateModel> templateListArrayList = new ArrayList<TemplateModel>();
 		try {
@@ -541,6 +602,8 @@ public class CrawlToolResource {
 				}
 			}			
 		} catch (Exception e) {
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("Redis操作异常！");
 			pool.returnBrokenResource(jedis);
 			e.printStackTrace();
 		} finally {
@@ -549,8 +612,9 @@ public class CrawlToolResource {
 		//列表按名称排序
 		Collections.sort(templateListArrayList, new TemplateModelComparator());	
 		templateList.setTemplateList(templateListArrayList);		
-		templateListJSONString = GetTemplateListJSONString(templateList);		
-		return templateListJSONString;
+		jsonProvider.setData(templateList);	
+		jsonProvider.setTotal(templateListArrayList.size());
+		return jsonProvider.toJSON();
 	}
 	/**
 	 * 
@@ -560,8 +624,11 @@ public class CrawlToolResource {
 	@Path("/disableTemplate")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String DisableTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl, @DefaultValue("") @FormParam("name") String name) {
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
 		setTemplateStatus(templateUrl, name, "false");
-		return "success";
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData("操作成功！");
+		return jsonProvider.toJSON();
 	}
 
 	/**
@@ -572,8 +639,11 @@ public class CrawlToolResource {
 	@Path("/enableTemplate")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String EnableTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl, @DefaultValue("") @FormParam("name") String name) {
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
 		setTemplateStatus(templateUrl, name, "true");
-		return "success";
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData("操作成功！");
+		return jsonProvider.toJSON();
 	}
 
 	/**
@@ -584,8 +654,11 @@ public class CrawlToolResource {
 	@Path("/getSingleTemplateModel")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getSingleTemplateModel(@DefaultValue("") @FormParam("templateGuid") String templateGuid) {	
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
 		String json = RedisOperator.getFromDefaultDB(templateGuid + key_partern);
-		return json;
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData(json);
+		return jsonProvider.toJSON();
 	}
 
 	/**
@@ -596,16 +669,21 @@ public class CrawlToolResource {
 	@Path("/exportAllTemplates")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String exportAllTemplates(@DefaultValue("") @FormParam("filePath") String filePath) {
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData("导出模板操作成功！");
 		String newFilePath="";
 		try{
 			newFilePath=getFilePathByOSPlatForm(filePath);
 		}catch(Exception e){
-			return "pathInvalid";
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("pathInvalid");
+			jsonProvider.setData(null);
+			return jsonProvider.toJSON();
 		}
 				
 		JedisPool pool = null;
-		Jedis jedis = null;	
-		String resultStatus = "true";
+		Jedis jedis = null;			
 		try {
 			pool = RedisUtils.getPool();
 			jedis = pool.getResource();
@@ -635,14 +713,16 @@ public class CrawlToolResource {
 					}
 				}
 			}			
-		} catch (Exception e) {
-			resultStatus = "false";
+		} catch (Exception e) {		
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("导入模板操作失败！");
+			jsonProvider.setData(null);
 			pool.returnBrokenResource(jedis);
 			e.printStackTrace();
 		} finally {
 			RedisUtils.returnResource(pool, jedis);
 		}
-		return resultStatus;
+		return jsonProvider.toJSON();
 	}
 
 	/**
@@ -653,16 +733,21 @@ public class CrawlToolResource {
 	@Path("/importAllTemplates")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String importAllTemplates(@DefaultValue("") @FormParam("filePath") String dirPath) {
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData("导入模板操作成功！");
 		String newFilePath="";
 		try {
 			newFilePath=getFilePathByOSPlatForm(dirPath);
 		} catch (Exception e) {
-			return "pathInvalid";
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("pathInvalid");
+			jsonProvider.setData(null);
+			return jsonProvider.toJSON();
 		}
 		
 		JedisPool pool = null;
-		Jedis jedis = null;
-		String resultStatus = "true";
+		Jedis jedis = null;		
 		try {
 			pool = RedisUtils.getPool();
 			jedis = pool.getResource();
@@ -684,14 +769,16 @@ public class CrawlToolResource {
 				}
 			}
 		} catch (Exception e) {
-			resultStatus = "false";
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("导出模板操作失败！");
+			jsonProvider.setData(null);			
 			e.printStackTrace();
 			pool.returnBrokenResource(jedis);
 		} finally {
 			RedisUtils.returnResource(pool, jedis);
 		}
 
-		return resultStatus;
+		return jsonProvider.toJSON();
 	}
 
 	/**
