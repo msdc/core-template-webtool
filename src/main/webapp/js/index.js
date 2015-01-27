@@ -281,13 +281,38 @@ function templateViewModel(templateList){
 }
 /*****************View-Model***********************/
 
+/**
+ *
+ * ajax post请求
+ * */
 function ajaxPostRequest(url,postData,successHandler,errorHandler){
     $.ajax({
         url: virtualWebPath + url,
         type: 'POST',
         data:postData,
-        success: successHandler(result),
-        error: errorHandler(error)
+        success: function(data){
+            successHandler(data);
+        },
+        error: function(error){
+            errorHandler(error);
+        }
+    });
+}
+
+/**
+ *
+ * ajax Get 请求
+ * */
+function ajaxGetRequest(url,successHandler,errorHandler){
+    $.ajax({
+        url: virtualWebPath + url,
+        type: 'GET',
+        success: function(data){
+            successHandler(data);
+        },
+        error: function(error){
+            errorHandler(error);
+        }
     });
 }
 
