@@ -141,7 +141,13 @@ function basicInfoViewModel(){
             success:function(result){
                 var modalBody=$('#modal-viewHtml-body');
                 modalBody.text('');//清空
-                modalBody.text(result);
+                var json=JSON.parse(result);
+                if(json.success){
+                    modalBody.text(json.data);
+                }else{
+                    modalBody.text(json.errorMsg);
+                }
+
             },
             error:function(){}
         });
@@ -321,7 +327,11 @@ $(function(){
             },
             success: function (data) {
                 var json=JSON.parse(data);
-                loadPageContext(json);
+                if(json.success){
+                    loadPageContext(json.data);
+                }else{
+                    loadPageContext(null);
+                }
             },
             error: function (error) {
             }
@@ -523,7 +533,8 @@ function updateTemplate(initData,pageViewModel){
             templateGuid: templateGuid
         },
         success: function (data) {
-            updateTemplateDataInit(initData,pageViewModel,data);
+            var json=JSON.parse(data);
+            updateTemplateDataInit(initData,pageViewModel,json.data);
         },
         error: function (error) {
         }
@@ -766,14 +777,12 @@ function setViewModelFormatter(viewModel,viewModelFormatter){
 function showResultInTextArea(data){
     //$('#modal_body_showError').html('');
     //$('#btn_showErrorMessage').hide();
-    var jsonString="";
-    try{
-        jsonString=JSON.parse(data);
-        $('#txt_testResult').val(JSON.stringify(jsonString,null,4)).css({color:'#000000',fontSize:'14px'});
-    }catch(e){
-        $('#txt_testResult').val(data).css({color:'#000000',fontSize:'14px'});
+    var result=JSON.parse(data);
+    if(result.success){
+        $('#txt_testResult').val(JSON.stringify(result.data,null,4)).css({color:'#000000',fontSize:'14px'});
+    }else{
+        $('#txt_testResult').val(result.errorMsg).css({color:'#000000',fontSize:'14px'});
     }
-
 }
 
 /**
@@ -796,7 +805,12 @@ function showResultInModal(data){
     if(data.responseText){
         modalBody.text("错误信息:"+data.responseText);
     }else{
-        modalBody.text(data);
+        var result=JSON.parse(data);
+        if(result.success){
+            modalBody.text(result.data);
+        }else{
+            modalBody.text(result.errorMsg);
+        }
     }
 }
 
