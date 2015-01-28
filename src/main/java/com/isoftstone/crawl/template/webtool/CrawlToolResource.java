@@ -806,6 +806,7 @@ public class CrawlToolResource {
 			sb.append(temp + " ");
 			temp = br.readLine();
 		}
+		br.close();
 		return sb.toString();
 	}
 
