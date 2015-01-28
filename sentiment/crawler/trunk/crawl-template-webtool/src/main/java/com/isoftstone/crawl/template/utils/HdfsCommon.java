@@ -12,7 +12,7 @@ import com.isoftstone.crawl.template.consts.WebtoolConstants;
 
 public class HdfsCommon {
 
-    public void upFileToHdfs(String fileName) throws IOException {
+    public static void upFileToHdfs(String fileName) throws IOException {
         // 将本地文件上传到hdfs。
         //"hdfs://192.168.100.231:8020/user/hdfs/tmp1/"
         String target = Config.getValue(WebtoolConstants.KEY_HDFS_ROOT_FOLDER);
