@@ -32,4 +32,10 @@ public class WebtoolConstants {
     
     public static final String KEY_HDFS_ROOT_FOLDER = "hdfsRootFolder";
 
+    public static final String KEY_IS_COPYFOLDER = "isCopyFile";
+    
+    public static final String KEY_HOST_IP = "hostip";
+    public static final String KEY_HOST_USERNAME = "hostUserName";
+    public static final String KEY_HOST_PASSWORD = "hostPassword";
+    public static final String KEY_DES_FOLDER = "desFolderName";
 }
