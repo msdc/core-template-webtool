@@ -829,28 +829,6 @@ public class CrawlToolResource {
 		//System.out.println("导出模板文件保存路径:" + filePath);
 	}
 
-	/**
-	 * 将对象转换为JSON-string形式
-	 * */
-	private String GetTemplateListJSONString(TemplateList templateList) {
-		String json = null;
-
-		ObjectMapper objectmapper = new ObjectMapper();
-		try {
-			json = objectmapper.writeValueAsString(templateList);
-		} catch (JsonGenerationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return json;
-	}
-
 	private String GetTemplateModelJSONString(TemplateModel templateModel) {
 		String json = null;
 
