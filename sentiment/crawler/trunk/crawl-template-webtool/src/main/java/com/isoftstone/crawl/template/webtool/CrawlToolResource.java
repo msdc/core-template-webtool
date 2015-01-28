@@ -62,7 +62,7 @@ import com.isoftstone.crawl.template.utils.DownloadHtml;
 import com.isoftstone.crawl.template.utils.MD5Utils;
 import com.isoftstone.crawl.template.utils.RedisOperator;
 import com.isoftstone.crawl.template.utils.RedisUtils;
-import com.isoftstone.crawl.template.utils.ShellUtils;
+import com.isoftstone.crawl.template.utils.SFTPUtils;
 import com.isoftstone.crawl.template.vo.DispatchVo;
 import com.isoftstone.crawl.template.vo.Runmanager;
 import com.isoftstone.crawl.template.vo.Seed;
@@ -306,17 +306,12 @@ public class CrawlToolResource {
 		runmanager.setPort(22);
 		String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
 		LOG.info("文件根目录" + folderRoot);
-		String command = "";
 		if ("local".equals(type)) {
-			command = "scp -r " + folderRoot + "/" + folderName + " root@192.168.100.231:/home/" + folderName;
+		    String folderPath = folderRoot + "/" + folderName;
+		    new SFTPUtils().copyFile(runmanager, folderPath, folderPath);
 		} else {
 			// FIXME:集群模式，执行的命令.
-			command = "";
 		}
-		LOG.info("命令：" + command);
-		runmanager.setCommand(command);
-		ShellUtils.execCmd(runmanager);
-		LOG.info("命令执行完毕：" + command);
 	}
 
 	/**
