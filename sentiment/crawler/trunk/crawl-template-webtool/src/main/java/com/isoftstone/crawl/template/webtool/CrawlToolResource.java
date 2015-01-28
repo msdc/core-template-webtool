@@ -57,12 +57,13 @@ import com.isoftstone.crawl.template.model.TemplateIncreaseViewModel;
 import com.isoftstone.crawl.template.model.TemplateModel;
 import com.isoftstone.crawl.template.model.TemplateTagModel;
 import com.isoftstone.crawl.template.utils.Config;
-import com.isoftstone.crawl.template.utils.TemplateModelComparator;
 import com.isoftstone.crawl.template.utils.DownloadHtml;
+import com.isoftstone.crawl.template.utils.HdfsCommon;
 import com.isoftstone.crawl.template.utils.MD5Utils;
 import com.isoftstone.crawl.template.utils.RedisOperator;
 import com.isoftstone.crawl.template.utils.RedisUtils;
-import com.isoftstone.crawl.template.utils.SFTPUtils;
+import com.isoftstone.crawl.template.utils.ShellUtils;
+import com.isoftstone.crawl.template.utils.TemplateModelComparator;
 import com.isoftstone.crawl.template.vo.DispatchVo;
 import com.isoftstone.crawl.template.vo.Runmanager;
 import com.isoftstone.crawl.template.vo.Seed;
@@ -280,7 +281,11 @@ public class CrawlToolResource {
 			output = new BufferedWriter(new FileWriter(f));
 			output.write(strBuf.toString());
 			output.close();
-			putSeedsFolder(folderName, "local");
+			String isCopy = Config.getValue(WebtoolConstants.KEY_IS_COPYFOLDER);
+			if("true".equals(isCopy)) {
+			    putSeedsFolder(folderName, "local");
+			}
+			HdfsCommon.upFileToHdfs(filePath);
 		} catch (Exception e) {
 			LOG.error("生成文件错误.", e);
 		} finally {
@@ -299,19 +304,29 @@ public class CrawlToolResource {
 
 	private static void putSeedsFolder(String folderName, String type) {
 		LOG.info("进入方法");
+		String hostIp = Config.getValue(WebtoolConstants.KEY_HOST_IP);
+		String userName = Config.getValue(WebtoolConstants.KEY_HOST_USERNAME);
+		String password = Config.getValue(WebtoolConstants.KEY_HOST_PASSWORD);
 		Runmanager runmanager = new Runmanager();
-		runmanager.setHostIp("192.168.100.236");
-		runmanager.setUsername("root");
-		runmanager.setPassword("Password1");
-		runmanager.setPort(22);
-		String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
-		LOG.info("文件根目录" + folderRoot);
-		if ("local".equals(type)) {
-		    String folderPath = folderRoot + "/" + folderName;
-		    new SFTPUtils().copyFile(runmanager, folderPath, folderPath);
-		} else {
-			// FIXME:集群模式，执行的命令.
-		}
+		runmanager.setHostIp(hostIp);
+		runmanager.setUsername(userName);
+        runmanager.setPassword(password);
+        runmanager.setPort(22);
+        String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
+        LOG.info("文件根目录" + folderRoot);
+        String command = "";
+        if ("local".equals(type)) {
+            //String folderPath = folderRoot + "/" + folderName;
+            //new SFTPUtils().copyFile(runmanager, folderPath, folderPath);
+            String desCopyRootFolder = Config.getValue(WebtoolConstants.KEY_DES_FOLDER);
+            command = "scp -r " + folderRoot + "/" + folderName
+                    + " " + desCopyRootFolder + folderName;
+        } else {
+            // FIXME:集群模式，执行的命令.
+        }
+        LOG.info("命令：" + command);
+        runmanager.setCommand(command);
+        ShellUtils.execCmd(runmanager);
 	}
 
 	/**
