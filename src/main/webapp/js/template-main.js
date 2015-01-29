@@ -358,115 +358,117 @@ function loadPageContext(initData){
     $('#news_tab').load('template-news.html',function(){
         $('#schedule_tab').load('template-schedule.html',function(){
             $('#list_tab').load('template-list.html',function(){
-                //master view model with instances of both the view models.
-                var masterVM = (function(){
-                    this.basicInfoViewModel = new basicInfoViewModel();
-                    this.scheduleDispatchViewModel=new scheduleDispatchViewModel();
-                    this.templateTagsViewModel=new templateTagsViewModel();
-                    this.templateIncreaseViewModel=new templateIncreaseViewModel();
+                $('#templateTag_tab').load('template-tags.html',function(){
+                    //master view model with instances of both the view models.
+                    var masterVM = (function(){
+                        this.basicInfoViewModel = new basicInfoViewModel();
+                        this.scheduleDispatchViewModel=new scheduleDispatchViewModel();
+                        this.templateTagsViewModel=new templateTagsViewModel();
+                        this.templateIncreaseViewModel=new templateIncreaseViewModel();
 
-                    this.newsCustomerAttrViewModel=new customerAttrViewModel();
-                    this.newsTitleViewModel=new commonAttrViewMode();
-                    this.newsPublishTimeViewModel=new commonAttrViewMode();
-                    this.newsSourceViewModel=new commonAttrViewMode();
-                    this.newsContentViewModel=new commonAttrViewMode();
+                        this.newsCustomerAttrViewModel=new customerAttrViewModel();
+                        this.newsTitleViewModel=new commonAttrViewMode();
+                        this.newsPublishTimeViewModel=new commonAttrViewMode();
+                        this.newsSourceViewModel=new commonAttrViewMode();
+                        this.newsContentViewModel=new commonAttrViewMode();
 
-                    this.listCustomerAttrViewModel=new customerAttrViewModel();
-                    this.listOutLinkViewModel=new commonAttrViewMode();
-                    this.listPaginationViewModel=new paginationViewModel();
+                        this.listCustomerAttrViewModel=new customerAttrViewModel();
+                        this.listOutLinkViewModel=new commonAttrViewMode();
+                        this.listPaginationViewModel=new paginationViewModel();
 
-                    if(initData!=null){
-                        updateTemplate(initData,this);
-                    }else{
-                        addNewTemplateDataInit(this);
-                        //测试 添加模板
-                        //testAddNewTemplate(this);
-                    }
-
-                    //内容页自定义属性
-                    this.newsAttrModels=function(){
-                        var attrModels=[];
-                        var modelArray=this.newsCustomerAttrViewModel.regions();
-                        for(var i=0;i<modelArray.length;i++){
-                            var model=modelArray[i];
-                            var temp=new customerAttrModel(
-                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.formatCategorySelected(),model.formatter(),model.filterReplaceTo()
-                            );
-                            attrModels.push(temp);
+                        if(initData!=null){
+                            updateTemplate(initData,this);
+                        }else{
+                            addNewTemplateDataInit(this);
+                            //测试 添加模板
+                            //testAddNewTemplate(this);
                         }
-                        return attrModels;
-                    };
 
-                    //列表页自定义属性
-                    this.listAttrModels=function(){
-                        var attrModels=[];
-                        var modelArray=this.listCustomerAttrViewModel.regions();
-                        for(var i=0;i<modelArray.length;i++){
-                            var model=modelArray[i];
-                            var temp=new customerAttrModel(
-                                model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.formatCategorySelected(),model.formatter(),model.filterReplaceTo()
-                            );
-                            attrModels.push(temp);
-                        }
-                        return attrModels;
-                    };
+                        //内容页自定义属性
+                        this.newsAttrModels=function(){
+                            var attrModels=[];
+                            var modelArray=this.newsCustomerAttrViewModel.regions();
+                            for(var i=0;i<modelArray.length;i++){
+                                var model=modelArray[i];
+                                var temp=new customerAttrModel(
+                                    model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.formatCategorySelected(),model.formatter(),model.filterReplaceTo()
+                                );
+                                attrModels.push(temp);
+                            }
+                            return attrModels;
+                        };
 
-                    //模板静态属性列表
-                    this.templateTagModels=function(){
-                        var attrModels=[];
-                        var modelArray=this.templateTagsViewModel.tags();
-                        for(var i=0;i<modelArray.length;i++){
-                            var model=modelArray[i];
-                            var temp=new templateTagModel(model.tagKey(),model.tagValue());
-                            attrModels.push(temp);
-                        }
-                        return attrModels;
-                    };
+                        //列表页自定义属性
+                        this.listAttrModels=function(){
+                            var attrModels=[];
+                            var modelArray=this.listCustomerAttrViewModel.regions();
+                            for(var i=0;i<modelArray.length;i++){
+                                var model=modelArray[i];
+                                var temp=new customerAttrModel(
+                                    model.target(),model.selector(),model.attrSelected(),model.filter(),model.filterCategorySelected(),model.formatCategorySelected(),model.formatter(),model.filterReplaceTo()
+                                );
+                                attrModels.push(temp);
+                            }
+                            return attrModels;
+                        };
 
-                    //验证内容页
-                    this.verifyNewContent=function(){
-                        $('#lbl_result_title').text('内容页验证结果');
-                        $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
-                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyNewContent', this, showResultInTextArea, showErrorsInTextArea);
-                    };
+                        //模板静态属性列表
+                        this.templateTagModels=function(){
+                            var attrModels=[];
+                            var modelArray=this.templateTagsViewModel.tags();
+                            for(var i=0;i<modelArray.length;i++){
+                                var model=modelArray[i];
+                                var temp=new templateTagModel(model.tagKey(),model.tagValue());
+                                attrModels.push(temp);
+                            }
+                            return attrModels;
+                        };
 
-                    //验证列表页
-                    this.verifyListContent=function(){
-                        $('#lbl_result_title').text('列表页验证结果');
-                        $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
-                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyListContent', this, showResultInTextArea, showErrorsInTextArea);
-                    };
+                        //验证内容页
+                        this.verifyNewContent=function(){
+                            $('#lbl_result_title').text('内容页验证结果');
+                            $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
+                            ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyNewContent', this, showResultInTextArea, showErrorsInTextArea);
+                        };
 
-                    /*查看模板JSON*/
-                    this.templateTest=function(){
-                        $('#lbl_result_title').text('查看模板JSON');
-                        $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red'});
-                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/getJSONString', this, showResultInTextArea, showErrorsInTextArea);
-                    }.bind(this);
+                        //验证列表页
+                        this.verifyListContent=function(){
+                            $('#lbl_result_title').text('列表页验证结果');
+                            $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
+                            ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyListContent', this, showResultInTextArea, showErrorsInTextArea);
+                        };
 
-                    /*保存模板配置*/
-                    this.saveTemplate=function(){
-                        $('#modalHtmlTitle').text('保存结果');
-                        $('#modal-viewHtml').modal('show');
-                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveTemplate', this, showResultInModal, showResultInModal);
-                    }.bind(this);
+                        /*查看模板JSON*/
+                        this.templateTest=function(){
+                            $('#lbl_result_title').text('查看模板JSON');
+                            $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red'});
+                            ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/getJSONString', this, showResultInTextArea, showErrorsInTextArea);
+                        }.bind(this);
 
-                    /*保存增量模板*/
-                    this.saveIncreaseTemplate=function(){
-                        $('#modalHtmlTitle').text('保存结果');
-                        $('#modal-viewHtml').modal('show');
-                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveIncreaseTemplate', this, showResultInModal, showResultInModal);
-                    }.bind(this);
+                        /*保存模板配置*/
+                        this.saveTemplate=function(){
+                            $('#modalHtmlTitle').text('保存结果');
+                            $('#modal-viewHtml').modal('show');
+                            ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveTemplate', this, showResultInModal, showResultInModal);
+                        }.bind(this);
 
-                    /*保存到本地文件*/
-                    this.saveToLocalFile=function(){
-                        $('#modalHtmlTitle').text('保存结果');
-                        $('#modal-viewHtml').modal('show');
-                        ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveToLocalFile',this,showResultInModal,showResultInModal);
-                    }.bind(this);
+                        /*保存增量模板*/
+                        this.saveIncreaseTemplate=function(){
+                            $('#modalHtmlTitle').text('保存结果');
+                            $('#modal-viewHtml').modal('show');
+                            ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveIncreaseTemplate', this, showResultInModal, showResultInModal);
+                        }.bind(this);
 
-                })();
-                ko.applyBindings(masterVM);
+                        /*保存到本地文件*/
+                        this.saveToLocalFile=function(){
+                            $('#modalHtmlTitle').text('保存结果');
+                            $('#modal-viewHtml').modal('show');
+                            ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveToLocalFile',this,showResultInModal,showResultInModal);
+                        }.bind(this);
+
+                    })();
+                    ko.applyBindings(masterVM);
+                });
             })
         });
     });
