@@ -49,6 +49,7 @@ import com.isoftstone.crawl.template.impl.SelectorFormat;
 import com.isoftstone.crawl.template.impl.SelectorIndexer;
 import com.isoftstone.crawl.template.impl.TemplateFactory;
 import com.isoftstone.crawl.template.impl.TemplateResult;
+import com.isoftstone.crawl.template.model.BasicInfoViewModel;
 import com.isoftstone.crawl.template.model.CustomerAttrModel;
 import com.isoftstone.crawl.template.model.PageModel;
 import com.isoftstone.crawl.template.model.ResponseJSONProvider;
@@ -789,6 +790,54 @@ public class CrawlToolResource {
 		return jsonProvider.toJSON();
 	}
 
+	
+	/**
+	 * 
+	 * 根据关键字，自动批量生成搜索引擎模板
+	 * */	
+	@POST
+	@Path("/autoGenerateTemplates")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String AutoGenerateTemplates(@DefaultValue("") @FormParam("data") String data){
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
+		PageModel pageModel = GetPageModelByJsonString(data);
+		//TODO: 获取关键词，根据关键词产生搜索引擎模板
+		List<String> wordsList=new ArrayList<String>();
+		wordsList.add("政府");
+		wordsList.add("公司");
+		for(String word: wordsList){			
+			//TODO:根据words关键字，处理pageModel中的相关信息:URL,名称,Tags,并重新赋值
+			String templateURL=pageModel.getBasicInfoViewModel().getUrl();
+			templateURL=templateURL.replace("###",word);
+			
+			//处理URL及名称
+			BasicInfoViewModel basicInfoViewModel=pageModel.getBasicInfoViewModel();
+			basicInfoViewModel.setUrl(templateURL);
+			basicInfoViewModel.setName("百度新闻-"+word);
+			
+			//处理静态属性tags值
+			List<TemplateTagModel> templateTagsViewModel=pageModel.getTemplateTagsViewModel();
+			if(templateTagsViewModel!=null){
+				for (int i = 0; i < templateTagsViewModel.size(); i++) {
+					if(templateTagsViewModel.get(i).getTagKey().equals("分类")){
+						templateTagsViewModel.get(i).setTagValue(word); 
+					}					
+				}
+			}			
+			
+			//构造新的pageModel
+			pageModel.setBasicInfoViewModel(basicInfoViewModel);
+			pageModel.setTemplateTagsViewModel(templateTagsViewModel);			
+			TemplateResult templateResult = GetTemplateResult(pageModel);						
+			RedisOperator.saveTemplateToDefaultDB(templateResult, templateResult.getTemplateGuid());		
+			// 保存数据源列表所需要的key值 模板默认为启用状态
+			SaveTemplateToList(pageModel, "true");
+		}
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData("关键字对应的搜索引擎模板，已全部生成！请回到列表页面，并刷新!");
+		return jsonProvider.toJSON();
+	}
+	
 	/**
 	 * 
 	 * 读取文件
