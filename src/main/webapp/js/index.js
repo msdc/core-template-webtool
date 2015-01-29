@@ -151,7 +151,7 @@ function templateViewModel(templateList){
     var self=this;
     var templateListInitData=updateTemplateListInitData(templateList);
     self.urls=ko.observableArray(templateListInitData);
-    self.searchString=ko.observable();
+    self.searchString=ko.observable('');
     //分页显示的url列表
     self.paginationUrls=ko.observableArray(templateListInitData.slice(0,paginationItemCounts));
     self.addNew=function(){
