@@ -155,7 +155,7 @@ function basicInfoViewModel(){
             error:function(){}
         });
     }.bind(this);
-    this.showSearchTemplateField=ko.computed(function(){
+    this.showSearchTemplateElement=ko.computed(function(){
         if(this.templateTypesSelected()=='普通模板'){
             return false;
         }else{
@@ -476,6 +476,22 @@ function loadPageContext(initData){
                             ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveToLocalFile',this,showResultInModal,showResultInModal);
                         }.bind(this);
 
+                        /*根据模板类型显示相应按钮*/
+                        this.showNormalTemplateBtn=ko.computed(function(){
+                            if(this.basicInfoViewModel.templateTypesSelected()=="普通模板"){
+                                return true;
+                            }else{
+                                return false;
+                            }
+                        },this);
+                        /*根据模板类型显示相应按钮*/
+                        this.showSearchTemplateBtn=ko.computed(function(){
+                            if(this.basicInfoViewModel.templateTypesSelected()=="普通模板"){
+                                return false;
+                            }else{
+                                return true;
+                            }
+                        },this);
                     })();
                     ko.applyBindings(masterVM);
                 });
@@ -586,7 +602,7 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
 
     //列表页外链接
     var listOutLinkArray=initData.list;
-    if(listOutLinkArray!=null){
+    if(listOutLinkArray!=null&&listOutLinkArray.length>0){
         var listOutLink=listOutLinkArray[0];
         if(listOutLink.indexers!=null){
             var listOutLinkIndexer=listOutLink.indexers[0];
@@ -629,7 +645,7 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
 
     //列表分页
     var listPaginationArray=initData.pagination;
-    if(listPaginationArray!=null){
+    if(listPaginationArray!=null&&listPaginationArray.length>0){
         var listPagination=listPaginationArray[0];
         //分页索引器
         if(listPagination.indexers!=null){
