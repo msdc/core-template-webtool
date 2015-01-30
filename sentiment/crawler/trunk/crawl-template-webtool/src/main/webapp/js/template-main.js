@@ -128,6 +128,9 @@ function basicInfoViewModel(){
     this.name=ko.observable();
     this.tags=ko.observableArray(['财经','体育','经济']);
     this.tagsSelected=ko.observable('财经');
+    this.templateTypes=ko.observableArray(['普通模板','百度新闻搜索']);
+    this.templateTypesSelected=ko.observable('普通模板');
+    this.currentString=ko.observable();
     this.viewHtmlContent=function(){
         var url=this.url;
         $('#modalHtmlTitle').text('Html内容');
@@ -152,6 +155,13 @@ function basicInfoViewModel(){
             error:function(){}
         });
     }.bind(this);
+    this.showSearchTemplateField=ko.computed(function(){
+        if(this.templateTypesSelected()=='普通模板'){
+            return false;
+        }else{
+            return true;
+        }
+    },this);
 }
 
 /**
@@ -558,10 +568,13 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
     //基本信息、调度配置信息、增量配置信息
     if(templateModel!=null){
         //页面标题
-        $('title').text(templateModel.name);
-        $('#title_config').text(templateModel.name);
-        pageViewModel.basicInfoViewModel.name(templateModel.name);
-        pageViewModel.basicInfoViewModel.url(templateModel.url);
+        var templateName=templateModel.basicInfoViewModel.name;
+        $('title').text(templateName);
+        $('#title_config').text(templateName);
+        pageViewModel.basicInfoViewModel.name(templateName);
+        pageViewModel.basicInfoViewModel.url(templateModel.basicInfoViewModel.url);
+        pageViewModel.basicInfoViewModel.currentString(templateModel.basicInfoViewModel.currentString);
+        pageViewModel.basicInfoViewModel.templateTypesSelected(templateModel.basicInfoViewModel.templateType);
         //调度配置信息
         pageViewModel.scheduleDispatchViewModel.periodsSelected(templateModel.scheduleDispatchViewModel.period);
         pageViewModel.scheduleDispatchViewModel.sequence(templateModel.scheduleDispatchViewModel.sequence);
@@ -845,7 +858,9 @@ function getJSONString(obj){
         basicInfoViewModel:{
             url:obj.basicInfoViewModel.url(),
             name:obj.basicInfoViewModel.name(),
-            tag:obj.basicInfoViewModel.tagsSelected()
+            tag:obj.basicInfoViewModel.tagsSelected(),
+            templateType:obj.basicInfoViewModel.templateTypesSelected(),
+            currentString:obj.basicInfoViewModel.currentString()
         },
         newsCustomerAttrViewModel:obj.newsAttrModels(),
         newsTitleViewModel:{

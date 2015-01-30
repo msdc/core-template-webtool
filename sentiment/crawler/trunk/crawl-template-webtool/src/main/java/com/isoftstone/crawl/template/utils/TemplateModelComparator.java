@@ -10,6 +10,6 @@ import com.isoftstone.crawl.template.model.TemplateModel;
  * */
 public class TemplateModelComparator implements Comparator<TemplateModel> {
 	public int compare(TemplateModel t1, TemplateModel t2) {
-		return t1.getName().compareTo(t2.getName());
+		return t1.getBasicInfoViewModel().getName().compareTo(t2.getBasicInfoViewModel().getName());
 	}
 }

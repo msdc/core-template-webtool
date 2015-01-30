@@ -191,7 +191,7 @@ function templateViewModel(templateList){
     self.modalDelete=function(){
         var item=self.tempData();
         if(item){
-            var templateUrl=item.url;
+            var templateUrl=item.basicInfoViewModel.url;
             $.ajax({
                 url: virtualWebPath + '/webapi/crawlToolResource/deleteTemplate',
                 type: 'POST',
@@ -228,7 +228,7 @@ function templateViewModel(templateList){
     };
     self.updateItem=function(){
         var that=this;
-        var templateUrl=that.url;
+        var templateUrl=that.basicInfoViewModel.url;
         $.ajax({
             url: virtualWebPath + '/webapi/crawlToolResource/getTemplateGuid',
             type: 'POST',
@@ -252,8 +252,8 @@ function templateViewModel(templateList){
     };
     self.disableTemplate=function(){
         var that=this;
-        var templateUrl=that.url;
-        var name=that.name;
+        var templateUrl=that.basicInfoViewModel.url;
+        var name=that.basicInfoViewModel.name;
         $.ajax({
             url: virtualWebPath + '/webapi/crawlToolResource/disableTemplate',
             type: 'POST',
@@ -274,8 +274,8 @@ function templateViewModel(templateList){
     };
     self.enableTemplate=function(){
         var that=this;
-        var templateUrl=that.url;
-        var name=that.name;
+        var templateUrl=that.basicInfoViewModel.url;
+        var name=that.basicInfoViewModel.name;
         $.ajax({
             url: virtualWebPath + '/webapi/crawlToolResource/enableTemplate',
             type: 'POST',
