@@ -7,11 +7,10 @@ import java.util.List;
  * 模板列表实体
  * */
 public class TemplateModel {	
-   private String templateId="";
-   private String name="";
-   private String url="";
+   private String templateId="";   
    private String status="";
    private String description="";
+   private BasicInfoViewModel basicInfoViewModel;
    private ScheduleDispatchViewModel scheduleDispatchViewModel;
    private TemplateIncreaseViewModel templateIncreaseViewModel;
    private List<String> templateIncreaseIdList;
@@ -44,18 +43,6 @@ public String getAddedTime() {
 public void setAddedTime(String addedTime) {
 	this.addedTime = addedTime;
 }
-public String getName() {
-	return name;
-}
-public void setName(String name) {
-	this.name = name;
-}
-public String getUrl() {
-	return url;
-}
-public void setUrl(String url) {
-	this.url = url;
-}
 
 public ScheduleDispatchViewModel getScheduleDispatchViewModel() {
 	return scheduleDispatchViewModel;
@@ -75,5 +62,11 @@ public List<String> getTemplateIncreaseIdList() {
 }
 public void setTemplateIncreaseIdList(List<String> templateIncreaseIdList) {
 	this.templateIncreaseIdList = templateIncreaseIdList;
+}
+public BasicInfoViewModel getBasicInfoViewModel() {
+	return basicInfoViewModel;
+}
+public void setBasicInfoViewModel(BasicInfoViewModel basicInfoViewModel) {
+	this.basicInfoViewModel = basicInfoViewModel;
 }
 }

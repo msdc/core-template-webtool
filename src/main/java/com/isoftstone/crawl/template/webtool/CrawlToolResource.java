@@ -1053,10 +1053,15 @@ public class CrawlToolResource {
 		TemplateModel templateModel = new TemplateModel();
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		String templateGuid = MD5Utils.MD5(templateUrl);
-		templateModel.setTemplateId(templateGuid);
-		templateModel.setName(pageModel.getBasicInfoViewModel().getName());
-		templateModel.setDescription(pageModel.getBasicInfoViewModel().getName());
-		templateModel.setUrl(pageModel.getBasicInfoViewModel().getUrl());
+		templateModel.setTemplateId(templateGuid);		
+		templateModel.setDescription(pageModel.getBasicInfoViewModel().getName());		
+		
+		BasicInfoViewModel basicInfoViewModel=new BasicInfoViewModel();
+		basicInfoViewModel.setName(pageModel.getBasicInfoViewModel().getName());
+		basicInfoViewModel.setUrl(pageModel.getBasicInfoViewModel().getUrl());
+		basicInfoViewModel.setTemplateType(pageModel.getBasicInfoViewModel().getTemplateType());
+		basicInfoViewModel.setCurrentString(pageModel.getBasicInfoViewModel().getCurrentString());
+		templateModel.setBasicInfoViewModel(basicInfoViewModel);
 		
 		ScheduleDispatchViewModel scheduleDispatchViewModel=new ScheduleDispatchViewModel();
 		scheduleDispatchViewModel.setPeriod(pageModel.getScheduleDispatchViewModel().getPeriod());

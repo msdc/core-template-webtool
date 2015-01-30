@@ -144,14 +144,27 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
+                        <!--<div class="col-md-12">-->
+                            <!--<div class="form-group">-->
+                                <!--<div class="row">-->
+                                    <!--<div class="col-md-12">-->
+                                        <!--<label>模板类别</label>-->
+                                    <!--</div>-->
+                                    <!--<div class="col-md-6">-->
+                                        <!--<select class="form-control" data-bind="options: templateTypes, value:templateTypesSelected"></select>-->
+                                    <!--</div>-->
+                                    <!--<div class="col-md-6"></div>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
                         <div class="col-md-12">
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <label for="txt_url">模板Url</label>
+                                        <label for="txt_url">模板URL</label>
                                     </div>
                                     <div class="col-md-6">
-                                        <input type="text" class="form-control" data-bind="value: url" id="txt_url" placeholder="页面url">
+                                        <input type="text" class="form-control" data-bind="value: url" id="txt_url" placeholder="页面URL">
                                     </div>
                                     <div class="col-md-6">
                                         <button type="button" data-bind="click: viewHtmlContent" class="btn btn-primary">查看</button>
@@ -160,6 +173,17 @@
                                 </div>
                             </div>
                         </div>
+                        <!--<div class="col-md-12" data-bind="visible: showSearchTemplateField">-->
+                            <!--<div class="form-group">-->
+                                <!--<div class="row">-->
+                                    <!--<div class="col-md-6">-->
+                                        <!--<label>模板URL查询关键字</label>-->
+                                        <!--<input type="text" data-bind="value: currentString" class="form-control" placeholder="模板URL动态变化内容">-->
+                                    <!--</div>-->
+                                    <!--<div class="col-md-6"></div>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
                         <div class="col-md-12">
                             <div class="form-group">
                                 <div class="row">

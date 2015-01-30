@@ -8,6 +8,8 @@ public class BasicInfoViewModel {
 	private String url="";
 	private String name = "";
 	private String tag="";
+	private String templateType="";
+	private String currentString="";
 	
 	public String getUrl() {
 		return url;
@@ -28,5 +30,17 @@ public class BasicInfoViewModel {
 	}
 	public void setTag(String tag) {
 		this.tag = tag;
+	}
+	public String getTemplateType() {
+		return templateType;
+	}
+	public void setTemplateType(String templateType) {
+		this.templateType = templateType;
+	}
+	public String getCurrentString() {
+		return currentString;
+	}
+	public void setCurrentString(String currentString) {
+		this.currentString = currentString;
 	}
 }
