@@ -1047,7 +1047,7 @@ public class CrawlToolResource {
 	}
 
 	/**
-	 * 设置模板列表中单个模板的状态
+	 * 保存模板，设置模板列表中单个模板的状态
 	 * */
 	private TemplateModel setTemplateStatus(PageModel pageModel, String status) {
 		TemplateModel templateModel = new TemplateModel();
@@ -1079,7 +1079,7 @@ public class CrawlToolResource {
 	}
 
 	/**
-	 * 设置模板列表中单个模板的状态
+	 * 更改模板状态，设置模板列表中单个模板的状态
 	 * */
 	private void setTemplateStatus(String templateUrl, String name, String status) {
 		String templateGuid = MD5Utils.MD5(templateUrl);
