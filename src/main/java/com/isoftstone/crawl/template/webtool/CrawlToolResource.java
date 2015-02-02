@@ -1097,7 +1097,13 @@ public class CrawlToolResource {
         templateIncreaseViewModel.setPageSort(pageModel.getTemplateIncreaseViewModel().getPageSort());
         templateModel.setTemplateIncreaseViewModel(templateIncreaseViewModel);
 
-        templateModel.setStatus(status);
+        //修改时状态不变
+        if(!oldTemplateModel.getStatus().equals("")){
+        	templateModel.setStatus(oldTemplateModel.getStatus());
+        }else{
+        	 templateModel.setStatus(status);
+        }        
+       
 		return templateModel;
 	}
 
