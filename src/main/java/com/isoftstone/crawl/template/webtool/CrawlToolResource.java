@@ -808,7 +808,8 @@ public class CrawlToolResource {
 		for(String word: wordsList){			
 			//TODO:根据words关键字，处理pageModel中的相关信息:URL,名称,Tags,并重新赋值
 			String templateURL=pageModel.getBasicInfoViewModel().getUrl();
-			templateURL=templateURL.replace("###",word);
+			String currentString=pageModel.getBasicInfoViewModel().getCurrentString();
+			templateURL=templateURL.replace(currentString,word);
 			
 			//处理URL及名称
 			BasicInfoViewModel basicInfoViewModel=pageModel.getBasicInfoViewModel();
