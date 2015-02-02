@@ -815,8 +815,12 @@ public class CrawlToolResource {
 			
 			//处理URL及名称
 			BasicInfoViewModel basicInfoViewModel=pageModel.getBasicInfoViewModel();
+			String templateType=basicInfoViewModel.getTemplateType();
+			if(templateType.equals("百度新闻搜索")){
+				basicInfoViewModel.setName("百度新闻-"+word);
+			}
 			basicInfoViewModel.setUrl(templateURL);
-			basicInfoViewModel.setName("百度新闻-"+word);
+			
 			
 			//处理静态属性tags值
 			List<TemplateTagModel> templateTagsViewModel=pageModel.getTemplateTagsViewModel();
