@@ -81,6 +81,7 @@ function scheduleDispatchViewModel(){
     this.periods=ko.observableArray(['hour','day','week']);
     this.periodsSelected=ko.observable('hour');
     this.sequence=ko.observable();
+    this.useProxy=ko.observable(false);
 }
 
 /**
@@ -594,6 +595,7 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
         //调度配置信息
         pageViewModel.scheduleDispatchViewModel.periodsSelected(templateModel.scheduleDispatchViewModel.period);
         pageViewModel.scheduleDispatchViewModel.sequence(templateModel.scheduleDispatchViewModel.sequence);
+        pageViewModel.scheduleDispatchViewModel.useProxy(templateModel.scheduleDispatchViewModel.useProxy);
         //增量配置信息
         pageViewModel.templateIncreaseViewModel.periodsSelected(templateModel.templateIncreaseViewModel.period);
         pageViewModel.templateIncreaseViewModel.pageCounts(templateModel.templateIncreaseViewModel.pageCounts);
@@ -923,7 +925,8 @@ function getJSONString(obj){
         scheduleDispatchViewModel:{
             domain:getDomainByUrl(obj.basicInfoViewModel.url()),
             period:obj.scheduleDispatchViewModel.periodsSelected(),
-            sequence:obj.scheduleDispatchViewModel.sequence()
+            sequence:obj.scheduleDispatchViewModel.sequence(),
+            useProxy:obj.scheduleDispatchViewModel.useProxy()
         },
         templateTagsViewModel:obj.templateTagModels(),
         templateIncreaseViewModel:{

@@ -1067,6 +1067,7 @@ public class CrawlToolResource {
 		ScheduleDispatchViewModel scheduleDispatchViewModel=new ScheduleDispatchViewModel();
 		scheduleDispatchViewModel.setPeriod(pageModel.getScheduleDispatchViewModel().getPeriod());
 		scheduleDispatchViewModel.setSequence(pageModel.getScheduleDispatchViewModel().getSequence());
+		scheduleDispatchViewModel.setUseProxy(pageModel.getScheduleDispatchViewModel().getUseProxy());
 		templateModel.setScheduleDispatchViewModel(scheduleDispatchViewModel);
         
         TemplateIncreaseViewModel templateIncreaseViewModel=new TemplateIncreaseViewModel();
