@@ -8,6 +8,7 @@ public class ScheduleDispatchViewModel {
 	private String domain="";
 	private String period = "";
 	private String sequence="";
+	private boolean useProxy;
 	
 	public String getDomain() {
 		return domain;
@@ -28,5 +29,11 @@ public class ScheduleDispatchViewModel {
 	}
 	public void setSequence(String sequence) {
 		this.sequence = sequence;
+	}
+	public boolean getUseProxy() {
+		return useProxy;
+	}
+	public void setUseProxy(boolean useProxy) {
+		this.useProxy = useProxy;
 	}
 }
