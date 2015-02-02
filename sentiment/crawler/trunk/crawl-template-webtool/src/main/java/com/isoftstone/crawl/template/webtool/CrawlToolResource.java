@@ -99,6 +99,7 @@ public class CrawlToolResource {
 //		String period = pageModel.getScheduleDispatchViewModel().getPeriod();
 		String period = pageModel.getTemplateIncreaseViewModel().getPeriod();
 		String sequence = pageModel.getScheduleDispatchViewModel().getSequence();
+		boolean userProxy = pageModel.getScheduleDispatchViewModel().getUseProxy();
 		if (sequence == null || sequence.equals("")) {
 			jsonProvider.setSuccess(false);
 			jsonProvider.setErrorMsg("保存失败，请输入时序.");	
@@ -142,7 +143,7 @@ public class CrawlToolResource {
                 seeds.add(seedsTemp.get(i));
             }
         }
-		saveSeedsValueToFile(folderName, incrementFolderName, templateUrl, seeds, status);
+		saveSeedsValueToFile(folderName, incrementFolderName, templateUrl, seeds, status, userProxy);
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("文件保存成功!");
 		return jsonProvider.toJSON();
@@ -152,7 +153,7 @@ public class CrawlToolResource {
 	 * 保存种子到本地文件. 并将文件夹相关信息存入redis.
 	 */
 	private void saveSeedsValueToFile(String folderName, String incrementFolderName, 
-	        String templateUrl, List<String> seeds, String status) {
+	        String templateUrl, List<String> seeds, String status, boolean userProxy) {
 		// --1.1 保存模板url到本地文件.
 	    List<String> templateList = new ArrayList<String>();
 	    templateList.add(templateUrl);
@@ -168,6 +169,7 @@ public class CrawlToolResource {
 		    dispatchVo = new DispatchVo();
 		}
 		dispatchVo.setStatus(WebtoolConstants.DISPATCH_STATIS_START);
+		dispatchVo.setUserProxy(userProxy);
 		List<Seed> seedList = dispatchVo.getSeed();
 		if(seedList == null) {
 		    seedList = new ArrayList<Seed>();
