@@ -99,6 +99,8 @@ function btnModalImportConfirmHandler(){
             modalFooter.html(modalFooterHtml);
         },
         error: function (error) {
+            modalBody.html(modalBodyHtml);
+            modalFooter.html(modalFooterHtml);
             $('#export_result').text('');
             $('#export_result').text("操作失败！错误信息:"+error.responseText);
         }
@@ -137,6 +139,8 @@ function btnModalExportConfirmHandler(){
             modalFooter.html(modalFooterHtml);
         },
         error: function (error) {
+            modalBody.html(modalBodyHtml);
+            modalFooter.html(modalFooterHtml);
             $('#export_result').text('');
             $('#export_result').text("操作失败！错误信息:"+error.responseText);
         }
