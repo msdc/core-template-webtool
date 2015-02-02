@@ -11,8 +11,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -974,9 +976,7 @@ public class CrawlToolResource {
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		ParseResult parseResult = null;
 		byte[] input = DownloadHtml.getHtml(templateUrl);
-		String encoding = sniffCharacterEncoding(input);		
-		//保存增量模板 不需要保存列表文件
-		//SaveTemplateToList(pageModel, "true");// 保存数据源列表所需要的key值
+		String encoding = sniffCharacterEncoding(input);				
 		parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
 		if(parseResult==null){
 			jsonProvider.setSuccess(false);
@@ -996,6 +996,16 @@ public class CrawlToolResource {
 			int counts=Integer.parseInt(pageCounts);	
 			//增量模板移除分页
 			templateResult.setPagination(null);
+			String templateGuid = MD5Utils.MD5(templateUrl);	
+			 //先取之前的模板列表JSON字符串           
+	        String singleTemplateListModel=RedisOperator.getFromDefaultDB(templateGuid+key_partern);        
+	        TemplateModel singleTemplateModel=GetTemplateModel(singleTemplateListModel);
+	        //删除之前的增量模板
+	        if(singleTemplateModel.getTemplateIncreaseIdList()!=null){
+	        	for(String oldIncreaseTemplateId: singleTemplateModel.getTemplateIncreaseIdList()){
+	        		RedisOperator.delFromIncreaseDB(oldIncreaseTemplateId);
+	        	}
+	        }
 			if(paginationOutlinkArray.size()>=counts){
 				//记录增量模板id
 				List<String> increaseTemplateIdList=new ArrayList<String>();
@@ -1018,10 +1028,7 @@ public class CrawlToolResource {
 						RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);
 					}
 				}
-				String templateGuid = MD5Utils.MD5(templateUrl);	
-				 //先取之前的模板列表JSON字符串           
-		        String singleTemplateListModel=RedisOperator.getFromDefaultDB(templateGuid+key_partern);        
-		        TemplateModel singleTemplateModel=GetTemplateModel(singleTemplateListModel);
+				//保存新的增量模板列表
 		        singleTemplateModel.setTemplateIncreaseIdList(increaseTemplateIdList);
 		        RedisOperator.setToDefaultDB(templateGuid+key_partern, GetTemplateModelJSONString(singleTemplateModel));
 			}else{
@@ -1068,6 +1075,20 @@ public class CrawlToolResource {
 		scheduleDispatchViewModel.setPeriod(pageModel.getScheduleDispatchViewModel().getPeriod());
 		scheduleDispatchViewModel.setSequence(pageModel.getScheduleDispatchViewModel().getSequence());
 		scheduleDispatchViewModel.setUseProxy(pageModel.getScheduleDispatchViewModel().getUseProxy());
+		 //这里必须先取之前的模板列表JSON字符串，因为增量模板列表可能因为修改操作而被覆盖           
+        String singleTemplateListModel=RedisOperator.getFromDefaultDB(templateGuid+key_partern);     
+		TemplateModel oldTemplateModel = GetTemplateModel(singleTemplateListModel);	
+		if(oldTemplateModel.getTemplateIncreaseIdList()!=null){//修改操作时，保存原来的增量模板列表
+			templateModel.setTemplateIncreaseIdList(oldTemplateModel.getTemplateIncreaseIdList());			
+		}		
+		if(!oldTemplateModel.getAddedTime().equals("")){//修改操作时，时间不变
+			templateModel.setAddedTime(oldTemplateModel.getAddedTime());
+		}else{
+			Date currentDate=new Date();
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String nowDateString = dateFormat.format(currentDate);
+			templateModel.setAddedTime(nowDateString);
+		}
 		templateModel.setScheduleDispatchViewModel(scheduleDispatchViewModel);
         
         TemplateIncreaseViewModel templateIncreaseViewModel=new TemplateIncreaseViewModel();
