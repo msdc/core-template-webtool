@@ -69,6 +69,14 @@ function registerExportModalEvent(){
 
 function btnModalImportConfirmHandler(){
     var filePath=$('#file_path').val();
+    var modalBody=$('#model_export').find('.modal-body');
+    var modalBodyHtml=modalBody.html();
+    var modalFooter=$('#model_export').find('.modal-footer');
+    var modalFooterHtml=modalFooter.html();
+    //清空modalBody内容
+    modalBody.html('');
+    modalBody.html('<div class=\"text-center\"><img src=\"image/load.gif\"></div>');
+    modalFooter.html('');
     $.ajax({
         url: virtualWebPath + '/webapi/crawlToolResource/importAllTemplates',
         type: 'POST',
@@ -87,6 +95,8 @@ function btnModalImportConfirmHandler(){
                 }
             }
             $('#model_export').modal('hide');
+            modalBody.html(modalBodyHtml);
+            modalFooter.html(modalFooterHtml);
         },
         error: function (error) {
             $('#export_result').text('');
@@ -97,6 +107,14 @@ function btnModalImportConfirmHandler(){
 
 function btnModalExportConfirmHandler(){
     var filePath=$('#file_path').val();
+    var modalBody=$('#model_export').find('.modal-body');
+    var modalBodyHtml=modalBody.html();
+    var modalFooter=$('#model_export').find('.modal-footer');
+    var modalFooterHtml=modalFooter.html();
+    //清空modalBody内容
+    modalBody.html('');
+    modalBody.html('<div class=\"text-center\"><img src=\"image/load.gif\"></div>');
+    modalFooter.html('');
     $.ajax({
         url: virtualWebPath + '/webapi/crawlToolResource/exportAllTemplates',
         type: 'POST',
@@ -115,6 +133,8 @@ function btnModalExportConfirmHandler(){
                 }
             }
             $('#model_export').modal('hide');
+            modalBody.html(modalBodyHtml);
+            modalFooter.html(modalFooterHtml);
         },
         error: function (error) {
             $('#export_result').text('');
