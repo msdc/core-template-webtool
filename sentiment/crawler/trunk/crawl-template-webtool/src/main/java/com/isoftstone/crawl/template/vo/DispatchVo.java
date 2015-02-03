@@ -4,24 +4,40 @@ import java.util.List;
 
 public class DispatchVo {
 
-	private List<Seed> seed;
+    private List<Seed> seed;
 
-	private String status;
+    private String status;
 
-	public List<Seed> getSeed() {
-		return seed;
-	}
+    private boolean userProxy;
 
-	public void setSeed(List<Seed> seed) {
-		this.seed = seed;
-	}
+    public List<Seed> getSeed() {
+        return seed;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public void setSeed(List<Seed> seed) {
+        this.seed = seed;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    /**
+     * @return the userProxy
+     */
+    public boolean isUserProxy() {
+        return userProxy;
+    }
+
+    /**
+     * @param userProxy the userProxy to set
+     */
+    public void setUserProxy(boolean userProxy) {
+        this.userProxy = userProxy;
+    }
 
 }
