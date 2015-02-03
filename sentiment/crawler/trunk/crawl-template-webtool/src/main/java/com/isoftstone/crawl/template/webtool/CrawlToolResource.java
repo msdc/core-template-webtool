@@ -325,7 +325,7 @@ public class CrawlToolResource {
             //new SFTPUtils().copyFile(runmanager, folderPath, folderPath);
             String desCopyRootFolder = Config.getValue(WebtoolConstants.KEY_DES_FOLDER);
             command = "scp -r " + folderRoot + File.separator + folderName
-                    + " " + desCopyRootFolder + folderName;
+                    + " " + desCopyRootFolder;
         } else {
             // FIXME:集群模式，执行的命令.
         }
