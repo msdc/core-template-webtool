@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../css/bootstrap.css" type="text/css"/>
+    <link rel="stylesheet" href="../../css/main.css" type="text/css"/>
+    <script src="../../js/jQuery.js" type="text/javascript"></script>
+    <script src="../../js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="../../js/knockout.js" type="text/javascript"></script>
+    <title>爬取运行监控</title>
+</head>
+<body>
+<div class="container">
+
+    <div class="row">
+         <div class="col-md-12">
+             <h3 class="text-center">爬取运行监控</h3>
+         </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div role="tabpanel">
+                <!-- Nav tabs --> <!--nav nav-tabs nav-stacked-->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#seeds_effective" aria-controls="seeds_effective"
+                                                              role="tab"
+                                                              data-toggle="tab">种子有效性</a></li>
+                    <li role="presentation"><a href="#crawl_status" aria-controls="crawl_status" role="tab"
+                                               data-toggle="tab">爬取状态</a>
+                    </li>
+                    <li role="presentation"><a href="#crawl_data" aria-controls="crawl_data" role="tab"
+                                               data-toggle="tab">爬取数据</a>
+                    </li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="seeds_effective">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                    <tr>
+                                        <td>序号</td>
+                                        <td>名称</td>
+                                        <td>数据源地址</td>
+                                        <td>有效性状态</td>
+                                        <td>操作</td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>上海证券报-信托研究</td>
+                                        <td>http://caifu.cnstock.com/list/xingtuo_yanjiu</td>
+                                        <td>有效</td>
+                                        <td>
+                                            <button type="button" class="btn btn-primary">详细</button>
+                                            <a role="button" class="btn btn-primary">设置</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>上海证券报-信托调查</td>
+                                        <td>http://caifu.cnstock.com/list/xingtuo_diaocha</td>
+                                        <td>有效</td>
+                                        <td>
+                                            <button type="button" class="btn btn-primary">详细</button>
+                                            <a role="button" class="btn btn-primary">设置</a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td colspan="5">
+                                            <div id="seeds_effective_pagination"></div>
+                                        </td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="crawl_status">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                    <tr>
+                                        <td>序号</td>
+                                        <td>名称</td>
+                                        <td>数据源地址</td>
+                                        <td>爬取状态</td>
+                                        <td>操作</td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>上海证券报-信托研究</td>
+                                        <td>http://caifu.cnstock.com/list/xingtuo_yanjiu</td>
+                                        <td>爬去中</td>
+                                        <td>
+                                            <button type="button" class="btn btn-primary">详细</button>
+                                            <a role="button" class="btn btn-primary">停止</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>上海证券报-信托调查</td>
+                                        <td>http://caifu.cnstock.com/list/xingtuo_diaocha</td>
+                                        <td>注入</td>
+                                        <td>
+                                            <button type="button" class="btn btn-primary">详细</button>
+                                            <a role="button" class="btn btn-primary">停止</a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td colspan="5">
+                                            <div id="crawl_status_pagination"></div>
+                                        </td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="crawl_data">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                    <tr>
+                                        <td>序号</td>
+                                        <td>名称</td>
+                                        <td>数据源地址</td>
+                                        <td>已索引条数</td>
+                                        <td>操作</td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>上海证券报-信托研究</td>
+                                        <td>http://caifu.cnstock.com/list/xingtuo_yanjiu</td>
+                                        <td>2890</td>
+                                        <td>
+                                            <button type="button" class="btn btn-primary">详细</button>
+                                            <a role="button" class="btn btn-primary">停止</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>上海证券报-信托调查</td>
+                                        <td>http://caifu.cnstock.com/list/xingtuo_diaocha</td>
+                                        <td>2234</td>
+                                        <td>
+                                            <button type="button" class="btn btn-primary">详细</button>
+                                            <a role="button" class="btn btn-primary">刷新</a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td colspan="5">
+                                            <div id="crawl_data_pagination"></div>
+                                        </td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
