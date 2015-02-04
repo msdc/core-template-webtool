@@ -1012,36 +1012,44 @@ public class CrawlToolResource {
 	        		RedisOperator.delFromIncreaseDB(oldIncreaseTemplateId);
 	        	}
 	        }
-			if(paginationOutlinkArray.size()>=counts){
-				//记录增量模板id
-				List<String> increaseTemplateIdList=new ArrayList<String>();
-				if(pageSort.equals("升序")){
-					for (int i = 0; i < counts; i++) {
-						String paginationUrl=paginationOutlinkArray.get(i);
-						String paginationUrlGuid=MD5Utils.MD5(paginationUrl);						
-						increaseTemplateIdList.add(paginationUrlGuid);
-						//修改模板的guid
-						templateResult.setTemplateGuid(paginationUrlGuid);
-						RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);						
+	        
+	        if(paginationOutlinkArray!=null){
+				if(paginationOutlinkArray.size()>=counts){
+					//记录增量模板id
+					List<String> increaseTemplateIdList=new ArrayList<String>();
+					if(pageSort.equals("升序")){
+						for (int i = 0; i < counts-1; i++) {
+							String paginationUrl=paginationOutlinkArray.get(i);
+							String paginationUrlGuid=MD5Utils.MD5(paginationUrl);						
+							increaseTemplateIdList.add(paginationUrlGuid);
+							//修改模板的guid
+							templateResult.setTemplateGuid(paginationUrlGuid);
+							RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);						
+						}
+					}else{
+						for (int i = 0; i < counts-1; i++) {
+							String paginationUrl=paginationOutlinkArray.get(paginationOutlinkArray.size()-(i+1));
+							String paginationUrlGuid=MD5Utils.MD5(paginationUrl);	
+							increaseTemplateIdList.add(paginationUrlGuid);
+							//修改模板的guid
+							templateResult.setTemplateGuid(paginationUrlGuid);
+							RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);
+						}
 					}
+					//保存增量的首页模板
+					increaseTemplateIdList.add(templateGuid);
+					templateResult.setTemplateGuid(templateGuid);
+					RedisOperator.saveTemplateToIncreaseDB(templateResult, templateGuid);
+					
+					//保存新的增量模板列表
+			        singleTemplateModel.setTemplateIncreaseIdList(increaseTemplateIdList);
+			        RedisOperator.setToDefaultDB(templateGuid+key_partern, GetTemplateModelJSONString(singleTemplateModel));
 				}else{
-					for (int i = 0; i < counts; i++) {
-						String paginationUrl=paginationOutlinkArray.get(paginationOutlinkArray.size()-(i+1));
-						String paginationUrlGuid=MD5Utils.MD5(paginationUrl);	
-						increaseTemplateIdList.add(paginationUrlGuid);
-						//修改模板的guid
-						templateResult.setTemplateGuid(paginationUrlGuid);
-						RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);
-					}
-				}
-				//保存新的增量模板列表
-		        singleTemplateModel.setTemplateIncreaseIdList(increaseTemplateIdList);
-		        RedisOperator.setToDefaultDB(templateGuid+key_partern, GetTemplateModelJSONString(singleTemplateModel));
-			}else{
-				jsonProvider.setSuccess(false);
-				jsonProvider.setErrorMsg("请检查列表分页配置，未能解析到pagination_outlink！");
-				return jsonProvider;
-			}
+					jsonProvider.setSuccess(false);
+					jsonProvider.setErrorMsg("请检查配置是否正确，解析到pagination_outlink个数不应该小于增量配置中的页数量，配置信息错误！");
+					return jsonProvider;
+				}	        	
+	        }
 		}
 		jsonProvider.setData("增量模板保存成功!");
 		return jsonProvider;
