@@ -139,7 +139,7 @@ public class CrawlToolResource {
                 seeds.add(seedsTemp.get(i));
             }
         }else {
-            for(int i = seedsTemp.size() - 1; i > 0 && incrementPageCount > 0; i--, incrementPageCount--) {
+            for(int i = seedsTemp.size() - 1; i >= 0 && incrementPageCount > 0; i--, incrementPageCount--) {
                 seeds.add(seedsTemp.get(i));
             }
         }
