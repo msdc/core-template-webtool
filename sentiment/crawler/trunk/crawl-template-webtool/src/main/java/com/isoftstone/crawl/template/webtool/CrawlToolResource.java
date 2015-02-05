@@ -547,31 +547,23 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String GetTemplateList() {
 		ResponseJSONProvider<TemplateList> jsonProvider=new ResponseJSONProvider<TemplateList>();
-		jsonProvider.setSuccess(true);
-		JedisPool pool = null;
-		Jedis jedis = null;
+		jsonProvider.setSuccess(true);		
 		TemplateList templateList = new TemplateList();
 		List<TemplateModel> templateListArrayList = new ArrayList<TemplateModel>();
-		try {
-			pool = RedisUtils.getPool();
-			jedis = pool.getResource();
-			jedis.select(RedisOperator.DEFAULT_DBINDEX);
-			Set<String> listKeys = jedis.keys("*" + key_partern);
+		try {			
+			Set<String> listKeys =RedisOperator.searchKeysFromDefaultDB("*" + key_partern);
 			if(listKeys!=null){
 				for (String key : listKeys) {
-					String templateString = jedis.get(key);
+					String templateString =RedisOperator.getFromDefaultDB(key);
 					TemplateModel templateModel = GetTemplateModel(templateString);
 					templateListArrayList.add(templateModel);
 				}
 			}			
 		} catch (Exception e) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("Redis操作异常！");
-			pool.returnBrokenResource(jedis);
+			jsonProvider.setErrorMsg("Redis操作异常！");			
 			e.printStackTrace();
-		} finally {
-			RedisUtils.returnResource(pool, jedis);
-		}
+		} 
 		//列表按名称排序
         Collections.sort(templateListArrayList, new TemplateModelComparator());		 
 		templateList.setTemplateList(templateListArrayList);
@@ -596,18 +588,14 @@ public class CrawlToolResource {
 		}else if(searchString.equals("停用")){
 			searchString="false";
 		}
-		JedisPool pool = null;
-		Jedis jedis = null;		
+		
 		TemplateList templateList = new TemplateList();
 		List<TemplateModel> templateListArrayList = new ArrayList<TemplateModel>();
-		try {
-			pool = RedisUtils.getPool();
-			jedis = pool.getResource();
-			jedis.select(RedisOperator.DEFAULT_DBINDEX);
-			Set<String> listKeys = jedis.keys("*" + key_partern);
+		try {			
+			Set<String> listKeys =RedisOperator.searchKeysFromDefaultDB("*" + key_partern);
 			if(listKeys!=null){
 				for (String key : listKeys) {
-					String templateString = jedis.get(key);
+					String templateString =RedisOperator.getFromDefaultDB(key);
 					if(templateString.contains(searchString)){
 						TemplateModel templateModel = GetTemplateModel(templateString);
 						templateListArrayList.add(templateModel);
@@ -616,12 +604,9 @@ public class CrawlToolResource {
 			}			
 		} catch (Exception e) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("Redis操作异常！");
-			pool.returnBrokenResource(jedis);
+			jsonProvider.setErrorMsg("Redis操作异常！");			
 			e.printStackTrace();
-		} finally {
-			RedisUtils.returnResource(pool, jedis);
-		}	
+		} 
 		//列表按名称排序
 		Collections.sort(templateListArrayList, new TemplateModelComparator());	
 		templateList.setTemplateList(templateListArrayList);		
@@ -910,14 +895,11 @@ public class CrawlToolResource {
 		ObjectMapper objectmapper = new ObjectMapper();
 		try {
 			json = objectmapper.writeValueAsString(templateModel);
-		} catch (JsonGenerationException e) {
-			// TODO Auto-generated catch block
+		} catch (JsonGenerationException e) {			
 			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
+		} catch (JsonMappingException e) {			
 			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {			
 			e.printStackTrace();
 		}
 		return json;
@@ -931,14 +913,11 @@ public class CrawlToolResource {
 		try {
 			ObjectMapper objectmapper = new ObjectMapper();
 			templateModel = objectmapper.readValue(jsonString, TemplateModel.class);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
+		} catch (JsonParseException e) {			
 			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
+		} catch (JsonMappingException e) {			
 			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {			
 			e.printStackTrace();
 		}
 		return templateModel;
@@ -1257,14 +1236,11 @@ public class CrawlToolResource {
 		try {
 			ObjectMapper objectmapper = new ObjectMapper();
 			pageModel = objectmapper.readValue(json, PageModel.class);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
+		} catch (JsonParseException e) {			
 			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
+		} catch (JsonMappingException e) {			
 			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {			
 			e.printStackTrace();
 		}
 		return pageModel;
@@ -1407,8 +1383,7 @@ public class CrawlToolResource {
 		if (!pageModel.getListPaginationViewModel().getInterval().equals("")) {
 			try {
 				paginationInterval = Integer.parseInt(pageModel.getListPaginationViewModel().getInterval());
-			} catch (Exception e) {
-				// TODO: handle exception
+			} catch (Exception e) {				
 				e.printStackTrace();
 				paginationInterval = 0;
 			}
