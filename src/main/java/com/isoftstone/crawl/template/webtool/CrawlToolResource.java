@@ -695,19 +695,14 @@ public class CrawlToolResource {
 			return jsonProvider.toJSON();
 		}
 				
-		JedisPool pool = null;
-		Jedis jedis = null;			
-		try {
-			pool = RedisUtils.getPool();
-			jedis = pool.getResource();
-			jedis.select(RedisOperator.DEFAULT_DBINDEX);
-			Set<String> listKeys = jedis.keys("*" + key_partern);
+		try {			
+			Set<String> listKeys = RedisOperator.searchKeysFromDefaultDB("*" + key_partern);
 			if(listKeys!=null){
 				for (String key : listKeys) {
-					String templateString = jedis.get(key);
+					String templateString = RedisOperator.getFromDefaultDB(key);
 					TemplateModel templateModel = GetTemplateModel(templateString);
 					String templateGuid = templateModel.getTemplateId();
-					String templateJsonString = jedis.get(templateGuid);
+					String templateJsonString = RedisOperator.getFromDefaultDB(templateGuid);
 					String templateFileName = templateGuid + file_extensionName;
 					String templateListName = key + file_extensionName;
 					// 保存模板
@@ -718,7 +713,7 @@ public class CrawlToolResource {
 					List<String> increaseTemplateIdList=templateModel.getTemplateIncreaseIdList();
 					if(increaseTemplateIdList!=null){
 						for(String increaseTemplateId:increaseTemplateIdList){
-							String increaseTemplateJsonString=jedis.get(increaseTemplateId);
+							String increaseTemplateJsonString=RedisOperator.getFromIncreaseDB(increaseTemplateId);
 							String increaseTemplateFileName=increaseTemplateId+WebtoolConstants.INCREASE_TEMPLATE_PARTERN+file_extensionName;
 							//导出增量模板
 							exportTemplateJSONStringToFile(newFilePath + increaseTemplateFileName,increaseTemplateJsonString);
@@ -729,12 +724,9 @@ public class CrawlToolResource {
 		} catch (Exception e) {		
 			jsonProvider.setSuccess(false);
 			jsonProvider.setErrorMsg("导出模板操作失败！");
-			jsonProvider.setData(null);
-			pool.returnBrokenResource(jedis);
+			jsonProvider.setData(null);	
 			e.printStackTrace();
-		} finally {
-			RedisUtils.returnResource(pool, jedis);
-		}
+		}		
 		return jsonProvider.toJSON();
 	}
 
