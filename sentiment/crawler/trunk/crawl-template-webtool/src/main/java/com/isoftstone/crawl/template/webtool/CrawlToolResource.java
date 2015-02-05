@@ -749,13 +749,9 @@ public class CrawlToolResource {
 			jsonProvider.setErrorMsg("pathInvalid");
 			jsonProvider.setData(null);
 			return jsonProvider.toJSON();
-		}
+		}		
 		
-		JedisPool pool = null;
-		Jedis jedis = null;		
-		try {
-			pool = RedisUtils.getPool();
-			jedis = pool.getResource();
+		try {			
 			File file = new File(newFilePath);
 			File[] files = file.listFiles();
 			for (File f : files) {
@@ -765,23 +761,19 @@ public class CrawlToolResource {
 					String templateGuid=null;
 					if(fileName.contains(WebtoolConstants.INCREASE_TEMPLATE_PARTERN)){
 						templateGuid = fileName.substring(0, fileName.lastIndexOf(WebtoolConstants.INCREASE_TEMPLATE_PARTERN));
-						jedis.select(RedisOperator.INCREASE_DBINDEX);	
+						RedisOperator.setToIncreaseDB(templateGuid, templateString);	
 					}else{
 						templateGuid = fileName.substring(0, fileName.lastIndexOf("."));
-						jedis.select(RedisOperator.DEFAULT_DBINDEX);						
+						RedisOperator.setToDefaultDB(templateGuid, templateString);					
 					}
-					jedis.set(templateGuid, templateString);
 				}
 			}
 		} catch (Exception e) {
 			jsonProvider.setSuccess(false);
 			jsonProvider.setErrorMsg("导入模板操作失败！");
 			jsonProvider.setData(null);			
-			e.printStackTrace();
-			pool.returnBrokenResource(jedis);
-		} finally {
-			RedisUtils.returnResource(pool, jedis);
-		}
+			e.printStackTrace();			
+		} 
 
 		return jsonProvider.toJSON();
 	}
