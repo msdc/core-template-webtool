@@ -849,6 +849,39 @@ public class CrawlToolResource {
 	
 	/**
 	 * 
+	 * 根据关键字，自动批量生成增量模板
+	 * */	
+	@GET
+	@Path("/generateAllIncreaseTemplates")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String GenerateAllIncreaseTemplates(){
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
+		jsonProvider.setSuccess(true);
+		StringBuilder sbString=new StringBuilder();		
+		sbString.append("批量生成增量模板执行完成！结果如下:<br/>");
+		Set<String> templateListKeys=RedisOperator.searchKeysFromDefaultDB("*" + key_partern);
+		int failedTemplateCount=0;
+		for (String listKey : templateListKeys) {			
+			String templateModelJSONString=RedisOperator.getFromDefaultDB(listKey);
+			TemplateModel templateModel=GetTemplateModel(templateModelJSONString);
+			ResponseJSONProvider<String> saveResult=saveIncreaseTemplateResult(templateModel);
+			if(saveResult.getErrorMsg()!=null){
+				failedTemplateCount++;				
+				sbString.append(failedTemplateCount+"."+saveResult.getErrorMsg()+"<br/>");
+			}
+		}
+		if(failedTemplateCount>0){
+			sbString.append("共找到"+templateListKeys.size()+"个模板，其中"+failedTemplateCount+"个未成功生成增量模板，请根据上述说明进行检查！<br/>");
+		}else{
+			sbString.append("共找到"+templateListKeys.size()+"个模板,全部成功生成增量模板！<br/>");
+		}
+		
+		jsonProvider.setData(sbString.toString());		
+		return jsonProvider.toJSON();
+	}
+	
+	/**
+	 * 
 	 * 读取文件
 	 * */
 	private String importTemplateJSONString(String path) throws IOException {
@@ -1055,6 +1088,101 @@ public class CrawlToolResource {
 		return jsonProvider;
 	}	
 
+    /**
+     * 
+     * 生成增量模板
+     * */
+	private ResponseJSONProvider<String> saveIncreaseTemplateResult(TemplateModel singleTemplateListModel){	
+		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
+		jsonProvider.setSuccess(true);
+		TemplateResult templateResult =RedisOperator.getTemplateResultFromDefaultDB(singleTemplateListModel.getTemplateId());
+		String templateUrl = singleTemplateListModel.getBasicInfoViewModel().getUrl();
+		ParseResult parseResult = null;
+		byte[] input=null;
+		String encoding=null;
+		try {
+			input = DownloadHtml.getHtml(templateUrl);
+		} catch (Exception e) {
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("模板名称:"+singleTemplateListModel.getBasicInfoViewModel().getName()+",无法访问该网站！");
+			return jsonProvider;
+		}
+		try {
+			encoding= sniffCharacterEncoding(input);	
+		} catch (Exception e) {
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("模板名称:"+singleTemplateListModel.getBasicInfoViewModel().getName()+",无法获取该网站编码格式！");
+			return jsonProvider;			
+		}
+					
+		parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
+		if(parseResult==null){
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("请先保存常规模板！");
+			return jsonProvider;
+		}		
+		String pageSort=singleTemplateListModel.getTemplateIncreaseViewModel().getPageSort();
+		String pageCounts=singleTemplateListModel.getTemplateIncreaseViewModel().getPageCounts();	
+		
+		ArrayList<String> paginationOutlinkArray = TemplateFactory.getPaginationOutlink(parseResult);
+		
+		if(pageCounts.equals("")){
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("模板名称:"+singleTemplateListModel.getBasicInfoViewModel().getName()+"中，增量配置的中页数值不能为空！");
+			return jsonProvider;
+		}else{
+			int counts=Integer.parseInt(pageCounts);	
+			//增量模板移除分页
+			templateResult.setPagination(null);
+			String templateGuid = singleTemplateListModel.getTemplateId();
+	        //删除之前的增量模板
+	        if(singleTemplateListModel.getTemplateIncreaseIdList()!=null){
+	        	for(String oldIncreaseTemplateId: singleTemplateListModel.getTemplateIncreaseIdList()){
+	        		RedisOperator.delFromIncreaseDB(oldIncreaseTemplateId);
+	        	}
+	        }
+	        
+	        if(paginationOutlinkArray!=null){
+				if(paginationOutlinkArray.size()>=counts){
+					//记录增量模板id
+					List<String> increaseTemplateIdList=new ArrayList<String>();
+					if(pageSort.equals("升序")){
+						for (int i = 0; i < counts-1; i++) {
+							String paginationUrl=paginationOutlinkArray.get(i);
+							String paginationUrlGuid=MD5Utils.MD5(paginationUrl);						
+							increaseTemplateIdList.add(paginationUrlGuid);
+							//修改模板的guid
+							templateResult.setTemplateGuid(paginationUrlGuid);
+							RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);						
+						}
+					}else{
+						for (int i = 0; i < counts-1; i++) {
+							String paginationUrl=paginationOutlinkArray.get(paginationOutlinkArray.size()-(i+1));
+							String paginationUrlGuid=MD5Utils.MD5(paginationUrl);	
+							increaseTemplateIdList.add(paginationUrlGuid);
+							//修改模板的guid
+							templateResult.setTemplateGuid(paginationUrlGuid);
+							RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);
+						}
+					}
+					//保存增量的首页模板
+					increaseTemplateIdList.add(templateGuid);
+					templateResult.setTemplateGuid(templateGuid);
+					RedisOperator.saveTemplateToIncreaseDB(templateResult, templateGuid);
+					
+					//保存新的增量模板列表
+					singleTemplateListModel.setTemplateIncreaseIdList(increaseTemplateIdList);
+			        RedisOperator.setToDefaultDB(templateGuid+key_partern, GetTemplateModelJSONString(singleTemplateListModel));
+				}else{
+					jsonProvider.setSuccess(false);
+					jsonProvider.setErrorMsg("模板名称:"+singleTemplateListModel.getBasicInfoViewModel().getName()+"，请检查配置是否正确，解析到pagination_outlink个数不应该小于增量配置中的页数量，配置信息错误！");
+					return jsonProvider;
+				}	        	
+	        }
+		}
+		jsonProvider.setData("success");
+		return jsonProvider;
+	}	
 
 	/**
 	 * 将redis中模板的id和数据源列表做关联

@@ -31,6 +31,22 @@
     </div>
 </div>
 
+<!--批量生成增量模板提示-->
+<div class="modal fade" id="modal_generate_increase" tabindex="-1" role="dialog" aria-labelledby="modal_generate_increase_title" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="modal_generate_increase_title">批量生成增量模板结果</h4>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!--导入导出-->
 <div class="modal fade" id="model_export" tabindex="-1" role="dialog" aria-labelledby="model_export_title"
      aria-hidden="true">
@@ -80,6 +96,7 @@
             <button type="button" class="btn btn-primary" data-bind="click: addNew">添加</button>
             <button type="button" class="btn btn-primary" data-optiontype="file_export" data-toggle="modal" data-target="#model_export">批量导出模板</button>
             <button type="button" class="btn btn-primary" data-optiontype="file_import" data-toggle="modal" data-target="#model_export">批量导入模板</button>
+            <button type="button" class="btn btn-primary" data-bind="click: generateAllIncreaseTemplates">批量生成增量模板</button>
         </div>
         <div class="col-md-4 text-right">
             <div class="input-group">

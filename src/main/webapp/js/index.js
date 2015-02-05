@@ -210,7 +210,25 @@ function templateViewModel(templateList){
             }
         });
     };
-
+    //批量生成增量模板
+    self.generateAllIncreaseTemplates=function(){
+        var increaseModel=$('#modal_generate_increase');
+        var informationBody=increaseModel.find('.modal-body');
+        informationBody.html('');
+        $.ajax2({
+            url: virtualWebPath + '/webapi/crawlToolResource/generateAllIncreaseTemplates',
+            type: 'GET',
+            success: function (data) {
+                var json=JSON.parse(data);
+                informationBody.html(json.data);
+                increaseModel.modal('show');
+            },
+            error: function (error) {
+                informationBody.html("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;批量生成增量模板失败！<br/>");
+                increaseModel.modal('show');
+            }
+        });
+    };
     //删除对话框中的【确定】按钮
     self.modalDelete=function(){
         var item=self.tempData();
@@ -391,3 +409,50 @@ function optionExecuteInfo(title,message){
     $('#option_alert').html('')
         .html("<div class=\"alert alert-warning alert-dismissible\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button><strong>"+title+"</strong>"+message+"</div>");
 }
+
+/******重写Ajax操作,做成通用Loading操作*******/
+$.ajax2 = function (options, aimDiv) {
+    var img = $("<img id=\"progressImgage\"  src=\"image/load.gif\" />"); //Loading小图标
+    var mask = $("<div id=\"maskOfProgressImage\"></div>").addClass("mask"); //Div遮罩
+    var PositionStyle = "fixed";
+    //是否将Loading固定在aimDiv中操作,否则默认为全屏Loading遮罩
+    if (aimDiv != null && aimDiv != "" && aimDiv != undefined) {
+        $(aimDiv).css("position", "relative").append(img).append(mask);
+        PositionStyle = "absolute";
+    }
+    else {
+        $("body").append(img).append(mask);
+    }
+    img.css({
+        "z-index": "2000",
+        "display": "none"
+    });
+    mask.css({
+        "position": PositionStyle,
+        "top": "0",
+        "right": "0",
+        "bottom": "0",
+        "left": "0",
+        "z-index": "1000",
+        "background-color": "#000000",
+        "display": "none"
+    });
+    var complete = options.complete;
+    options.complete = function (httpRequest, status) {
+        img.hide();
+        mask.hide();
+        if (complete) {
+            complete(httpRequest, status);
+        }
+    };
+    options.async = true;
+    img.show().css({
+        "position": PositionStyle,
+        "top": "40%",
+        "left": "50%",
+        "margin-top": function () { return -1 * img.height() / 2; },
+        "margin-left": function () { return -1 * img.width() / 2; }
+    });
+    mask.show().css("opacity", "0.1");
+    $.ajax(options);
+};
