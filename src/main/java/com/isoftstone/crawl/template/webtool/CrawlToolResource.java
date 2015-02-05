@@ -938,7 +938,13 @@ public class CrawlToolResource {
 		RedisOperator.saveTemplateToDefaultDB(templateResult, templateGuid);		
 		SaveTemplateToList(pageModel, "true");// 保存数据源列表所需要的key值
 		System.out.println("templateGuid=" + templateGuid);
-		parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);		
+		try {
+			parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);		
+		} catch (Exception e) {
+			parseResult=null;
+			e.printStackTrace();
+		}
+	
 		return parseResult;
 	}
 
@@ -951,7 +957,12 @@ public class CrawlToolResource {
 		ParseResult parseResult = null;
 		byte[] input = DownloadHtml.getHtml(templateUrl);
 		String encoding = sniffCharacterEncoding(input);
-		parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);		
+		try {
+			parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
+		} catch (Exception e) {
+			parseResult=null;
+			e.printStackTrace();
+		}
 		return parseResult;
 	}
 
@@ -979,8 +990,14 @@ public class CrawlToolResource {
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		ParseResult parseResult = null;
 		byte[] input = DownloadHtml.getHtml(templateUrl);
-		String encoding = sniffCharacterEncoding(input);				
-		parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
+		String encoding = sniffCharacterEncoding(input);			
+		try{
+			parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
+		}catch(Exception e){
+			parseResult=null;
+			e.printStackTrace();
+		}
+		
 		if(parseResult==null){
 			jsonProvider.setSuccess(false);
 			jsonProvider.setErrorMsg("请先保存常规模板！");
@@ -1082,8 +1099,14 @@ public class CrawlToolResource {
 			jsonProvider.setErrorMsg("模板名称【"+singleTemplateListModel.getBasicInfoViewModel().getName()+"】无法获取该网站编码格式！请检查！");
 			return jsonProvider;			
 		}
-					
-		parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
+				
+		try{
+			parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
+		}catch(Exception e){
+			parseResult=null;
+			e.printStackTrace();
+		}
+		
 		if(parseResult==null){
 			jsonProvider.setSuccess(false);
 			jsonProvider.setErrorMsg("模板名称【"+singleTemplateListModel.getBasicInfoViewModel().getName()+"】，parseResult结果为null");
