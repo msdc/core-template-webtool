@@ -143,7 +143,12 @@ public class CrawlToolResource {
                 seeds.add(seedsTemp.get(i));
             }
         }
-		saveSeedsValueToFile(folderName, incrementFolderName, templateUrl, seeds, status, userProxy);
+        String paginationUrl = pageModel.getListPaginationViewModel().getPaginationUrl();
+        String currentString = pageModel.getListPaginationViewModel().getCurrentString();
+        String start = pageModel.getListPaginationViewModel().getStart();
+        
+        saveSeedsValueToFile(folderName, incrementFolderName, templateUrl,
+            seeds, status, userProxy, paginationUrl, currentString, start);
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("文件保存成功!");
 		return jsonProvider.toJSON();
@@ -152,14 +157,18 @@ public class CrawlToolResource {
 	/**
 	 * 保存种子到本地文件. 并将文件夹相关信息存入redis.
 	 */
-	private void saveSeedsValueToFile(String folderName, String incrementFolderName, 
-	        String templateUrl, List<String> seeds, String status, boolean userProxy) {
+    private void saveSeedsValueToFile(String folderName,
+            String incrementFolderName, String templateUrl, List<String> seeds,
+            String status, boolean userProxy, String paginationUrl,
+            String currentString, String start) {
 		// --1.1 保存模板url到本地文件.
 	    List<String> templateList = new ArrayList<String>();
 	    templateList.add(templateUrl);
-		contentToTxt(folderName, templateList, status);
+		contentToTxt(folderName, templateList, status, paginationUrl,
+            currentString, start);
 		// --1.2 保存增量种子到本地文件.
-		contentToTxt(incrementFolderName, seeds, status);
+        contentToTxt(incrementFolderName, seeds, status, paginationUrl,
+            currentString, start);
 
 		// --2.保存到redis中.
 		String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
@@ -247,7 +256,9 @@ public class CrawlToolResource {
 	 * 
 	 * 保存内容到文件
 	 * */
-	private void contentToTxt(String folderName, List<String> seeds, String status) {
+    private void contentToTxt(String folderName, List<String> seeds,
+            String status, String paginationUrl, String currentString,
+            String start) {
 		String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
 		String filePath = folderRoot + File.separator + folderName + File.separator + WebtoolConstants.SEED_FILE_NAME;
 		String str = null; // 原有txt内容
@@ -264,17 +275,30 @@ public class CrawlToolResource {
 				f.createNewFile(); // 不存在则创建
 			} else {
 				input = new BufferedReader(new FileReader(f));
-
+				List<String> fileSeedList = new ArrayList<String>();
 				while ((str = input.readLine()) != null) {
-					String temp = str;
-					if (str.startsWith("#")) {
-						temp = str.substring(1, str.length());
-					}
-					if (!seeds.contains(temp)) {
-						strBuf.append(str + System.getProperty("line.separator"));
-					}
+				    fileSeedList.add(str);
 				}
 				input.close();
+				
+				//--根据分页url，生成与种子文件中种子相同数量的分页url.
+				List<String> tempSeedList = new ArrayList<String>();
+                for (int i = Integer.valueOf(start); i < fileSeedList.size() + Integer.valueOf(start); i++) {
+                    tempSeedList.add(paginationUrl.replace(currentString, String.valueOf(i)));
+                }
+                
+                //--写入未包含到本次种子中的历史数据.
+                for(int i = 0; i < fileSeedList.size(); i++) {
+                    String tempStr = fileSeedList.get(i);
+                    String temp = tempStr;
+                    if (tempStr.startsWith("#")) {
+                        temp = tempStr.substring(1, tempStr.length());
+                    }
+                    if (!seeds.contains(temp) && !tempSeedList.contains(temp)) {
+                        strBuf.append(tempStr + System.getProperty("line.separator"));
+                    }
+                }
+                
 			}
 			for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
 				String seedStr = it.next();
