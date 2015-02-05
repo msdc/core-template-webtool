@@ -1527,6 +1527,9 @@ public class CrawlToolResource {
 	private static Pattern charsetPatternHTML5 = Pattern.compile("<meta\\s+charset\\s*=\\s*[\"']?([a-z][_\\-0-9a-z]*)[^>]*>", Pattern.CASE_INSENSITIVE);
 
 	private static String sniffCharacterEncoding(byte[] content) {
+		if(content==null){
+			return "UTF-8";
+		}
 		int length = content.length < CHUNK_SIZE ? content.length : CHUNK_SIZE;
 		String str = "";
 		try {
@@ -1534,7 +1537,8 @@ public class CrawlToolResource {
 			str = new String(content, 0, length, Charset.forName("ASCII").toString());
 			// System.out.println("str:"+str);
 		} catch (UnsupportedEncodingException e) {
-			return null;
+			e.printStackTrace();
+			return "UTF-8";
 		}
 
 		Matcher metaMatcher = metaPattern.matcher(str);
@@ -1567,9 +1571,13 @@ public class CrawlToolResource {
 				} else if (content[0] == (byte) 0xFE && content[1] == (byte) 0xFF) {
 					encoding = "UTF-16BE";
 				} else {
-					encoding = "UTF-8";// ”尼玛“个别网站不设定编码
+					encoding = "UTF-8";
 				}
 			}
+		}
+		
+		if(encoding==null){
+			encoding = "UTF-8";
 		}
 		return encoding;
 	}
