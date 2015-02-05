@@ -826,8 +826,7 @@ public class CrawlToolResource {
 	public String GenerateAllIncreaseTemplates(){
 		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
 		jsonProvider.setSuccess(true);
-		StringBuilder sbString=new StringBuilder();		
-		sbString.append("<div class=\"bg-danger\"><ol>");
+		StringBuilder sbString=new StringBuilder();
 		Set<String> templateListKeys=RedisOperator.searchKeysFromDefaultDB("*" + key_partern);
 		int failedTemplateCount=0;
 		for (String listKey : templateListKeys) {			
@@ -836,14 +835,13 @@ public class CrawlToolResource {
 			ResponseJSONProvider<String> saveResult=saveIncreaseTemplateResult(templateModel);
 			if(saveResult.getErrorMsg()!=null){
 				failedTemplateCount++;				
-				sbString.append("<li>"+saveResult.getErrorMsg()+"</li>");
+				sbString.append("<div class=\"alert alert-danger\" role=\"alert\"><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span><span class=\"sr-only\">Error:</span>"+saveResult.getErrorMsg()+"</div>");
 			}
-		}
-		sbString.append("</ol></div>");
+		}		
 		if(failedTemplateCount>0){
-			sbString.append("<p class=\"bg-success\">&nbsp;&nbsp;&nbsp;共"+templateListKeys.size()+"个模板，其中"+failedTemplateCount+"个未成功生成增量模板，请根据上述说明进行检查！</p>");
+			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;共"+templateListKeys.size()+"个模板，其中"+failedTemplateCount+"个未成功生成增量模板，请根据上述模板名称，检查相应的模板配置！</div>");
 		}else{
-			sbString.append("<p class=\"bg-success\">&nbsp;&nbsp;&nbsp;共"+templateListKeys.size()+"个模板,全部成功生成增量模板!</p>");
+			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;共"+templateListKeys.size()+"个模板,全部成功生成增量模板!</div>");
 		}
 		
 		jsonProvider.setData(sbString.toString());		
