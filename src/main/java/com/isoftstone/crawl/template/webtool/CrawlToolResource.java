@@ -827,7 +827,7 @@ public class CrawlToolResource {
 		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
 		jsonProvider.setSuccess(true);
 		StringBuilder sbString=new StringBuilder();		
-		sbString.append("批量生成增量模板执行完成！结果如下:<br/>");
+		sbString.append("<div class=\"bg-danger\"><ol>");
 		Set<String> templateListKeys=RedisOperator.searchKeysFromDefaultDB("*" + key_partern);
 		int failedTemplateCount=0;
 		for (String listKey : templateListKeys) {			
@@ -836,13 +836,14 @@ public class CrawlToolResource {
 			ResponseJSONProvider<String> saveResult=saveIncreaseTemplateResult(templateModel);
 			if(saveResult.getErrorMsg()!=null){
 				failedTemplateCount++;				
-				sbString.append(failedTemplateCount+"."+saveResult.getErrorMsg()+"<br/>");
+				sbString.append("<li>"+saveResult.getErrorMsg()+"</li>");
 			}
 		}
+		sbString.append("</ol></div>");
 		if(failedTemplateCount>0){
-			sbString.append("共找到"+templateListKeys.size()+"个模板，其中"+failedTemplateCount+"个未成功生成增量模板，请根据上述说明进行检查！<br/>");
+			sbString.append("<p class=\"bg-success\">&nbsp;&nbsp;&nbsp;共"+templateListKeys.size()+"个模板，其中"+failedTemplateCount+"个未成功生成增量模板，请根据上述说明进行检查！</p>");
 		}else{
-			sbString.append("共找到"+templateListKeys.size()+"个模板,全部成功生成增量模板！<br/>");
+			sbString.append("<p class=\"bg-success\">&nbsp;&nbsp;&nbsp;共"+templateListKeys.size()+"个模板,全部成功生成增量模板!</p>");
 		}
 		
 		jsonProvider.setData(sbString.toString());		
@@ -1045,6 +1046,10 @@ public class CrawlToolResource {
 					jsonProvider.setErrorMsg("请检查配置是否正确，解析到pagination_outlink个数不应该小于增量配置中的页数量，配置信息错误！");
 					return jsonProvider;
 				}	        	
+	        }else{
+	        	jsonProvider.setSuccess(false);
+				jsonProvider.setErrorMsg("没有解析到分页链接，请检查列表分页配置是否正确！");
+				return jsonProvider;
 	        }
 		}
 		jsonProvider.setData("增量模板保存成功!");
@@ -1067,21 +1072,21 @@ public class CrawlToolResource {
 			input = DownloadHtml.getHtml(templateUrl);
 		} catch (Exception e) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("模板名称:"+singleTemplateListModel.getBasicInfoViewModel().getName()+",无法访问该网站！");
+			jsonProvider.setErrorMsg("模板名称【"+singleTemplateListModel.getBasicInfoViewModel().getName()+"】,无法访问该网站！");
 			return jsonProvider;
 		}
 		try {
 			encoding= sniffCharacterEncoding(input);	
 		} catch (Exception e) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("模板名称:"+singleTemplateListModel.getBasicInfoViewModel().getName()+",无法获取该网站编码格式！");
+			jsonProvider.setErrorMsg("模板名称【"+singleTemplateListModel.getBasicInfoViewModel().getName()+"】无法获取该网站编码格式！请检查！");
 			return jsonProvider;			
 		}
 					
 		parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
 		if(parseResult==null){
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("请先保存常规模板！");
+			jsonProvider.setErrorMsg("模板名称【"+singleTemplateListModel.getBasicInfoViewModel().getName()+"】，parseResult结果为null");
 			return jsonProvider;
 		}		
 		String pageSort=singleTemplateListModel.getTemplateIncreaseViewModel().getPageSort();
@@ -1091,7 +1096,7 @@ public class CrawlToolResource {
 		
 		if(pageCounts.equals("")){
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("模板名称:"+singleTemplateListModel.getBasicInfoViewModel().getName()+"中，增量配置的中页数值不能为空！");
+			jsonProvider.setErrorMsg("模板名称【"+singleTemplateListModel.getBasicInfoViewModel().getName()+"】中，增量配置的中页数值不能为空！");
 			return jsonProvider;
 		}else{
 			int counts=Integer.parseInt(pageCounts);	
@@ -1138,9 +1143,13 @@ public class CrawlToolResource {
 			        RedisOperator.setToDefaultDB(templateGuid+key_partern, GetTemplateModelJSONString(singleTemplateListModel));
 				}else{
 					jsonProvider.setSuccess(false);
-					jsonProvider.setErrorMsg("模板名称:"+singleTemplateListModel.getBasicInfoViewModel().getName()+"，请检查配置是否正确，解析到pagination_outlink个数不应该小于增量配置中的页数量，配置信息错误！");
+					jsonProvider.setErrorMsg("模板名称【"+singleTemplateListModel.getBasicInfoViewModel().getName()+"】，请检查配置是否正确，解析到pagination_outlink个数不应该小于增量配置中的页数量，配置信息错误！");
 					return jsonProvider;
 				}	        	
+	        }else{
+	        	jsonProvider.setSuccess(false);
+				jsonProvider.setErrorMsg("模板名称【"+singleTemplateListModel.getBasicInfoViewModel().getName()+"】，没有解析到分页链接，请检查列表分页配置是否正确！");
+				return jsonProvider;
 	        }
 		}
 		jsonProvider.setData("success");
