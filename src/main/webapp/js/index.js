@@ -7,7 +7,7 @@ var virtualWebPath="/crawl-template-webtool";
 var paginationItemCounts=10;
 
 $(function(){
-    $.ajax({
+    $.ajax2({
         url: virtualWebPath + '/webapi/crawlToolResource/getTemplateList',
         type: 'GET',
         success: function (data) {
