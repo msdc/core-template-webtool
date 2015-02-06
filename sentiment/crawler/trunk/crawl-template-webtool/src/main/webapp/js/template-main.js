@@ -439,21 +439,21 @@ function loadPageContext(initData){
                         this.verifyNewContent=function(){
                             $('#lbl_result_title').text('内容页验证结果');
                             $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
-                            ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyNewContent', this, showResultInTextArea, showErrorsInTextArea);
+                            ajaxLoadingPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyNewContent', this, showResultInTextArea, showErrorsInTextArea);
                         };
 
                         //验证列表页
                         this.verifyListContent=function(){
                             $('#lbl_result_title').text('列表页验证结果');
                             $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red',fontSize:'20px'});
-                            ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyListContent', this, showResultInTextArea, showErrorsInTextArea);
+                            ajaxLoadingPostRequest(virtualWebPath+'/webapi/crawlToolResource/verifyListContent', this, showResultInTextArea, showErrorsInTextArea);
                         };
 
                         /*查看模板JSON*/
                         this.templateTest=function(){
                             $('#lbl_result_title').text('查看模板JSON');
                             $('#txt_testResult').val('程序正在执行,请稍后...').css({color:'red'});
-                            ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/getJSONString', this, showResultInTextArea, showErrorsInTextArea);
+                            ajaxLoadingPostRequest(virtualWebPath+'/webapi/crawlToolResource/getJSONString', this, showResultInTextArea, showErrorsInTextArea);
                         }.bind(this);
 
                         /*保存模板配置*/
@@ -845,6 +845,26 @@ function showResultInModal(data){
             modalBody.text(result.errorMsg);
         }
     }
+}
+
+/**
+ *
+ * ajax post 请求
+ * @param {String} url
+ * @param {Object} data
+ * @param {Function} successCallback
+ * @param {Function} errorCallback
+ * */
+function ajaxLoadingPostRequest(url,data,successCallback,errorCallback){
+    $.ajax2({
+        url: url,
+        type: 'POST',
+        data: {
+            data: getJSONString(data)
+        },
+        success: function(data){successCallback(data)},
+        error: function(error){errorCallback(error)}
+    },'#test_validate_result');
 }
 
 /**
