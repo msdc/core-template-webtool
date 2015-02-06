@@ -32,7 +32,7 @@ function md5EncryptBtnHandler(){
         return;
     }
 
-    $.ajax2({
+    $.ajax({
         url: virtualWebPath + '/webapi/crawlToolResource/getTemplateGuid',
         type: 'POST',
         data: {
