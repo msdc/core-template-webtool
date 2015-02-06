@@ -183,7 +183,7 @@ function templateViewModel(templateList){
     };
     //搜索
     self.search=function(){
-        $.ajax({
+        $.ajax2({
             url:virtualWebPath + '/webapi/crawlToolResource/searchTemplateList',
             type:'POST',
             data:{
@@ -208,7 +208,7 @@ function templateViewModel(templateList){
                     optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;搜索操作执行失败！");
                 }
             }
-        });
+        },'#template_list_table');
     };
     //批量生成增量模板
     self.generateAllIncreaseTemplates=function(){
