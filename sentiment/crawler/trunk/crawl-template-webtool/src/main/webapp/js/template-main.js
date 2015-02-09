@@ -479,12 +479,10 @@ function loadPageContext(initData){
 
                         /*批量生成搜索引擎模板*/
                         this.bulkSearchTemplates=function(){
-                            $('#modalHtmlTitle').text('保存结果');
+                            $('#modalHtmlTitle').text('生成搜索引擎模板结果');
                             $('#modal-viewHtml').modal('show');
-                            ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/bulkSearchTemplates',this,showResultInModal,showResultInModal);
+                            ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/bulkSearchTemplates',this,showResultInModalWithHtml,showResultInModalWithHtml);
                         }.bind(this);
-
-                        /*批量生成搜索引擎增量模板*/
 
                         /*根据模板类型显示相应按钮*/
                         this.showNormalTemplateBtn=ko.computed(function(){
@@ -850,6 +848,25 @@ function showResultInModal(data){
         var result=JSON.parse(data);
         if(result.success){
             modalBody.text(result.data);
+        }else{
+            modalBody.text(result.errorMsg);
+        }
+    }
+}
+
+/**
+ *
+ * 在模式对话框中显示结果
+ * */
+function showResultInModalWithHtml(data){
+    var modalBody=$('#modal-viewHtml-body');
+    modalBody.html('');//清空
+    if(data.responseText){
+        modalBody.text("错误信息:"+data.responseText);
+    }else{
+        var result=JSON.parse(data);
+        if(result.success){
+            modalBody.html(result.data);
         }else{
             modalBody.text(result.errorMsg);
         }

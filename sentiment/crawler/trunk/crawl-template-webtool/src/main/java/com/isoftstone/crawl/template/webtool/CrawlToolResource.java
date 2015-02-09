@@ -798,6 +798,8 @@ public class CrawlToolResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String BulkSearchTemplates(@DefaultValue("") @FormParam("data") String data){
 		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
+		StringBuilder sbString=new StringBuilder();
+		int failedTemplateCount=0;
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("关键字对应的搜索引擎模板，已全部生成！请回到列表页面，并刷新!");		
 		//TODO: 获取关键词，根据关键词产生搜索引擎模板
@@ -810,6 +812,7 @@ public class CrawlToolResource {
 			String templateURL=pageModel.getBasicInfoViewModel().getUrl();
 			String currentString=pageModel.getBasicInfoViewModel().getCurrentString();
 			templateURL=templateURL.replace(currentString,searchKeyWord);
+			String templateGuid=MD5Utils.MD5(templateURL);
 			
 			//处理URL及名称
 			BasicInfoViewModel basicInfoViewModel=pageModel.getBasicInfoViewModel();			
@@ -870,7 +873,24 @@ public class CrawlToolResource {
 			RedisOperator.saveTemplateToDefaultDB(templateResult, templateResult.getTemplateGuid());		
 			// 保存数据源列表所需要的key值 模板默认为启用状态
 			SaveTemplateToList(pageModel, "true");
+			//同时生成增量模板
+			String templateModelJSONString=RedisOperator.getFromDefaultDB(templateGuid+key_partern);
+			TemplateModel templateModel=GetTemplateModel(templateModelJSONString);
+			ResponseJSONProvider<String> saveResult=saveIncreaseTemplateResult(templateModel,"../");
+			if(saveResult.getErrorMsg()!=null){
+				failedTemplateCount++;				
+				sbString.append("<div class=\"alert alert-danger\" role=\"alert\"><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span><span class=\"sr-only\">Error:</span>"+saveResult.getErrorMsg()+"</div>");
+			}			
+			
+		}
+		
+		if(failedTemplateCount>0){
+			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：成功生成"+wordsList.size()+"个模板，其中"+failedTemplateCount+"个未成功生成增量模板，请根据上述模板名称，检查相应的模板配置！</div>");
+		}else{
+			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：成功生成"+wordsList.size()+"个模板，和这些模板相关联的增量模板也全部生成成功!</div>");
 		}		
+		jsonProvider.setData(sbString.toString());	
+		
 		return jsonProvider.toJSON();
 	}
 	
@@ -890,7 +910,7 @@ public class CrawlToolResource {
 		for (String listKey : templateListKeys) {			
 			String templateModelJSONString=RedisOperator.getFromDefaultDB(listKey);
 			TemplateModel templateModel=GetTemplateModel(templateModelJSONString);
-			ResponseJSONProvider<String> saveResult=saveIncreaseTemplateResult(templateModel);
+			ResponseJSONProvider<String> saveResult=saveIncreaseTemplateResult(templateModel,"");
 			if(saveResult.getErrorMsg()!=null){
 				failedTemplateCount++;				
 				sbString.append("<div class=\"alert alert-danger\" role=\"alert\"><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span><span class=\"sr-only\">Error:</span>"+saveResult.getErrorMsg()+"</div>");
@@ -1186,7 +1206,7 @@ public class CrawlToolResource {
      * 
      * 生成增量模板
      * */
-	private ResponseJSONProvider<String> saveIncreaseTemplateResult(TemplateModel singleTemplateListModel){	
+	private ResponseJSONProvider<String> saveIncreaseTemplateResult(TemplateModel singleTemplateListModel,String pagePath){	
 		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
 		jsonProvider.setSuccess(true);
 		TemplateResult templateResult =RedisOperator.getTemplateResultFromDefaultDB(singleTemplateListModel.getTemplateId());
@@ -1198,14 +1218,14 @@ public class CrawlToolResource {
 			input = DownloadHtml.getHtml(templateUrl);
 		} catch (Exception e) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\"pages/template-main.html?templateGuid="+singleTemplateListModel.getTemplateId()+"\">"+singleTemplateListModel.getBasicInfoViewModel().getName()+"</a>】,无法访问该网站！");
+			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\""+pagePath+"pages/template-main.html?templateGuid="+singleTemplateListModel.getTemplateId()+"\">"+singleTemplateListModel.getBasicInfoViewModel().getName()+"</a>】,无法访问该网站！");
 			return jsonProvider;
 		}
 		try {
 			encoding= sniffCharacterEncoding(input);	
 		} catch (Exception e) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\"pages/template-main.html?templateGuid="+singleTemplateListModel.getTemplateId()+"\">"+singleTemplateListModel.getBasicInfoViewModel().getName()+"</a>】无法获取该网站编码格式！请检查！");
+			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\""+pagePath+"pages/template-main.html?templateGuid="+singleTemplateListModel.getTemplateId()+"\">"+singleTemplateListModel.getBasicInfoViewModel().getName()+"</a>】无法获取该网站编码格式！请检查！");
 			return jsonProvider;			
 		}
 				
@@ -1218,7 +1238,7 @@ public class CrawlToolResource {
 		
 		if(parseResult==null){
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\"pages/template-main.html?templateGuid="+singleTemplateListModel.getTemplateId()+"\">"+singleTemplateListModel.getBasicInfoViewModel().getName()+"</a>】，调用TemplateFactory.process方法出错！无法解析出parseResult，请检查页面各项配置是否正确！确认选择器和过滤器表达式完全正确，重新保存模板后，重试！");
+			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\""+pagePath+"pages/template-main.html?templateGuid="+singleTemplateListModel.getTemplateId()+"\">"+singleTemplateListModel.getBasicInfoViewModel().getName()+"</a>】，调用TemplateFactory.process方法出错！无法解析出parseResult，请检查页面各项配置是否正确！确认选择器和过滤器表达式完全正确，重新保存模板后，重试！");
 			return jsonProvider;
 		}		
 		String pageSort=singleTemplateListModel.getTemplateIncreaseViewModel().getPageSort();
@@ -1228,7 +1248,7 @@ public class CrawlToolResource {
 		
 		if(pageCounts.equals("")){
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\"pages/template-main.html?templateGuid="+singleTemplateListModel.getTemplateId()+"\">"+singleTemplateListModel.getBasicInfoViewModel().getName()+"</a>】中，增量配置的中页数值不能为空！");
+			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\""+pagePath+"pages/template-main.html?templateGuid="+singleTemplateListModel.getTemplateId()+"\">"+singleTemplateListModel.getBasicInfoViewModel().getName()+"</a>】中，增量配置的中页数值不能为空！");
 			return jsonProvider;
 		}else{
 			int counts=Integer.parseInt(pageCounts);	
@@ -1275,12 +1295,12 @@ public class CrawlToolResource {
 			        RedisOperator.setToDefaultDB(templateGuid+key_partern, GetTemplateModelJSONString(singleTemplateListModel));
 				}else{
 					jsonProvider.setSuccess(false);
-					jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\"pages/template-main.html?templateGuid="+singleTemplateListModel.getTemplateId()+"\">"+singleTemplateListModel.getBasicInfoViewModel().getName()+"</a>】，请检查配置是否正确，解析到pagination_outlink个数不应该小于增量配置中的页数量，配置信息错误！");
+					jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\""+pagePath+"pages/template-main.html?templateGuid="+singleTemplateListModel.getTemplateId()+"\">"+singleTemplateListModel.getBasicInfoViewModel().getName()+"</a>】，请检查配置是否正确，解析到pagination_outlink个数不应该小于增量配置中的页数量，配置信息错误！");
 					return jsonProvider;
 				}	        	
 	        }else{
 	        	jsonProvider.setSuccess(false);
-				jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\"pages/template-main.html?templateGuid="+singleTemplateListModel.getTemplateId()+"\">"+singleTemplateListModel.getBasicInfoViewModel().getName()+"</a>】，没有解析到分页链接，请检查列表分页配置是否正确！");
+				jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\""+pagePath+"pages/template-main.html?templateGuid="+singleTemplateListModel.getTemplateId()+"\">"+singleTemplateListModel.getBasicInfoViewModel().getName()+"</a>】，没有解析到分页链接，请检查列表分页配置是否正确！");
 				return jsonProvider;
 	        }
 		}
