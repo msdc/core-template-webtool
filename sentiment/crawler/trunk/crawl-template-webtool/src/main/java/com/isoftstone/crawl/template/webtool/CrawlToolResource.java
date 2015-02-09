@@ -796,7 +796,7 @@ public class CrawlToolResource {
 	@POST
 	@Path("/bulkSearchTemplates")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String AutoGenerateTemplates(@DefaultValue("") @FormParam("data") String data){
+	public String BulkSearchTemplates(@DefaultValue("") @FormParam("data") String data){
 		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("关键字对应的搜索引擎模板，已全部生成！请回到列表页面，并刷新!");		
@@ -847,24 +847,25 @@ public class CrawlToolResource {
 				templateTagsViewModel.add(templateTagModel);
 			}	
 			
-			//处理内容页
-			List<CustomerAttrModel> newCustomerAttrViewModel=pageModel.getNewsCustomerAttrViewModel();
-			//无论内容页是否配置，搜索引擎默认选取网页的HTML body中的内容
-			if (newCustomerAttrViewModel != null) {
-				GetSearchNewCustomerAttrViewModel(newCustomerAttrViewModel);
-			} else {
-				newCustomerAttrViewModel = new ArrayList<CustomerAttrModel>();
-				CustomerAttrModel customerAttrModel = new CustomerAttrModel();
-				customerAttrModel.setTarget("page_content");
-				customerAttrModel.setSelector("body");
-				customerAttrModel.setAttr("html");
-				newCustomerAttrViewModel.add(customerAttrModel);
-			}		
+			//内容页目前不需要处理，暂时先屏蔽
+//			//处理内容页
+//			List<CustomerAttrModel> newCustomerAttrViewModel=pageModel.getNewsCustomerAttrViewModel();
+//			//无论内容页是否配置，搜索引擎默认选取网页的HTML body中的内容
+//			if (newCustomerAttrViewModel != null) {
+//				GetSearchNewCustomerAttrViewModel(newCustomerAttrViewModel);
+//			} else {
+//				newCustomerAttrViewModel = new ArrayList<CustomerAttrModel>();
+//				CustomerAttrModel customerAttrModel = new CustomerAttrModel();
+//				customerAttrModel.setTarget("page_content");
+//				customerAttrModel.setSelector("body");
+//				customerAttrModel.setAttr("html");
+//				newCustomerAttrViewModel.add(customerAttrModel);
+//			}		
 			
 			//构造新的pageModel
 			pageModel.setBasicInfoViewModel(basicInfoViewModel);
 			pageModel.setTemplateTagsViewModel(templateTagsViewModel);	
-			pageModel.setNewsCustomerAttrViewModel(newCustomerAttrViewModel);
+			//pageModel.setNewsCustomerAttrViewModel(newCustomerAttrViewModel);
 			TemplateResult templateResult = GetTemplateResult(pageModel);						
 			RedisOperator.saveTemplateToDefaultDB(templateResult, templateResult.getTemplateGuid());		
 			// 保存数据源列表所需要的key值 模板默认为启用状态
@@ -1633,6 +1634,18 @@ public class CrawlToolResource {
 				news.add(selector);
 			}
 		}
+		
+		//处理搜索引擎模板内容页
+		String templateType=pageModel.getBasicInfoViewModel().getTemplateType();
+		if(!templateType.equals("普通模板")){
+			// 添加page_content属性，默认选取整个网页的body
+			indexer = new SelectorIndexer();
+			selector = new Selector();
+			indexer.initJsoupIndexer("body", "html");
+			selector.initFieldSelector("page_content", "", indexer, null, null);
+			news.add(selector);
+		}
+		
 		template.setNews(news);
 		// System.out.println("templateResult:"+template.toJSON());
 		return template;
