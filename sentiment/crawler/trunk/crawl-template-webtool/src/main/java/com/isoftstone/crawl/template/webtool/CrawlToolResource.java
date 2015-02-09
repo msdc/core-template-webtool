@@ -1330,10 +1330,11 @@ public class CrawlToolResource {
         templateModel.setTemplateIncreaseViewModel(templateIncreaseViewModel); 
 		
 		 //这里必须先取之前的模板列表JSON字符串，因为增量模板列表可能因为修改操作而被覆盖           
-        String singleTemplateListModel=RedisOperator.getFromDefaultDB(templateGuid+key_partern);  
+        String singleTemplateListModel=RedisOperator.getFromDefaultDB(templateGuid+key_partern); 
+        TemplateModel oldTemplateModel=null;
         //bug:第一次保存没有列表模板文件，保存报错
         if(singleTemplateListModel!=null&&!singleTemplateListModel.equals("")){
-        	TemplateModel oldTemplateModel = GetTemplateModel(singleTemplateListModel);	
+        	oldTemplateModel = GetTemplateModel(singleTemplateListModel);	
         	//修改操作时，保存原来的增量模板列表
     		if(oldTemplateModel.getTemplateIncreaseIdList()!=null){
     			templateModel.setTemplateIncreaseIdList(oldTemplateModel.getTemplateIncreaseIdList());			
@@ -1347,15 +1348,19 @@ public class CrawlToolResource {
     			String nowDateString = dateFormat.format(currentDate);
     			templateModel.setAddedTime(nowDateString);
     		}
-    		
-    		//修改时状态不变
-            if(!oldTemplateModel.getStatus().equals("")){
-            	templateModel.setStatus(oldTemplateModel.getStatus());
-            }else{
-            	 templateModel.setStatus(status);
-            }
-        }	              
-       
+        }	
+        
+        //修改时状态不变
+        if(oldTemplateModel==null){
+        	 templateModel.setStatus(status);
+        }else{
+        	if(!oldTemplateModel.getStatus().equals("")){
+        		templateModel.setStatus(oldTemplateModel.getStatus());
+        	}else{
+        		 templateModel.setStatus(status);
+        	}
+        }
+        
 		return templateModel;
 	}
 
