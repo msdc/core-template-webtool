@@ -477,6 +477,15 @@ function loadPageContext(initData){
                             ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/saveToLocalFile',this,showResultInModal,showResultInModal);
                         }.bind(this);
 
+                        /*批量生成搜索引擎模板*/
+                        this.bulkSearchTemplates=function(){
+                            $('#modalHtmlTitle').text('保存结果');
+                            $('#modal-viewHtml').modal('show');
+                            ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/bulkSearchTemplates',this,showResultInModal,showResultInModal);
+                        }.bind(this);
+
+                        /*批量生成搜索引擎增量模板*/
+
                         /*根据模板类型显示相应按钮*/
                         this.showNormalTemplateBtn=ko.computed(function(){
                             if(this.basicInfoViewModel.templateTypesSelected()=="普通模板"){
