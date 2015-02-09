@@ -804,8 +804,9 @@ public class CrawlToolResource {
 		jsonProvider.setData("关键字对应的搜索引擎模板，已全部生成！请回到列表页面，并刷新!");		
 		//TODO: 获取关键词，根据关键词产生搜索引擎模板
 		List<String> wordsList=new ArrayList<String>();
-		wordsList.add("政府");
-		wordsList.add("公司");
+		wordsList.add("鸟巢,回龙观");
+		wordsList.add("国元信托,国元证券,安徽国元");
+		wordsList.add("北京,故宫,天安门");
 		for(String searchKeyWord: wordsList){		
 			PageModel pageModel = GetPageModelByJsonString(data);
 			//根据words关键字，处理pageModel中的相关信息:URL,名称,Tags,查询关键字,并重新赋值
@@ -946,6 +947,7 @@ public class CrawlToolResource {
 			}
 		}
 	}
+	
 	
 	
 	/**
@@ -1457,6 +1459,15 @@ public class CrawlToolResource {
 			}
 		}
 		return format;
+	}
+	
+	/**
+	 * 
+	 * 获取搜索关键字
+	 * */
+	private List<String> GetSearchKeyWords() {
+		List<String> searchKeyWords=new ArrayList<String>();
+		return searchKeyWords;
 	}
 	
 	/**
