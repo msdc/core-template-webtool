@@ -835,20 +835,25 @@ public class CrawlToolResource {
 			}	
 			
 			//处理内容页
-			List<CustomerAttrModel> newCustomerAttrViewModels=pageModel.getNewsCustomerAttrViewModel();
+			List<CustomerAttrModel> newCustomerAttrViewModel=pageModel.getNewsCustomerAttrViewModel();
 			//无论内容页是否配置，搜索引擎默认选取网页的html body中的内容
-			CustomerAttrModel customerAttrModel=new CustomerAttrModel();
-			customerAttrModel.setSelector("body");
-			customerAttrModel.setAttr("html");	
-			if(newCustomerAttrViewModels==null){
-				newCustomerAttrViewModels=new ArrayList<CustomerAttrModel>();
-			}			
-			newCustomerAttrViewModels.add(customerAttrModel);			
+			if (newCustomerAttrViewModel != null) {
+				GetSearchNewCustomerAttrViewModel(newCustomerAttrViewModel);
+			} else {
+				newCustomerAttrViewModel = new ArrayList<CustomerAttrModel>();
+				CustomerAttrModel customerAttrModel = new CustomerAttrModel();
+				customerAttrModel.setTarget("page_content");
+				customerAttrModel.setSelector("body");
+				customerAttrModel.setAttr("html");
+				newCustomerAttrViewModel.add(customerAttrModel);
+			}
+			
+						
 			
 			//构造新的pageModel
 			pageModel.setBasicInfoViewModel(basicInfoViewModel);
 			pageModel.setTemplateTagsViewModel(templateTagsViewModel);	
-			pageModel.setNewsCustomerAttrViewModel(newCustomerAttrViewModels);
+			pageModel.setNewsCustomerAttrViewModel(newCustomerAttrViewModel);
 			TemplateResult templateResult = GetTemplateResult(pageModel);						
 			RedisOperator.saveTemplateToDefaultDB(templateResult, templateResult.getTemplateGuid());		
 			// 保存数据源列表所需要的key值 模板默认为启用状态
@@ -891,8 +896,30 @@ public class CrawlToolResource {
 		return jsonProvider.toJSON();
 	}
 	
-
 	/**
+	 * 
+	 * 生成搜索引擎的内容页自定义属性
+	 * */
+	private void GetSearchNewCustomerAttrViewModel(List<CustomerAttrModel> newCustomerAttrViewModel) {
+		for (int i = 0; i < newCustomerAttrViewModel.size(); i++) {
+			CustomerAttrModel model=newCustomerAttrViewModel.get(i);
+			if(model.getTarget().equals("page_content")){
+				break;
+			}else{
+				if(i==(newCustomerAttrViewModel.size()-1)){//没有则添加属性
+					CustomerAttrModel customerAttrModel = new CustomerAttrModel();
+					customerAttrModel.setTarget("page_content");
+					customerAttrModel.setSelector("body");
+					customerAttrModel.setAttr("html");
+					newCustomerAttrViewModel.add(customerAttrModel);
+				}
+			}
+		}
+	}
+	
+	
+	/**
+	 * 
 	 * 生成搜索引擎的静态模板Tags属性
 	 * */
 	private void GetSearchEngineTagsViewModel(List<TemplateTagModel> searchEngineTagsViewModel,String searchKeyWord,String templateType){		
