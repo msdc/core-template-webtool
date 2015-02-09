@@ -53,6 +53,7 @@ import com.isoftstone.crawl.template.impl.TemplateFactory;
 import com.isoftstone.crawl.template.impl.TemplateResult;
 import com.isoftstone.crawl.template.model.BasicInfoViewModel;
 import com.isoftstone.crawl.template.model.CustomerAttrModel;
+import com.isoftstone.crawl.template.model.ListPaginationViewModel;
 import com.isoftstone.crawl.template.model.PageModel;
 import com.isoftstone.crawl.template.model.ResponseJSONProvider;
 import com.isoftstone.crawl.template.model.ScheduleDispatchViewModel;
@@ -793,23 +794,25 @@ public class CrawlToolResource {
 	 * 根据关键字，自动批量生成搜索引擎模板
 	 * */	
 	@POST
-	@Path("/autoGenerateTemplates")
+	@Path("/bulkSearchTemplates")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String AutoGenerateTemplates(@DefaultValue("") @FormParam("data") String data){
 		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData("关键字对应的搜索引擎模板，已全部生成！请回到列表页面，并刷新!");
 		PageModel pageModel = GetPageModelByJsonString(data);
 		//TODO: 获取关键词，根据关键词产生搜索引擎模板
 		List<String> wordsList=new ArrayList<String>();
 		wordsList.add("政府");
 		wordsList.add("公司");
 		for(String searchKeyWord: wordsList){			
-			//TODO:根据words关键字，处理pageModel中的相关信息:URL,名称,Tags,并重新赋值
+			//根据words关键字，处理pageModel中的相关信息:URL,名称,Tags,并重新赋值
 			String templateURL=pageModel.getBasicInfoViewModel().getUrl();
 			String currentString=pageModel.getBasicInfoViewModel().getCurrentString();
 			templateURL=templateURL.replace(currentString,searchKeyWord);
 			
 			//处理URL及名称
-			BasicInfoViewModel basicInfoViewModel=pageModel.getBasicInfoViewModel();
+			BasicInfoViewModel basicInfoViewModel=pageModel.getBasicInfoViewModel();			
 			String templateType=basicInfoViewModel.getTemplateType();
 			if(templateType.equals("百度新闻搜索")){
 				basicInfoViewModel.setName("百度新闻-"+searchKeyWord);
@@ -817,10 +820,19 @@ public class CrawlToolResource {
 				basicInfoViewModel.setName("Bing新闻-"+searchKeyWord);
 			}else if(templateType.equals("搜狗新闻搜索")){
 				basicInfoViewModel.setName("搜狗新闻-"+searchKeyWord);
-			}
-			
+			}			
 			basicInfoViewModel.setUrl(templateURL);
 			
+			//处理列表分页链接中的URL
+			ListPaginationViewModel paginationViewModel=pageModel.getListPaginationViewModel();
+			if(paginationViewModel==null){
+				jsonProvider.setSuccess(false);
+				jsonProvider.setData("列表分页配置不正确，请检查！");
+				return jsonProvider.toJSON();
+			}
+		   String paginationURL=paginationViewModel.getPaginationUrl();
+		   paginationURL=paginationURL.replace(currentString,searchKeyWord);
+		   paginationViewModel.setPaginationUrl(paginationURL);
 			
 			//处理静态属性Tags，无论是否配置静态属性tags值，都需要处理
 			List<TemplateTagModel> templateTagsViewModel=pageModel.getTemplateTagsViewModel();
@@ -836,7 +848,7 @@ public class CrawlToolResource {
 			
 			//处理内容页
 			List<CustomerAttrModel> newCustomerAttrViewModel=pageModel.getNewsCustomerAttrViewModel();
-			//无论内容页是否配置，搜索引擎默认选取网页的html body中的内容
+			//无论内容页是否配置，搜索引擎默认选取网页的HTML body中的内容
 			if (newCustomerAttrViewModel != null) {
 				GetSearchNewCustomerAttrViewModel(newCustomerAttrViewModel);
 			} else {
@@ -858,9 +870,7 @@ public class CrawlToolResource {
 			RedisOperator.saveTemplateToDefaultDB(templateResult, templateResult.getTemplateGuid());		
 			// 保存数据源列表所需要的key值 模板默认为启用状态
 			SaveTemplateToList(pageModel, "true");
-		}
-		jsonProvider.setSuccess(true);
-		jsonProvider.setData("关键字对应的搜索引擎模板，已全部生成！请回到列表页面，并刷新!");
+		}		
 		return jsonProvider.toJSON();
 	}
 	
@@ -1311,34 +1321,40 @@ public class CrawlToolResource {
 		scheduleDispatchViewModel.setPeriod(pageModel.getScheduleDispatchViewModel().getPeriod());
 		scheduleDispatchViewModel.setSequence(pageModel.getScheduleDispatchViewModel().getSequence());
 		scheduleDispatchViewModel.setUseProxy(pageModel.getScheduleDispatchViewModel().getUseProxy());
-		 //这里必须先取之前的模板列表JSON字符串，因为增量模板列表可能因为修改操作而被覆盖           
-        String singleTemplateListModel=RedisOperator.getFromDefaultDB(templateGuid+key_partern);     
-		TemplateModel oldTemplateModel = GetTemplateModel(singleTemplateListModel);	
-		if(oldTemplateModel.getTemplateIncreaseIdList()!=null){//修改操作时，保存原来的增量模板列表
-			templateModel.setTemplateIncreaseIdList(oldTemplateModel.getTemplateIncreaseIdList());			
-		}		
-		if(!oldTemplateModel.getAddedTime().equals("")){//修改操作时，时间不变
-			templateModel.setAddedTime(oldTemplateModel.getAddedTime());
-		}else{
-			Date currentDate=new Date();
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String nowDateString = dateFormat.format(currentDate);
-			templateModel.setAddedTime(nowDateString);
-		}
 		templateModel.setScheduleDispatchViewModel(scheduleDispatchViewModel);
-        
+		
         TemplateIncreaseViewModel templateIncreaseViewModel=new TemplateIncreaseViewModel();
         templateIncreaseViewModel.setPeriod(pageModel.getTemplateIncreaseViewModel().getPeriod());
         templateIncreaseViewModel.setPageCounts(pageModel.getTemplateIncreaseViewModel().getPageCounts());
         templateIncreaseViewModel.setPageSort(pageModel.getTemplateIncreaseViewModel().getPageSort());
-        templateModel.setTemplateIncreaseViewModel(templateIncreaseViewModel);
-
-        //修改时状态不变
-        if(!oldTemplateModel.getStatus().equals("")){
-        	templateModel.setStatus(oldTemplateModel.getStatus());
-        }else{
-        	 templateModel.setStatus(status);
-        }        
+        templateModel.setTemplateIncreaseViewModel(templateIncreaseViewModel); 
+		
+		 //这里必须先取之前的模板列表JSON字符串，因为增量模板列表可能因为修改操作而被覆盖           
+        String singleTemplateListModel=RedisOperator.getFromDefaultDB(templateGuid+key_partern);  
+        //bug:第一次保存没有列表模板文件，保存报错
+        if(singleTemplateListModel!=null&&!singleTemplateListModel.equals("")){
+        	TemplateModel oldTemplateModel = GetTemplateModel(singleTemplateListModel);	
+        	//修改操作时，保存原来的增量模板列表
+    		if(oldTemplateModel.getTemplateIncreaseIdList()!=null){
+    			templateModel.setTemplateIncreaseIdList(oldTemplateModel.getTemplateIncreaseIdList());			
+    		}		
+    		//修改操作时，时间不变
+    		if(!oldTemplateModel.getAddedTime().equals("")){
+    			templateModel.setAddedTime(oldTemplateModel.getAddedTime());
+    		}else{
+    			Date currentDate=new Date();
+    			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    			String nowDateString = dateFormat.format(currentDate);
+    			templateModel.setAddedTime(nowDateString);
+    		}
+    		
+    		//修改时状态不变
+            if(!oldTemplateModel.getStatus().equals("")){
+            	templateModel.setStatus(oldTemplateModel.getStatus());
+            }else{
+            	 templateModel.setStatus(status);
+            }
+        }	              
        
 		return templateModel;
 	}
