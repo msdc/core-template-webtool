@@ -129,7 +129,7 @@ function basicInfoViewModel(){
     this.name=ko.observable();
     this.tags=ko.observableArray(['财经','体育','经济']);
     this.tagsSelected=ko.observable('财经');
-    this.templateTypes=ko.observableArray(['普通模板','百度新闻搜索']);
+    this.templateTypes=ko.observableArray(['普通模板','百度新闻搜索','Bing新闻搜索','搜狗新闻搜索']);
     this.templateTypesSelected=ko.observable('普通模板');
     this.currentString=ko.observable();
     this.viewHtmlContent=function(){
