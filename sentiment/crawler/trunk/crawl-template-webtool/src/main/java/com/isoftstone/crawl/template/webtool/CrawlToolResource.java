@@ -799,14 +799,14 @@ public class CrawlToolResource {
 	public String AutoGenerateTemplates(@DefaultValue("") @FormParam("data") String data){
 		ResponseJSONProvider<String> jsonProvider=new ResponseJSONProvider<String>();
 		jsonProvider.setSuccess(true);
-		jsonProvider.setData("关键字对应的搜索引擎模板，已全部生成！请回到列表页面，并刷新!");
-		PageModel pageModel = GetPageModelByJsonString(data);
+		jsonProvider.setData("关键字对应的搜索引擎模板，已全部生成！请回到列表页面，并刷新!");		
 		//TODO: 获取关键词，根据关键词产生搜索引擎模板
 		List<String> wordsList=new ArrayList<String>();
 		wordsList.add("政府");
 		wordsList.add("公司");
-		for(String searchKeyWord: wordsList){			
-			//根据words关键字，处理pageModel中的相关信息:URL,名称,Tags,并重新赋值
+		for(String searchKeyWord: wordsList){		
+			PageModel pageModel = GetPageModelByJsonString(data);
+			//根据words关键字，处理pageModel中的相关信息:URL,名称,Tags,查询关键字,并重新赋值
 			String templateURL=pageModel.getBasicInfoViewModel().getUrl();
 			String currentString=pageModel.getBasicInfoViewModel().getCurrentString();
 			templateURL=templateURL.replace(currentString,searchKeyWord);
@@ -815,12 +815,13 @@ public class CrawlToolResource {
 			BasicInfoViewModel basicInfoViewModel=pageModel.getBasicInfoViewModel();			
 			String templateType=basicInfoViewModel.getTemplateType();
 			if(templateType.equals("百度新闻搜索")){
-				basicInfoViewModel.setName("百度新闻-"+searchKeyWord);
+				basicInfoViewModel.setName(WebtoolConstants.BAIDU_SEARCH+"-"+searchKeyWord);
 			}else if(templateType.equals("Bing新闻搜索")){
-				basicInfoViewModel.setName("Bing新闻-"+searchKeyWord);
+				basicInfoViewModel.setName(WebtoolConstants.BING_SEARCH+"-"+searchKeyWord);
 			}else if(templateType.equals("搜狗新闻搜索")){
-				basicInfoViewModel.setName("搜狗新闻-"+searchKeyWord);
-			}			
+				basicInfoViewModel.setName(WebtoolConstants.SOUGOU_SEARCH+"-"+searchKeyWord);
+			}
+			basicInfoViewModel.setCurrentString(searchKeyWord);
 			basicInfoViewModel.setUrl(templateURL);
 			
 			//处理列表分页链接中的URL
@@ -858,9 +859,7 @@ public class CrawlToolResource {
 				customerAttrModel.setSelector("body");
 				customerAttrModel.setAttr("html");
 				newCustomerAttrViewModel.add(customerAttrModel);
-			}
-			
-						
+			}		
 			
 			//构造新的pageModel
 			pageModel.setBasicInfoViewModel(basicInfoViewModel);
