@@ -39,9 +39,13 @@ public class WebtoolConstants {
     public static final String KEY_HOST_PASSWORD = "hostPassword";
     public static final String KEY_DES_FOLDER = "desFolderName";
     
-    public static final String BAIDU_SEARCH="百度新闻搜索";
-    public static final String BING_SEARCH="Bing新闻搜索";
-    public static final String SOUGOU_SEARCH="搜狗新闻搜索";
+    public static final String BAIDU_SEARCH_NAME="百度新闻搜索";
+    public static final String BING_SEARCH_NAME="Bing新闻搜索";
+    public static final String SOUGOU_SEARCH_NAME="搜狗新闻搜索";
+    
+    public static final String BAIDU_NEWS_ENGINE="baidu_news";
+    public static final String BING_NEWS_ENGINE="bing_news";
+    public static final String SOUGOU_NEWS_ENGINE="sogou_news";
     
     public static final String SEARCH_KEYWORD_API_URL="SEARCH_KEYWORD_API_URL";
 }

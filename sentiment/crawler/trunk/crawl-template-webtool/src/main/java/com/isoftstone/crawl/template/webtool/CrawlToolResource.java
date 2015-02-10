@@ -835,11 +835,16 @@ public class CrawlToolResource {
 			return jsonProvider.toJSON();
 		}
 		
-		List<SearchKeyWordDataModel> keyWordModelList=searchKeyWordModel.getData();		
+		String searchEngineType=getSearchEngineType(GetPageModelByJsonString(data));		
+		List<SearchKeyWordDataModel> originalKeyWordModelList=searchKeyWordModel.getData();	
+		//得到当前搜索引擎需要搜索的关键字信息
+		List<SearchKeyWordDataModel> keyWordModelList=getKeyWordModelList(originalKeyWordModelList, searchEngineType);
+		
 		for(SearchKeyWordDataModel model: keyWordModelList){
 			//搜索关键字
 			String searchKeyWord=model.getTagWords();
-			PageModel pageModel = GetPageModelByJsonString(data);
+			PageModel pageModel = GetPageModelByJsonString(data);			
+			
 			//根据words关键字，处理pageModel中的相关信息:URL,名称,Tags,查询关键字,并重新赋值
 			String templateURL=pageModel.getBasicInfoViewModel().getUrl();
 			String currentString=pageModel.getBasicInfoViewModel().getCurrentString();
@@ -850,11 +855,11 @@ public class CrawlToolResource {
 			BasicInfoViewModel basicInfoViewModel=pageModel.getBasicInfoViewModel();			
 			String templateType=basicInfoViewModel.getTemplateType();
 			if(templateType.equals("百度新闻搜索")){
-				basicInfoViewModel.setName(WebtoolConstants.BAIDU_SEARCH+"-"+searchKeyWord);
+				basicInfoViewModel.setName(WebtoolConstants.BAIDU_SEARCH_NAME+"-"+searchKeyWord);
 			}else if(templateType.equals("Bing新闻搜索")){
-				basicInfoViewModel.setName(WebtoolConstants.BING_SEARCH+"-"+searchKeyWord);
+				basicInfoViewModel.setName(WebtoolConstants.BING_SEARCH_NAME+"-"+searchKeyWord);
 			}else if(templateType.equals("搜狗新闻搜索")){
-				basicInfoViewModel.setName(WebtoolConstants.SOUGOU_SEARCH+"-"+searchKeyWord);
+				basicInfoViewModel.setName(WebtoolConstants.SOUGOU_SEARCH_NAME+"-"+searchKeyWord);
 			}
 			basicInfoViewModel.setCurrentString(searchKeyWord);
 			basicInfoViewModel.setUrl(templateURL);
@@ -942,6 +947,26 @@ public class CrawlToolResource {
 		return jsonProvider.toJSON();
 	}
 	
+	private List<SearchKeyWordDataModel> getKeyWordModelList(List<SearchKeyWordDataModel> originalKeyWordModelList,String searchEngineType) {
+		List<SearchKeyWordDataModel> keyWordModelList=new ArrayList<SearchKeyWordDataModel>();
+		for(SearchKeyWordDataModel model: originalKeyWordModelList){
+			if(model.getEngineNames().contains(searchEngineType)){
+				//拆分tagWords
+				String orginalTagWords=model.getTagWords();
+				if(!orginalTagWords.equals("")){
+					String[] tagWordsArray=orginalTagWords.split(",");
+					for (String word : tagWordsArray) {
+						SearchKeyWordDataModel newSearchKeyWordDataModel=(SearchKeyWordDataModel)model.clone();
+						newSearchKeyWordDataModel.setEngineNames(searchEngineType);
+						newSearchKeyWordDataModel.setTagWords(word);
+						keyWordModelList.add(newSearchKeyWordDataModel);
+					}					
+				}				
+			}
+		}
+		return keyWordModelList;
+	}
+	
 	/**
 	 * 
 	 * 生成搜索引擎的静态模板Tags属性
@@ -950,7 +975,7 @@ public class CrawlToolResource {
 		List<TemplateTagModel> templateTagsViewModel=new ArrayList<TemplateTagModel>();
 		TemplateTagModel templateTagModel=new TemplateTagModel();
 		templateTagModel.setTagKey("分类");
-		templateTagModel.setTagValue(WebtoolConstants.BAIDU_SEARCH+"-"+searchKeyWord);
+		templateTagModel.setTagValue(WebtoolConstants.BAIDU_SEARCH_NAME+"-"+searchKeyWord);
 		templateTagsViewModel.add(templateTagModel);
 		return templateTagsViewModel;
 	}
@@ -963,22 +988,22 @@ public class CrawlToolResource {
 		for (int i = 0; i < searchEngineTagsViewModel.size(); i++) {
 			if(searchEngineTagsViewModel.get(i).getTagKey().equals("分类")){
 				if(templateType.equals("百度新闻搜索")){
-					searchEngineTagsViewModel.get(i).setTagValue(WebtoolConstants.BAIDU_SEARCH+"-"+searchKeyWord); 
+					searchEngineTagsViewModel.get(i).setTagValue(WebtoolConstants.BAIDU_SEARCH_NAME+"-"+searchKeyWord); 
 				}else if(templateType.equals("Bing新闻搜索")){
-					searchEngineTagsViewModel.get(i).setTagValue(WebtoolConstants.BING_SEARCH+"-"+searchKeyWord); 
+					searchEngineTagsViewModel.get(i).setTagValue(WebtoolConstants.BING_SEARCH_NAME+"-"+searchKeyWord); 
 				}else if(templateType.equals("搜狗新闻搜索")){
-					searchEngineTagsViewModel.get(i).setTagValue(WebtoolConstants.SOUGOU_SEARCH+"-"+searchKeyWord); 
+					searchEngineTagsViewModel.get(i).setTagValue(WebtoolConstants.SOUGOU_SEARCH_NAME+"-"+searchKeyWord); 
 				}				
 			}else{//没有设置标签为“分类”的时候，自己添加
 				if(i==(searchEngineTagsViewModel.size()-1)){
 					TemplateTagModel templateTagModel=new TemplateTagModel();
 					templateTagModel.setTagKey("分类");
 					if(templateType.equals("百度新闻搜索")){
-						templateTagModel.setTagValue(WebtoolConstants.BAIDU_SEARCH+"-"+searchKeyWord); 
+						templateTagModel.setTagValue(WebtoolConstants.BAIDU_SEARCH_NAME+"-"+searchKeyWord); 
 					}else if(templateType.equals("Bing新闻搜索")){
-						templateTagModel.setTagValue(WebtoolConstants.BING_SEARCH+"-"+searchKeyWord); 
+						templateTagModel.setTagValue(WebtoolConstants.BING_SEARCH_NAME+"-"+searchKeyWord); 
 					}else if(templateType.equals("搜狗新闻搜索")){
-						templateTagModel.setTagValue(WebtoolConstants.SOUGOU_SEARCH+"-"+searchKeyWord); 
+						templateTagModel.setTagValue(WebtoolConstants.SOUGOU_SEARCH_NAME+"-"+searchKeyWord); 
 					}					
 					searchEngineTagsViewModel.add(templateTagModel);
 				}						
@@ -1464,6 +1489,23 @@ public class CrawlToolResource {
 			}
 		}
 		return format;
+	}
+	
+	/**
+	 * 
+	 * 获取搜索引擎类型
+	 * */
+	private String getSearchEngineType(PageModel pageModel) {
+		BasicInfoViewModel basicInfoViewModel=pageModel.getBasicInfoViewModel();			
+		String templateType=basicInfoViewModel.getTemplateType();
+		if(templateType.equals("百度新闻搜索")){
+			return WebtoolConstants.BAIDU_NEWS_ENGINE;
+		}else if(templateType.equals("Bing新闻搜索")){
+			return WebtoolConstants.BING_NEWS_ENGINE;
+		}else if(templateType.equals("搜狗新闻搜索")){
+			return WebtoolConstants.SOUGOU_NEWS_ENGINE;
+		}
+		return null;
 	}
 	
 	/**
