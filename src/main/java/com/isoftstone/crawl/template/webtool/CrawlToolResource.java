@@ -842,28 +842,27 @@ public class CrawlToolResource {
 			//处理静态属性Tags，无论是否配置静态属性tags值，都需要处理
 			List<TemplateTagModel> templateTagsViewModel=pageModel.getTemplateTagsViewModel();
 			if(templateTagsViewModel!=null){
-				GetSearchEngineTagsViewModel(templateTagsViewModel, searchKeyWord,templateType);
+				if(templateTagsViewModel.size()>0){
+					GetSearchEngineTagsViewModel(templateTagsViewModel, searchKeyWord,templateType);
+				}else{
+					templateTagsViewModel=GetSearchEngineTagsViewModel(searchKeyWord);
+				}				
 			}else{//没有设置模板静态属性的时候
-				templateTagsViewModel=new ArrayList<TemplateTagModel>();
-				TemplateTagModel templateTagModel=new TemplateTagModel();
-				templateTagModel.setTagKey("分类");
-				templateTagModel.setTagValue(WebtoolConstants.BAIDU_SEARCH+"-"+searchKeyWord);
-				templateTagsViewModel.add(templateTagModel);
+				templateTagsViewModel=GetSearchEngineTagsViewModel(searchKeyWord);
 			}	
 			
-			//内容页目前不需要处理，暂时先屏蔽
+//			//内容页目前不需要处理，暂时先屏蔽,如果取消此处注释，对应页面中的内容页就得放出，还得删除GetTemplateResult方法中对搜索引擎内容页单独处理的代码
 //			//处理内容页
 //			List<CustomerAttrModel> newCustomerAttrViewModel=pageModel.getNewsCustomerAttrViewModel();
 //			//无论内容页是否配置，搜索引擎默认选取网页的HTML body中的内容
 //			if (newCustomerAttrViewModel != null) {
-//				GetSearchNewCustomerAttrViewModel(newCustomerAttrViewModel);
+//				if(newCustomerAttrViewModel.size()>0){
+//					GetSearchNewCustomerAttrViewModel(newCustomerAttrViewModel);
+//				}else{
+//					newCustomerAttrViewModel=GetSearchNewCustomerAttrViewModel();
+//				}				
 //			} else {
-//				newCustomerAttrViewModel = new ArrayList<CustomerAttrModel>();
-//				CustomerAttrModel customerAttrModel = new CustomerAttrModel();
-//				customerAttrModel.setTarget("page_content");
-//				customerAttrModel.setSelector("body");
-//				customerAttrModel.setAttr("html");
-//				newCustomerAttrViewModel.add(customerAttrModel);
+//				newCustomerAttrViewModel=GetSearchNewCustomerAttrViewModel();
 //			}		
 			
 			//构造新的pageModel
@@ -931,6 +930,20 @@ public class CrawlToolResource {
 	 * 
 	 * 生成搜索引擎的内容页自定义属性
 	 * */
+	private List<CustomerAttrModel> GetSearchNewCustomerAttrViewModel() {
+		List<CustomerAttrModel> newCustomerAttrViewModel = new ArrayList<CustomerAttrModel>();
+		CustomerAttrModel customerAttrModel = new CustomerAttrModel();
+		customerAttrModel.setTarget("page_content");
+		customerAttrModel.setSelector("body");
+		customerAttrModel.setAttr("html");
+		newCustomerAttrViewModel.add(customerAttrModel);
+		return newCustomerAttrViewModel;
+	}
+	
+	/**
+	 * 
+	 * 生成搜索引擎的内容页自定义属性
+	 * */
 	private void GetSearchNewCustomerAttrViewModel(List<CustomerAttrModel> newCustomerAttrViewModel) {
 		for (int i = 0; i < newCustomerAttrViewModel.size(); i++) {
 			CustomerAttrModel model=newCustomerAttrViewModel.get(i);
@@ -948,7 +961,18 @@ public class CrawlToolResource {
 		}
 	}
 	
-	
+	/**
+	 * 
+	 * 生成搜索引擎的静态模板Tags属性
+	 * */
+	private List<TemplateTagModel> GetSearchEngineTagsViewModel(String searchKeyWord){
+		List<TemplateTagModel> templateTagsViewModel=new ArrayList<TemplateTagModel>();
+		TemplateTagModel templateTagModel=new TemplateTagModel();
+		templateTagModel.setTagKey("分类");
+		templateTagModel.setTagValue(WebtoolConstants.BAIDU_SEARCH+"-"+searchKeyWord);
+		templateTagsViewModel.add(templateTagModel);
+		return templateTagsViewModel;
+	}
 	
 	/**
 	 * 
