@@ -42,4 +42,6 @@ public class WebtoolConstants {
     public static final String BAIDU_SEARCH="百度新闻搜索";
     public static final String BING_SEARCH="Bing新闻搜索";
     public static final String SOUGOU_SEARCH="搜狗新闻搜索";
+    
+    public static final String SEARCH_KEYWORD_API_URL="SEARCH_KEYWORD_API_URL";
 }
