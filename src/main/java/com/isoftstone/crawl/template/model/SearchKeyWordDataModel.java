@@ -4,7 +4,7 @@ package com.isoftstone.crawl.template.model;
  * 
  * 搜索关键字实体
  * */
-public class SearchKeyWordDataModel {
+public class SearchKeyWordDataModel implements Cloneable {
 	private String id;
 	private String sysId;
 	private String sysName;
@@ -108,4 +108,19 @@ public class SearchKeyWordDataModel {
 	public void setState(String state) {
 		this.state = state;
 	}
+	
+	@Override  
+    public Object clone()
+    {  
+		try{
+			SearchKeyWordDataModel searchKeyWordDataModel = (SearchKeyWordDataModel) super.clone();        
+	        return searchKeyWordDataModel;  
+		}catch(CloneNotSupportedException e){
+			e.printStackTrace();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+    } 
 }
