@@ -479,9 +479,9 @@ function loadPageContext(initData){
 
                         /*批量生成搜索引擎模板*/
                         this.bulkSearchTemplates=function(){
-                            $('#modalHtmlTitle').text('生成搜索引擎模板结果');
-                            $('#modal-viewHtml').modal('show');
-                            ajaxPostRequest(virtualWebPath+'/webapi/crawlToolResource/bulkSearchTemplates',this,showResultInModalWithHtml,showResultInModalWithHtml);
+                            var infoTitle='生成搜索引擎模板结果';
+                            var infoErrorMsg='批量生成生成搜索引擎模板失败！';
+                            ajax2PostRequest(virtualWebPath+'/webapi/crawlToolResource/bulkSearchTemplates',this,infoTitle,infoErrorMsg);
                         }.bind(this);
 
                         /*根据模板类型显示相应按钮*/
@@ -891,6 +891,36 @@ function ajaxLoadingPostRequest(url,data,successCallback,errorCallback){
         success: function(data){successCallback(data)},
         error: function(error){errorCallback(error)}
     },'#test_validate_result');
+}
+
+/**
+ *
+ * ajax post 请求
+ * @param {String} url 资源URL
+ * @param {Object} data POST数据
+ * @param {String} title 提示标题
+ * @param {String} errMsg 错误信息
+ * */
+function ajax2PostRequest(url,data,title,errMsg){
+    var htmlModal=$('#modal-viewHtml');
+    $('#modalHtmlTitle').text(title);
+    var modalBody=$('#modal-viewHtml-body');
+    $.ajax2({
+        url: url,
+        type: 'POST',
+        data: {
+            data: getJSONString(data)
+        },
+        success: function(data){
+            var json=JSON.parse(data);
+            modalBody.html(json.data);
+            htmlModal.modal('show');
+        },
+        error: function(error){
+            modalBody.text("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;"+errMsg+"<br/> 错误信息：<br/>"+data.responseText);
+            htmlModal.modal('show');
+        }
+    });
 }
 
 /**
