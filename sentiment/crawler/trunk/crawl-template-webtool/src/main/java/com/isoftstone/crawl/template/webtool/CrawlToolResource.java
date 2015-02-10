@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -31,6 +33,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonGenerationException;
@@ -57,11 +68,13 @@ import com.isoftstone.crawl.template.model.ListPaginationViewModel;
 import com.isoftstone.crawl.template.model.PageModel;
 import com.isoftstone.crawl.template.model.ResponseJSONProvider;
 import com.isoftstone.crawl.template.model.ScheduleDispatchViewModel;
+import com.isoftstone.crawl.template.model.SearchKeyWordModel;
 import com.isoftstone.crawl.template.model.TemplateIncreaseViewModel;
 import com.isoftstone.crawl.template.model.TemplateModel;
 import com.isoftstone.crawl.template.model.TemplateTagModel;
 import com.isoftstone.crawl.template.utils.Config;
 import com.isoftstone.crawl.template.utils.DownloadHtml;
+import com.isoftstone.crawl.template.utils.EncodeUtils;
 import com.isoftstone.crawl.template.utils.HdfsCommon;
 import com.isoftstone.crawl.template.utils.MD5Utils;
 import com.isoftstone.crawl.template.utils.RedisOperator;
@@ -801,7 +814,8 @@ public class CrawlToolResource {
 		StringBuilder sbString=new StringBuilder();
 		int failedTemplateCount=0;
 		jsonProvider.setSuccess(true);
-		jsonProvider.setData("关键字对应的搜索引擎模板，已全部生成！请回到列表页面，并刷新!");		
+		jsonProvider.setData("关键字对应的搜索引擎模板，已全部生成！请回到列表页面，并刷新!");	
+		//SearchKeyWordModel searchKeyWordModel=getSearchKeyWordModel();
 		//TODO: 获取关键词，根据关键词产生搜索引擎模板
 		List<String> wordsList=new ArrayList<String>();
 		wordsList.add("鸟巢,回龙观");
@@ -1439,9 +1453,77 @@ public class CrawlToolResource {
 	 * 
 	 * 获取搜索关键字
 	 * */
-	private List<String> GetSearchKeyWords() {
-		List<String> searchKeyWords=new ArrayList<String>();
-		return searchKeyWords;
+	private SearchKeyWordModel getSearchKeyWordModel() {
+		//请求相应体
+		String responseBody = "";
+		SearchKeyWordModel searchKeyWordModel=null;
+		String keyWordURL = Config
+				.getValue(WebtoolConstants.SEARCH_KEYWORD_API_URL);
+		if (StringUtils.isBlank(keyWordURL)) {
+			return searchKeyWordModel;
+		}		
+		// 创建Get连接方法的实例
+		HttpMethod getMethod = null;
+		try {
+			// 创建 HttpClient 的实例
+			HttpClient httpClient = new HttpClient();
+			// 创建Get连接方法的实例
+			// getMethod = new GetMethod(url);
+			getMethod = new GetMethod(EncodeUtils.formatUrl(keyWordURL, ""));
+			// 使用系统提供的默认的恢复策略
+			getMethod.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler());
+			// 设置 get 请求超时为 10秒
+			getMethod.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 10000);
+
+			// 执行getMethod
+			int status = httpClient.executeMethod(getMethod);
+			
+			// 连接返回的状态码
+			if (HttpStatus.SC_OK == status) {
+				System.out.println("Connection to " + getMethod.getURI() + " Success!");
+				// 获取到的内容
+				InputStream resStream = getMethod.getResponseBodyAsStream();
+
+				BufferedReader br = new BufferedReader(new InputStreamReader(resStream));
+				StringBuffer resBuffer = new StringBuffer();
+				char[] chars = new char[4096];
+				int length = 0;
+				while (0 < (length = br.read(chars))) {
+					resBuffer.append(chars, 0, length);
+				}
+				resStream.close();
+				responseBody=resBuffer.toString();
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (URIException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			// 释放连接
+			getMethod.releaseConnection();
+		}
+		
+		//JSON映射
+		if(!responseBody.equals("")){			
+			try {
+				ObjectMapper objectmapper = new ObjectMapper();
+				searchKeyWordModel = objectmapper.readValue(responseBody, SearchKeyWordModel.class);
+			} catch (JsonParseException e) {			
+				e.printStackTrace();
+			} catch (JsonMappingException e) {			
+				e.printStackTrace();
+			} catch (IOException e) {			
+				e.printStackTrace();
+			}			
+		}else{
+			return searchKeyWordModel;
+		}
+		
+		return searchKeyWordModel;
 	}
 	
 	/**
