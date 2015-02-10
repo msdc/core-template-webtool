@@ -68,6 +68,7 @@ import com.isoftstone.crawl.template.model.ListPaginationViewModel;
 import com.isoftstone.crawl.template.model.PageModel;
 import com.isoftstone.crawl.template.model.ResponseJSONProvider;
 import com.isoftstone.crawl.template.model.ScheduleDispatchViewModel;
+import com.isoftstone.crawl.template.model.SearchKeyWordDataModel;
 import com.isoftstone.crawl.template.model.SearchKeyWordModel;
 import com.isoftstone.crawl.template.model.TemplateIncreaseViewModel;
 import com.isoftstone.crawl.template.model.TemplateModel;
@@ -815,13 +816,29 @@ public class CrawlToolResource {
 		int failedTemplateCount=0;
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("关键字对应的搜索引擎模板，已全部生成！请回到列表页面，并刷新!");	
-		//SearchKeyWordModel searchKeyWordModel=getSearchKeyWordModel();
-		//TODO: 获取关键词，根据关键词产生搜索引擎模板
-		List<String> wordsList=new ArrayList<String>();
-		wordsList.add("鸟巢,回龙观");
-		wordsList.add("国元信托,国元证券,安徽国元");
-		wordsList.add("北京,故宫,天安门");
-		for(String searchKeyWord: wordsList){		
+		SearchKeyWordModel searchKeyWordModel=getSearchKeyWordModel();
+		String keyWordURL = Config
+				.getValue(WebtoolConstants.SEARCH_KEYWORD_API_URL);	
+		if(StringUtils.isBlank(keyWordURL)){
+			jsonProvider.setSuccess(false);
+			jsonProvider.setData("配置文件中缺少，关键字服务地址，请检查相关配置！");	
+			return jsonProvider.toJSON();
+		}
+		if(searchKeyWordModel==null){					
+			jsonProvider.setSuccess(false);
+			jsonProvider.setData("未能成功获取到关键字信息，请检查关键字获取地址是否有效，地址如下："+keyWordURL+"<br/>");	
+			return jsonProvider.toJSON();
+		}
+		if(searchKeyWordModel.getData().size()==0){
+			jsonProvider.setSuccess(false);
+			jsonProvider.setData("关键字服务中没有可以提取的关键字信息，关键字服务地址如下："+keyWordURL+"<br/>");	
+			return jsonProvider.toJSON();
+		}
+		
+		List<SearchKeyWordDataModel> keyWordModelList=searchKeyWordModel.getData();		
+		for(SearchKeyWordDataModel model: keyWordModelList){
+			//搜索关键字
+			String searchKeyWord=model.getTagWords();
 			PageModel pageModel = GetPageModelByJsonString(data);
 			//根据words关键字，处理pageModel中的相关信息:URL,名称,Tags,查询关键字,并重新赋值
 			String templateURL=pageModel.getBasicInfoViewModel().getUrl();
@@ -884,9 +901,9 @@ public class CrawlToolResource {
 		}
 		
 		if(failedTemplateCount>0){
-			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：成功生成"+wordsList.size()+"个模板，其中"+failedTemplateCount+"个未成功生成增量模板，请根据上述模板名称，检查相应的模板配置！</div>");
+			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：成功生成"+keyWordModelList.size()+"个模板，其中"+failedTemplateCount+"个未成功生成增量模板，请根据上述模板名称，检查相应的模板配置！</div>");
 		}else{
-			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：成功生成"+wordsList.size()+"个模板，和这些模板相关联的增量模板也全部生成成功!</div>");
+			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：成功生成"+keyWordModelList.size()+"个模板，和这些模板相关联的增量模板也全部生成成功!</div>");
 		}		
 		jsonProvider.setData(sbString.toString());	
 		
