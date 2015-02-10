@@ -849,26 +849,11 @@ public class CrawlToolResource {
 				}				
 			}else{//没有设置模板静态属性的时候
 				templateTagsViewModel=GetSearchEngineTagsViewModel(searchKeyWord);
-			}	
-			
-//			//内容页目前不需要处理，暂时先屏蔽,如果取消此处注释，对应页面中的内容页就得放出，还得删除GetTemplateResult方法中对搜索引擎内容页单独处理的代码
-//			//处理内容页
-//			List<CustomerAttrModel> newCustomerAttrViewModel=pageModel.getNewsCustomerAttrViewModel();
-//			//无论内容页是否配置，搜索引擎默认选取网页的HTML body中的内容
-//			if (newCustomerAttrViewModel != null) {
-//				if(newCustomerAttrViewModel.size()>0){
-//					GetSearchNewCustomerAttrViewModel(newCustomerAttrViewModel);
-//				}else{
-//					newCustomerAttrViewModel=GetSearchNewCustomerAttrViewModel();
-//				}				
-//			} else {
-//				newCustomerAttrViewModel=GetSearchNewCustomerAttrViewModel();
-//			}		
-			
+			}				
+	
 			//构造新的pageModel
 			pageModel.setBasicInfoViewModel(basicInfoViewModel);
 			pageModel.setTemplateTagsViewModel(templateTagsViewModel);	
-			//pageModel.setNewsCustomerAttrViewModel(newCustomerAttrViewModel);
 			TemplateResult templateResult = GetTemplateResult(pageModel);						
 			RedisOperator.saveTemplateToDefaultDB(templateResult, templateResult.getTemplateGuid());		
 			// 保存数据源列表所需要的key值 模板默认为启用状态
@@ -924,41 +909,6 @@ public class CrawlToolResource {
 		
 		jsonProvider.setData(sbString.toString());		
 		return jsonProvider.toJSON();
-	}
-	
-	/**
-	 * 
-	 * 生成搜索引擎的内容页自定义属性
-	 * */
-	private List<CustomerAttrModel> GetSearchNewCustomerAttrViewModel() {
-		List<CustomerAttrModel> newCustomerAttrViewModel = new ArrayList<CustomerAttrModel>();
-		CustomerAttrModel customerAttrModel = new CustomerAttrModel();
-		customerAttrModel.setTarget("page_content");
-		customerAttrModel.setSelector("body");
-		customerAttrModel.setAttr("html");
-		newCustomerAttrViewModel.add(customerAttrModel);
-		return newCustomerAttrViewModel;
-	}
-	
-	/**
-	 * 
-	 * 生成搜索引擎的内容页自定义属性
-	 * */
-	private void GetSearchNewCustomerAttrViewModel(List<CustomerAttrModel> newCustomerAttrViewModel) {
-		for (int i = 0; i < newCustomerAttrViewModel.size(); i++) {
-			CustomerAttrModel model=newCustomerAttrViewModel.get(i);
-			if(model.getTarget().equals("page_content")){
-				break;
-			}else{
-				if(i==(newCustomerAttrViewModel.size()-1)){//没有则添加属性
-					CustomerAttrModel customerAttrModel = new CustomerAttrModel();
-					customerAttrModel.setTarget("page_content");
-					customerAttrModel.setSelector("body");
-					customerAttrModel.setAttr("html");
-					newCustomerAttrViewModel.add(customerAttrModel);
-				}
-			}
-		}
 	}
 	
 	/**
@@ -1693,12 +1643,32 @@ public class CrawlToolResource {
 		//处理搜索引擎模板内容页
 		String templateType=pageModel.getBasicInfoViewModel().getTemplateType();
 		if(!templateType.equals("普通模板")){
-			// 添加page_content属性，默认选取整个网页的body
-			indexer = new SelectorIndexer();
-			selector = new Selector();
-			indexer.initJsoupIndexer("body", "html");
-			selector.initFieldSelector("page_content", "", indexer, null, null);
-			news.add(selector);
+			//判断是否已经添加了page_content属性（可能是修改操作）			
+			if(newsCustomerAttrViewModel.size()>0){
+				boolean foundFlag=false;
+				for (CustomerAttrModel model : newsCustomerAttrViewModel) {
+					if(model.getTarget().equals("page_content")){
+						foundFlag=true;
+						break;
+					}
+				}				
+				//如果内容页中未定义属性 page_content 则添加，否则不执行操作
+				if(foundFlag==false){
+					// 添加page_content属性，默认选取整个网页的body
+					indexer = new SelectorIndexer();
+					selector = new Selector();
+					indexer.initJsoupIndexer("body", "html");
+					selector.initFieldSelector("page_content", "", indexer, null, null);
+					news.add(selector);
+				}
+			}else{
+				// 添加page_content属性，默认选取整个网页的body
+				indexer = new SelectorIndexer();
+				selector = new Selector();
+				indexer.initJsoupIndexer("body", "html");
+				selector.initFieldSelector("page_content", "", indexer, null, null);
+				news.add(selector);
+			}
 		}
 		
 		template.setNews(news);
