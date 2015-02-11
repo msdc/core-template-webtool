@@ -894,6 +894,8 @@ public class CrawlToolResource {
 			RedisOperator.saveTemplateToDefaultDB(templateResult, templateResult.getTemplateGuid());		
 			// 保存数据源列表所需要的key值 模板默认为启用状态
 			SaveTemplateToList(pageModel, "true");
+			//同时导出到文件
+			saveToLocalFile(pageModel.toJSON());
 			//同时生成增量模板
 			String templateModelJSONString=RedisOperator.getFromDefaultDB(templateGuid+key_partern);
 			TemplateModel templateModel=GetTemplateModel(templateModelJSONString);
