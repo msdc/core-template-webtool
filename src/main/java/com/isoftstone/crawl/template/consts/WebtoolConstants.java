@@ -48,4 +48,12 @@ public class WebtoolConstants {
     public static final String SOUGOU_NEWS_ENGINE="sogou_news";
     
     public static final String SEARCH_KEYWORD_API_URL="SEARCH_KEYWORD_API_URL";
+    
+    //模板列表文件后缀
+    public static final String TEMPLATE_LIST_KEY_PARTERN = "_templatelist";
+    //模板导出文件后缀
+    public static final String TEMPLATE_FILE_EXTENTIONS_NAME =  ".txt";
+    
+    //-- 增量文件夹命名标识.
+  	public static final String INCREMENT_FILENAME_SIGN = "increment";
 }
