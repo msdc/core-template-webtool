@@ -854,14 +854,20 @@ public class CrawlToolResource {
 		
 		for(SearchKeyWordDataModel model: keyWordModelList){
 			//搜索关键字
-			String searchKeyWord=model.getTagWords();
+			String searchKeyWord=model.getTagWords();			
 			PageModel pageModel = GetPageModelByJsonString(data);			
 			
 			//根据words关键字，处理pageModel中的相关信息:URL,名称,Tags,查询关键字,并重新赋值
 			String templateURL=pageModel.getBasicInfoViewModel().getUrl();
 			String currentString=pageModel.getBasicInfoViewModel().getCurrentString();
 			templateURL=templateURL.replace(currentString,searchKeyWord);
-			String templateGuid=MD5Utils.MD5(templateURL);
+			String encodeTemplateUrl="";
+			try {
+				encodeTemplateUrl=EncodeUtils.formatUrl(templateURL, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			String templateGuid=MD5Utils.MD5(encodeTemplateUrl);
 			
 			//处理URL及名称
 			BasicInfoViewModel basicInfoViewModel=pageModel.getBasicInfoViewModel();			
@@ -873,8 +879,15 @@ public class CrawlToolResource {
 			}else if(templateType.equals("搜狗新闻搜索")){
 				basicInfoViewModel.setName(WebtoolConstants.SOUGOU_SEARCH_NAME+"-"+searchKeyWord);
 			}
-			basicInfoViewModel.setCurrentString(searchKeyWord);
-			basicInfoViewModel.setUrl(templateURL);
+			String encodedSearchKeyWord="";
+			try {
+				encodedSearchKeyWord=EncodeUtils.formatUrl(searchKeyWord, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			basicInfoViewModel.setCurrentString(encodedSearchKeyWord);
+			basicInfoViewModel.setUrl(encodeTemplateUrl);
 			
 			//处理列表分页链接中的URL
 			ListPaginationViewModel paginationViewModel=pageModel.getListPaginationViewModel();
@@ -885,7 +898,13 @@ public class CrawlToolResource {
 			}
 		   String paginationURL=paginationViewModel.getPaginationUrl();
 		   paginationURL=paginationURL.replace(currentString,searchKeyWord);
-		   paginationViewModel.setPaginationUrl(paginationURL);
+		   String encodepaginationURL="";
+			try {
+				encodepaginationURL=EncodeUtils.formatUrl(paginationURL, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		   paginationViewModel.setPaginationUrl(encodepaginationURL);
 			
 			//处理静态属性Tags，无论是否配置静态属性tags值，都需要处理
 			List<TemplateTagModel> templateTagsViewModel=pageModel.getTemplateTagsViewModel();
@@ -1791,37 +1810,6 @@ public class CrawlToolResource {
 			if (!model.getSelector().equals("")) {
 				indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
 				selector.initFieldSelector(model.getTarget(), "", indexer, filter, format);
-				news.add(selector);
-			}
-		}
-		
-		//处理搜索引擎模板内容页
-		String templateType=pageModel.getBasicInfoViewModel().getTemplateType();
-		if(!templateType.equals("普通模板")){
-			//判断是否已经添加了page_content属性（可能是修改操作）			
-			if(newsCustomerAttrViewModel.size()>0){
-				boolean foundFlag=false;
-				for (CustomerAttrModel model : newsCustomerAttrViewModel) {
-					if(model.getTarget().equals("page_content")){
-						foundFlag=true;
-						break;
-					}
-				}				
-				//如果内容页中未定义属性 page_content 则添加，否则不执行操作
-				if(foundFlag==false){
-					// 添加page_content属性，默认选取整个网页的body
-					indexer = new SelectorIndexer();
-					selector = new Selector();
-					indexer.initJsoupIndexer("body", "html");
-					selector.initFieldSelector("page_content", "", indexer, null, null);
-					news.add(selector);
-				}
-			}else{
-				// 添加page_content属性，默认选取整个网页的body
-				indexer = new SelectorIndexer();
-				selector = new Selector();
-				indexer.initJsoupIndexer("body", "html");
-				selector.initFieldSelector("page_content", "", indexer, null, null);
 				news.add(selector);
 			}
 		}
