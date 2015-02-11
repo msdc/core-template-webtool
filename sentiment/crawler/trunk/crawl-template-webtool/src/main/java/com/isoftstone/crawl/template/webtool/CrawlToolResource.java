@@ -34,7 +34,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
-import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
@@ -178,11 +177,24 @@ public class CrawlToolResource {
             String currentString, String start) {
 		// --1.1 保存模板url到本地文件.
 	    List<String> templateList = new ArrayList<String>();
-	    templateList.add(templateUrl);
+        try {
+            templateList.add(EncodeUtils.formatUrl(templateUrl, ""));
+        } catch (UnsupportedEncodingException e) {
+            LOG.error("UnsupportedEncodingException", e);
+        }
 		contentToTxt(folderName, templateList, status, paginationUrl,
             currentString, start);
 		// --1.2 保存增量种子到本地文件.
-        contentToTxt(incrementFolderName, seeds, status, paginationUrl,
+		List<String> encodeSeeds = new ArrayList<String>();
+        for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
+            String seed = it.next();
+            try {
+                encodeSeeds.add(EncodeUtils.formatUrl(seed, ""));
+            } catch (UnsupportedEncodingException e) {
+                LOG.error("UnsupportedEncodingException", e);
+            }
+        }
+        contentToTxt(incrementFolderName, encodeSeeds, status, paginationUrl,
             currentString, start);
 
 		// --2.保存到redis中.
@@ -347,7 +359,6 @@ public class CrawlToolResource {
 	}
 
 	private static void putSeedsFolder(String folderName, String type) {
-		LOG.info("进入方法");
 		String hostIp = Config.getValue(WebtoolConstants.KEY_HOST_IP);
 		String userName = Config.getValue(WebtoolConstants.KEY_HOST_USERNAME);
 		String password = Config.getValue(WebtoolConstants.KEY_HOST_PASSWORD);
