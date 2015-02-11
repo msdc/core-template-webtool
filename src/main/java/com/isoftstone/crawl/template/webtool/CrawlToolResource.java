@@ -177,24 +177,25 @@ public class CrawlToolResource {
             String currentString, String start) {
 		// --1.1 保存模板url到本地文件.
 	    List<String> templateList = new ArrayList<String>();
-        try {
-            templateList.add(EncodeUtils.formatUrl(templateUrl, ""));
-        } catch (UnsupportedEncodingException e) {
-            LOG.error("UnsupportedEncodingException", e);
-        }
+//        try {
+//            templateList.add(EncodeUtils.formatUrl(templateUrl, ""));
+//        } catch (UnsupportedEncodingException e) {
+//            LOG.error("UnsupportedEncodingException", e);
+//        }
+	    templateList.add(templateUrl);
 		contentToTxt(folderName, templateList, status, paginationUrl,
             currentString, start);
 		// --1.2 保存增量种子到本地文件.
-		List<String> encodeSeeds = new ArrayList<String>();
-        for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
-            String seed = it.next();
-            try {
-                encodeSeeds.add(EncodeUtils.formatUrl(seed, ""));
-            } catch (UnsupportedEncodingException e) {
-                LOG.error("UnsupportedEncodingException", e);
-            }
-        }
-        contentToTxt(incrementFolderName, encodeSeeds, status, paginationUrl,
+//		List<String> encodeSeeds = new ArrayList<String>();
+//        for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
+//            String seed = it.next();
+//            try {
+//                encodeSeeds.add(EncodeUtils.formatUrl(seed, ""));
+//            } catch (UnsupportedEncodingException e) {
+//                LOG.error("UnsupportedEncodingException", e);
+//            }
+//        }
+        contentToTxt(incrementFolderName, seeds, status, paginationUrl,
             currentString, start);
 
 		// --2.保存到redis中.
