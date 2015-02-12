@@ -647,10 +647,14 @@ public class CrawlToolResource {
 			if(listKeys!=null){
 				for (String key : listKeys) {
 					String templateString =RedisOperator.getFromDefaultDB(key);
-					if(templateString.contains(searchString)){
-						TemplateModel templateModel = GetTemplateModel(templateString);
+					TemplateModel templateModel = GetTemplateModel(templateString);
+					if(StringUtils.isBlank(searchString)){
 						templateListArrayList.add(templateModel);
-					}
+					}else{
+						if(templateModel.getStatus().equals(searchString)){
+							templateListArrayList.add(templateModel);
+						}
+					}										
 				}
 			}			
 		} catch (Exception e) {
