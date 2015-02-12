@@ -650,8 +650,13 @@ public class CrawlToolResource {
 					TemplateModel templateModel = GetTemplateModel(templateString);
 					if(StringUtils.isBlank(searchString)){
 						templateListArrayList.add(templateModel);
-					}else{
+					}else if(searchString=="false"||searchString=="true"){
 						if(templateModel.getStatus().equals(searchString)){
+							templateListArrayList.add(templateModel);
+						}
+					}
+					else{
+						if(StringUtils.contains(templateString, searchString)){
 							templateListArrayList.add(templateModel);
 						}
 					}										
