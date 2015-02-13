@@ -175,29 +175,19 @@ public class CrawlToolResource {
             String incrementFolderName, String templateUrl, List<String> seeds,
             String status, boolean userProxy, String paginationUrl,
             String currentString, String start) {
-		// --1.1 保存模板url到本地文件.
+        List<String> beforeSeedList = getSeedListResult(templateUrl, WebtoolConstants.SEEDLIST_REDIS_DEBINDEX);
+		
+        // --1.1 保存模板url到本地文件.
 	    List<String> templateList = new ArrayList<String>();
-//        try {
-//            templateList.add(EncodeUtils.formatUrl(templateUrl, ""));
-//        } catch (UnsupportedEncodingException e) {
-//            LOG.error("UnsupportedEncodingException", e);
-//        }
 	    templateList.add(templateUrl);
 		contentToTxt(folderName, templateList, status, paginationUrl,
-            currentString, start);
+            currentString, start, templateList);
 		// --1.2 保存增量种子到本地文件.
-//		List<String> encodeSeeds = new ArrayList<String>();
-//        for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
-//            String seed = it.next();
-//            try {
-//                encodeSeeds.add(EncodeUtils.formatUrl(seed, ""));
-//            } catch (UnsupportedEncodingException e) {
-//                LOG.error("UnsupportedEncodingException", e);
-//            }
-//        }
         contentToTxt(incrementFolderName, seeds, status, paginationUrl,
-            currentString, start);
-
+            currentString, start, beforeSeedList);
+        
+        // --1.3将增量种子列表，保存到redis中，key为模板url.
+        setSeedListResult(seeds, templateUrl, WebtoolConstants.SEEDLIST_REDIS_DEBINDEX);        
 		// --2.保存到redis中.
 		String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
 		
@@ -208,21 +198,61 @@ public class CrawlToolResource {
 		dispatchVo.setStatus(WebtoolConstants.DISPATCH_STATIS_START);
 		dispatchVo.setUserProxy(userProxy);
 		List<Seed> seedList = dispatchVo.getSeed();
-		if(seedList == null) {
-		    seedList = new ArrayList<Seed>();
-		}
+        if (seedList == null) {
+            seedList = new ArrayList<Seed>();
+        } else {
+            List<Seed> removeSeeds = new ArrayList<Seed>();
+            for(Iterator<String> it = beforeSeedList.iterator(); it.hasNext();) {
+                Seed seed = new Seed(it.next());
+                removeSeeds.add(seed);
+            }
+            seedList.removeAll(removeSeeds);
+        }
 		for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
 			String seedStr = it.next();
 			Seed seed = new Seed(seedStr, status);
-			if(seedList.contains(seed)) {
-			    //-- 更新seed的status.
-			    seedList.remove(seed);
-			}
 			seedList.add(seed);
 		}
 		dispatchVo.setSeed(seedList);
 		setDispatchResult(dispatchVo, redisKey, WebtoolConstants.DISPATCH_REDIS_DBINDEX);
 	}
+    
+    public void setSeedListResult(List<String> seedList, String guid, int dbindex) {
+        JedisPool pool = null;
+        Jedis jedis = null;
+        try {
+            StringBuilder str = new StringBuilder();
+            str.append(JSON.toJSONString(seedList));
+            pool = RedisUtils.getPool();
+            jedis = pool.getResource();
+            jedis.select(dbindex);
+            jedis.set(guid, str.toString());
+        } catch (Exception e) {
+            pool.returnBrokenResource(jedis);
+            LOG.error("", e);
+        } finally {
+            RedisUtils.returnResource(pool, jedis);
+        }
+    }
+    
+    public List<String> getSeedListResult(String guid, int dbindex) {
+        JedisPool pool = null;
+        Jedis jedis = null;
+        try {
+            pool = RedisUtils.getPool();
+            jedis = pool.getResource();
+            jedis.select(dbindex);
+            String json = jedis.get(guid);
+            if (json != null)
+                return JSON.parseArray(json, String.class);
+        } catch (Exception e) {
+            pool.returnBrokenResource(jedis);
+            LOG.error("", e);
+        } finally {
+            RedisUtils.returnResource(pool, jedis);
+        }
+        return null;
+    }
 
     public DispatchVo getDispatchResult(String guid, int dbindex) {
         JedisPool pool = null;
@@ -286,7 +316,7 @@ public class CrawlToolResource {
 	 * */
     private void contentToTxt(String folderName, List<String> seeds,
             String status, String paginationUrl, String currentString,
-            String start) {
+            String start, List<String> removeSeedList) {
 		String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
 		String filePath = folderRoot + File.separator + folderName + File.separator + WebtoolConstants.SEED_FILE_NAME;
 		String str = null; // 原有txt内容
@@ -309,11 +339,11 @@ public class CrawlToolResource {
 				}
 				input.close();
 				
-				//--根据分页url，生成与种子文件中种子相同数量的分页url.
-				List<String> tempSeedList = new ArrayList<String>();
-                for (int i = Integer.valueOf(start); i < fileSeedList.size() + Integer.valueOf(start); i++) {
-                    tempSeedList.add(paginationUrl.replace(currentString, String.valueOf(i)));
-                }
+//				//--根据分页url，生成与种子文件中种子相同数量的分页url.
+//				List<String> tempSeedList = new ArrayList<String>();
+//                for (int i = Integer.valueOf(start); i < fileSeedList.size() + Integer.valueOf(start); i++) {
+//                    tempSeedList.add(paginationUrl.replace(currentString, String.valueOf(i)));
+//                }
                 
                 //--写入未包含到本次种子中的历史数据.
                 for(int i = 0; i < fileSeedList.size(); i++) {
@@ -322,7 +352,7 @@ public class CrawlToolResource {
                     if (tempStr.startsWith("#")) {
                         temp = tempStr.substring(1, tempStr.length());
                     }
-                    if (!seeds.contains(temp) && !tempSeedList.contains(temp)) {
+                    if (!seeds.contains(temp) && !removeSeedList.contains(temp)) {
                         strBuf.append(tempStr + System.getProperty("line.separator"));
                     }
                 }
