@@ -28,6 +28,8 @@ public class WebtoolConstants {
     
     public static final Integer DISPATCH_REDIS_DBINDEX = 2;
     
+    public static final Integer SEEDLIST_REDIS_DEBINDEX = 3;
+    
     public static final String INCREASE_TEMPLATE_PARTERN =  "_increasetemplate";  
     
     public static final String KEY_HDFS_ROOT_FOLDER = "hdfsRootFolder";

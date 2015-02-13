@@ -8,6 +8,14 @@ public class Seed {
     public Seed() {
         super();
     }
+    
+    /**
+     * @param url
+     */
+    public Seed(String url) {
+        super();
+        this.url = url;
+    }
 
     public Seed(String url, String isEnabled) {
         super();
