@@ -197,7 +197,7 @@ function paginationViewModel(){
     this.filterCategorySelected=ko.observable('匹配');
     this.formatter=ko.observable();
     this.formatCategory=ko.observableArray([]);
-    this.paginationType=ko.observableArray(['分页的末尾页数','分页步进数','获取分页的记录数','获取分页URL','自定义分页']);
+    this.paginationType=ko.observableArray(['分页的末尾页数','分页步进数','获取分页的记录数','自定义分页']);
     this.paginationTypeSelected=ko.observable('分页的末尾页数');
     this.paginationUrl=ko.observable();
     this.currentString=ko.observable();
