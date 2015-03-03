@@ -9,6 +9,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -426,8 +429,9 @@ public class CrawlToolResource {
 		File file = new File(path);
 		if (!file.exists() || file.isDirectory()) {
 			throw new FileNotFoundException();
-		}
-		BufferedReader br = new BufferedReader(new FileReader(file));
+		}		
+		BufferedReader br = new BufferedReader(new InputStreamReader(  
+                new FileInputStream(file), "utf-8"));  
 		String temp = null;
 		StringBuffer sb = new StringBuffer();
 		temp = br.readLine();
@@ -453,9 +457,10 @@ public class CrawlToolResource {
 		if (!f.exists()) {
 			f.createNewFile();// 不存在则创建
 		}
-		BufferedWriter output = new BufferedWriter(new FileWriter(f));
-		output.write(content);
-		output.close();
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(  
+                new FileOutputStream(f), "utf-8"));
+        writer.write(content);  
+        writer.close();
 		// System.out.println("导出模板文件保存路径:" + filePath);
 	}
 
