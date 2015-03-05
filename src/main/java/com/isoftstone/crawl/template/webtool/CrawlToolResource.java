@@ -82,30 +82,23 @@ public class CrawlToolResource {
 	/**
 	 * 保存种子到本地文件. 并将文件夹相关信息存入redis.
 	 */
-	public void saveSeedsValueToFile(String folderName,
-			String incrementFolderName, String templateUrl, List<String> seeds,
-			String status, boolean userProxy, String paginationUrl,
+	public void saveSeedsValueToFile(String folderName, String incrementFolderName, String templateUrl, List<String> seeds, String status, boolean userProxy, String paginationUrl,
 			String currentString, String start) {
-		List<String> beforeSeedList = getSeedListResult(templateUrl,
-				WebtoolConstants.SEEDLIST_REDIS_DEBINDEX);
+		List<String> beforeSeedList = getSeedListResult(templateUrl, WebtoolConstants.SEEDLIST_REDIS_DEBINDEX);
 
 		// --1.1 保存模板url到本地文件.
 		List<String> templateList = new ArrayList<String>();
 		templateList.add(templateUrl);
-		contentToTxt(folderName, templateList, status, paginationUrl,
-				currentString, start, templateList);
+		contentToTxt(folderName, templateList, status, paginationUrl, currentString, start, templateList);
 		// --1.2 保存增量种子到本地文件.
-		contentToTxt(incrementFolderName, seeds, status, paginationUrl,
-				currentString, start, beforeSeedList);
+		contentToTxt(incrementFolderName, seeds, status, paginationUrl, currentString, start, beforeSeedList);
 
 		// --1.3将增量种子列表，保存到redis中，key为模板url.
-		setSeedListResult(seeds, templateUrl,
-				WebtoolConstants.SEEDLIST_REDIS_DEBINDEX);
+		setSeedListResult(seeds, templateUrl, WebtoolConstants.SEEDLIST_REDIS_DEBINDEX);
 		// --2.保存到redis中.
 		String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
 
-		DispatchVo dispatchVo = getDispatchResult(redisKey,
-				WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+		DispatchVo dispatchVo = getDispatchResult(redisKey, WebtoolConstants.DISPATCH_REDIS_DBINDEX);
 		if (dispatchVo == null) {
 			dispatchVo = new DispatchVo();
 		}
@@ -128,12 +121,10 @@ public class CrawlToolResource {
 			seedList.add(seed);
 		}
 		dispatchVo.setSeed(seedList);
-		setDispatchResult(dispatchVo, redisKey,
-				WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+		setDispatchResult(dispatchVo, redisKey, WebtoolConstants.DISPATCH_REDIS_DBINDEX);
 	}
 
-	public void setSeedListResult(List<String> seedList, String guid,
-			int dbindex) {
+	public void setSeedListResult(List<String> seedList, String guid, int dbindex) {
 		JedisPool pool = null;
 		Jedis jedis = null;
 		try {
@@ -189,8 +180,7 @@ public class CrawlToolResource {
 		return null;
 	}
 
-	private void setDispatchResult(DispatchVo dispatchVo, String guid,
-			int dbindex) {
+	private void setDispatchResult(DispatchVo dispatchVo, String guid, int dbindex) {
 		JedisPool pool = null;
 		Jedis jedis = null;
 		try {
@@ -231,12 +221,9 @@ public class CrawlToolResource {
 	 * 
 	 * 保存内容到文件
 	 * */
-	private void contentToTxt(String folderName, List<String> seeds,
-			String status, String paginationUrl, String currentString,
-			String start, List<String> removeSeedList) {
+	private void contentToTxt(String folderName, List<String> seeds, String status, String paginationUrl, String currentString, String start, List<String> removeSeedList) {
 		String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
-		String filePath = folderRoot + File.separator + folderName
-				+ File.separator + WebtoolConstants.SEED_FILE_NAME;
+		String filePath = folderRoot + File.separator + folderName + File.separator + WebtoolConstants.SEED_FILE_NAME;
 		String str = null; // 原有txt内容
 		StringBuffer strBuf = new StringBuffer();// 内容更新
 		BufferedReader input = null;
@@ -273,8 +260,7 @@ public class CrawlToolResource {
 						temp = tempStr.substring(1, tempStr.length());
 					}
 					if (!seeds.contains(temp) && !removeSeedList.contains(temp)) {
-						strBuf.append(tempStr
-								+ System.getProperty("line.separator"));
+						strBuf.append(tempStr + System.getProperty("line.separator"));
 					}
 				}
 
@@ -325,10 +311,8 @@ public class CrawlToolResource {
 		if ("local".equals(type)) {
 			// String folderPath = folderRoot + "/" + folderName;
 			// new SFTPUtils().copyFile(runmanager, folderPath, folderPath);
-			String desCopyRootFolder = Config
-					.getValue(WebtoolConstants.KEY_DES_FOLDER);
-			command = "scp -r " + folderRoot + File.separator + folderName
-					+ " " + desCopyRootFolder;
+			String desCopyRootFolder = Config.getValue(WebtoolConstants.KEY_DES_FOLDER);
+			command = "scp -r " + folderRoot + File.separator + folderName + " " + desCopyRootFolder;
 		} else {
 			// FIXME:集群模式，执行的命令.
 		}
@@ -337,9 +321,7 @@ public class CrawlToolResource {
 		ShellUtils.execCmd(runmanager);
 	}
 
-	public List<SearchKeyWordDataModel> getKeyWordModelList(
-			List<SearchKeyWordDataModel> originalKeyWordModelList,
-			String searchEngineType) {
+	public List<SearchKeyWordDataModel> getKeyWordModelList(List<SearchKeyWordDataModel> originalKeyWordModelList, String searchEngineType) {
 		List<SearchKeyWordDataModel> keyWordModelList = new ArrayList<SearchKeyWordDataModel>();
 		for (SearchKeyWordDataModel model : originalKeyWordModelList) {
 			if (model.getEngineNames().contains(searchEngineType)) {
@@ -348,10 +330,8 @@ public class CrawlToolResource {
 				if (!orginalTagWords.equals("")) {
 					String[] tagWordsArray = orginalTagWords.split(",");
 					for (String word : tagWordsArray) {
-						SearchKeyWordDataModel newSearchKeyWordDataModel = (SearchKeyWordDataModel) model
-								.clone();
-						newSearchKeyWordDataModel
-								.setEngineNames(searchEngineType);
+						SearchKeyWordDataModel newSearchKeyWordDataModel = (SearchKeyWordDataModel) model.clone();
+						newSearchKeyWordDataModel.setEngineNames(searchEngineType);
 						newSearchKeyWordDataModel.setTagWords(word);
 						keyWordModelList.add(newSearchKeyWordDataModel);
 					}
@@ -365,13 +345,11 @@ public class CrawlToolResource {
 	 * 
 	 * 生成搜索引擎的静态模板Tags属性
 	 * */
-	public List<TemplateTagModel> getSearchEngineTagsViewModel(
-			String searchKeyWord) {
+	public List<TemplateTagModel> getSearchEngineTagsViewModel(String searchKeyWord) {
 		List<TemplateTagModel> templateTagsViewModel = new ArrayList<TemplateTagModel>();
 		TemplateTagModel templateTagModel = new TemplateTagModel();
 		templateTagModel.setTagKey("分类");
-		templateTagModel.setTagValue(WebtoolConstants.BAIDU_SEARCH_NAME + "-"
-				+ searchKeyWord);
+		templateTagModel.setTagValue(WebtoolConstants.BAIDU_SEARCH_NAME + "-" + searchKeyWord);
 		templateTagsViewModel.add(templateTagModel);
 		return templateTagsViewModel;
 	}
@@ -380,40 +358,26 @@ public class CrawlToolResource {
 	 * 
 	 * 生成搜索引擎的静态模板Tags属性
 	 * */
-	public void getSearchEngineTagsViewModel(
-			List<TemplateTagModel> searchEngineTagsViewModel,
-			String searchKeyWord, String templateType) {
+	public void getSearchEngineTagsViewModel(List<TemplateTagModel> searchEngineTagsViewModel, String searchKeyWord, String templateType) {
 		for (int i = 0; i < searchEngineTagsViewModel.size(); i++) {
 			if (searchEngineTagsViewModel.get(i).getTagKey().equals("分类")) {
 				if (templateType.equals("百度新闻搜索")) {
-					searchEngineTagsViewModel.get(i).setTagValue(
-							WebtoolConstants.BAIDU_SEARCH_NAME + "-"
-									+ searchKeyWord);
+					searchEngineTagsViewModel.get(i).setTagValue(WebtoolConstants.BAIDU_SEARCH_NAME + "-" + searchKeyWord);
 				} else if (templateType.equals("Bing新闻搜索")) {
-					searchEngineTagsViewModel.get(i).setTagValue(
-							WebtoolConstants.BING_SEARCH_NAME + "-"
-									+ searchKeyWord);
+					searchEngineTagsViewModel.get(i).setTagValue(WebtoolConstants.BING_SEARCH_NAME + "-" + searchKeyWord);
 				} else if (templateType.equals("搜狗新闻搜索")) {
-					searchEngineTagsViewModel.get(i).setTagValue(
-							WebtoolConstants.SOUGOU_SEARCH_NAME + "-"
-									+ searchKeyWord);
+					searchEngineTagsViewModel.get(i).setTagValue(WebtoolConstants.SOUGOU_SEARCH_NAME + "-" + searchKeyWord);
 				}
 			} else {// 没有设置标签为“分类”的时候，自己添加
 				if (i == (searchEngineTagsViewModel.size() - 1)) {
 					TemplateTagModel templateTagModel = new TemplateTagModel();
 					templateTagModel.setTagKey("分类");
 					if (templateType.equals("百度新闻搜索")) {
-						templateTagModel
-								.setTagValue(WebtoolConstants.BAIDU_SEARCH_NAME
-										+ "-" + searchKeyWord);
+						templateTagModel.setTagValue(WebtoolConstants.BAIDU_SEARCH_NAME + "-" + searchKeyWord);
 					} else if (templateType.equals("Bing新闻搜索")) {
-						templateTagModel
-								.setTagValue(WebtoolConstants.BING_SEARCH_NAME
-										+ "-" + searchKeyWord);
+						templateTagModel.setTagValue(WebtoolConstants.BING_SEARCH_NAME + "-" + searchKeyWord);
 					} else if (templateType.equals("搜狗新闻搜索")) {
-						templateTagModel
-								.setTagValue(WebtoolConstants.SOUGOU_SEARCH_NAME
-										+ "-" + searchKeyWord);
+						templateTagModel.setTagValue(WebtoolConstants.SOUGOU_SEARCH_NAME + "-" + searchKeyWord);
 					}
 					searchEngineTagsViewModel.add(templateTagModel);
 				}
@@ -429,9 +393,8 @@ public class CrawlToolResource {
 		File file = new File(path);
 		if (!file.exists() || file.isDirectory()) {
 			throw new FileNotFoundException();
-		}		
-		BufferedReader br = new BufferedReader(new InputStreamReader(  
-                new FileInputStream(file), "utf-8"));  
+		}
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
 		String temp = null;
 		StringBuffer sb = new StringBuffer();
 		temp = br.readLine();
@@ -447,8 +410,7 @@ public class CrawlToolResource {
 	 * 
 	 * 保存内容到文件
 	 * */
-	public void exportTemplateJSONStringToFile(String filePath, String content)
-			throws Exception {
+	public void exportTemplateJSONStringToFile(String filePath, String content) throws Exception {
 		File f = new File(filePath);
 		File parentDir = f.getParentFile();
 		if (parentDir != null && !parentDir.exists()) {
@@ -457,10 +419,9 @@ public class CrawlToolResource {
 		if (!f.exists()) {
 			f.createNewFile();// 不存在则创建
 		}
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(  
-                new FileOutputStream(f), "utf-8"));
-        writer.write(content);  
-        writer.close();
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "utf-8"));
+		writer.write(content);
+		writer.close();
 		// System.out.println("导出模板文件保存路径:" + filePath);
 	}
 
@@ -487,8 +448,7 @@ public class CrawlToolResource {
 		TemplateModel templateModel = null;
 		try {
 			ObjectMapper objectmapper = new ObjectMapper();
-			templateModel = objectmapper.readValue(jsonString,
-					TemplateModel.class);
+			templateModel = objectmapper.readValue(jsonString, TemplateModel.class);
 		} catch (JsonParseException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
@@ -514,8 +474,7 @@ public class CrawlToolResource {
 		saveTemplateToList(pageModel, "true");// 保存数据源列表所需要的key值
 		System.out.println("templateGuid=" + templateGuid);
 		try {
-			parseResult = RedisOperator.getParseResultFromDefaultDB(input,
-					encoding, templateUrl);
+			parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
 		} catch (Exception e) {
 			parseResult = null;
 			e.printStackTrace();
@@ -534,8 +493,7 @@ public class CrawlToolResource {
 		byte[] input = DownloadHtml.getHtml(templateUrl);
 		String encoding = sniffCharacterEncoding(input);
 		try {
-			parseResult = RedisOperator.getParseResultFromDefaultDB(input,
-					encoding, templateUrl);
+			parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
 		} catch (Exception e) {
 			parseResult = null;
 			e.printStackTrace();
@@ -560,8 +518,7 @@ public class CrawlToolResource {
 	 * 
 	 * 保存【增量】模板到redis
 	 * */
-	public ResponseJSONProvider<String> saveIncreaseTemplateResult(
-			PageModel pageModel) {
+	public ResponseJSONProvider<String> saveIncreaseTemplateResult(PageModel pageModel) {
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		jsonProvider.setSuccess(true);
 		TemplateResult templateResult = getTemplateResult(pageModel);
@@ -570,8 +527,7 @@ public class CrawlToolResource {
 		byte[] input = DownloadHtml.getHtml(templateUrl);
 		String encoding = sniffCharacterEncoding(input);
 		try {
-			parseResult = RedisOperator.getParseResultFromDefaultDB(input,
-					encoding, templateUrl);
+			parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
 		} catch (Exception e) {
 			parseResult = null;
 			e.printStackTrace();
@@ -582,13 +538,10 @@ public class CrawlToolResource {
 			jsonProvider.setErrorMsg("请先保存常规模板！");
 			return jsonProvider;
 		}
-		String pageSort = pageModel.getTemplateIncreaseViewModel()
-				.getPageSort();
-		String pageCounts = pageModel.getTemplateIncreaseViewModel()
-				.getPageCounts();
+		String pageSort = pageModel.getTemplateIncreaseViewModel().getPageSort();
+		String pageCounts = pageModel.getTemplateIncreaseViewModel().getPageCounts();
 
-		ArrayList<String> paginationOutlinkArray = TemplateFactory
-				.getPaginationOutlink(parseResult);
+		ArrayList<String> paginationOutlinkArray = TemplateFactory.getPaginationOutlink(parseResult);
 
 		if (pageCounts.equals("")) {
 			jsonProvider.setSuccess(false);
@@ -600,14 +553,11 @@ public class CrawlToolResource {
 			templateResult.setPagination(null);
 			String templateGuid = MD5Utils.MD5(templateUrl);
 			// 先取之前的模板列表JSON字符串
-			String singleTemplateListModel = RedisOperator
-					.getFromDefaultDB(templateGuid
-							+ WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
+			String singleTemplateListModel = RedisOperator.getFromDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
 			TemplateModel singleTemplateModel = getTemplateModelByJSONString(singleTemplateListModel);
 			// 删除之前的增量模板
 			if (singleTemplateModel.getTemplateIncreaseIdList() != null) {
-				for (String oldIncreaseTemplateId : singleTemplateModel
-						.getTemplateIncreaseIdList()) {
+				for (String oldIncreaseTemplateId : singleTemplateModel.getTemplateIncreaseIdList()) {
 					RedisOperator.delFromIncreaseDB(oldIncreaseTemplateId);
 				}
 			}
@@ -618,46 +568,34 @@ public class CrawlToolResource {
 					List<String> increaseTemplateIdList = new ArrayList<String>();
 					if (pageSort.equals("升序")) {
 						for (int i = 0; i < counts - 1; i++) {
-							String paginationUrl = paginationOutlinkArray
-									.get(i);
-							String paginationUrlGuid = MD5Utils
-									.MD5(paginationUrl);
+							String paginationUrl = paginationOutlinkArray.get(i);
+							String paginationUrlGuid = MD5Utils.MD5(paginationUrl);
 							increaseTemplateIdList.add(paginationUrlGuid);
 							// 修改模板的guid
 							templateResult.setTemplateGuid(paginationUrlGuid);
-							RedisOperator.saveTemplateToIncreaseDB(
-									templateResult, paginationUrlGuid);
+							RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);
 						}
 					} else {
 						for (int i = 0; i < counts - 1; i++) {
-							String paginationUrl = paginationOutlinkArray
-									.get(paginationOutlinkArray.size()
-											- (i + 1));
-							String paginationUrlGuid = MD5Utils
-									.MD5(paginationUrl);
+							String paginationUrl = paginationOutlinkArray.get(paginationOutlinkArray.size() - (i + 1));
+							String paginationUrlGuid = MD5Utils.MD5(paginationUrl);
 							increaseTemplateIdList.add(paginationUrlGuid);
 							// 修改模板的guid
 							templateResult.setTemplateGuid(paginationUrlGuid);
-							RedisOperator.saveTemplateToIncreaseDB(
-									templateResult, paginationUrlGuid);
+							RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);
 						}
 					}
 					// 保存增量的首页模板
 					increaseTemplateIdList.add(templateGuid);
 					templateResult.setTemplateGuid(templateGuid);
-					RedisOperator.saveTemplateToIncreaseDB(templateResult,
-							templateGuid);
+					RedisOperator.saveTemplateToIncreaseDB(templateResult, templateGuid);
 
 					// 保存新的增量模板列表
-					singleTemplateModel
-							.setTemplateIncreaseIdList(increaseTemplateIdList);
-					RedisOperator.setToDefaultDB(templateGuid
-							+ WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN,
-							getTemplateModelToJSONString(singleTemplateModel));
+					singleTemplateModel.setTemplateIncreaseIdList(increaseTemplateIdList);
+					RedisOperator.setToDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN, getTemplateModelToJSONString(singleTemplateModel));
 				} else {
 					jsonProvider.setSuccess(false);
-					jsonProvider
-							.setErrorMsg("请检查配置是否正确，解析到pagination_outlink个数不应该小于增量配置中的页数量，配置信息错误！");
+					jsonProvider.setErrorMsg("请检查配置是否正确，解析到pagination_outlink个数不应该小于增量配置中的页数量，配置信息错误！");
 					return jsonProvider;
 				}
 			} else {
@@ -674,15 +612,11 @@ public class CrawlToolResource {
 	 * 
 	 * 生成增量模板
 	 * */
-	public ResponseJSONProvider<String> saveIncreaseTemplateResult(
-			TemplateModel singleTemplateListModel, String pagePath) {
+	public ResponseJSONProvider<String> saveIncreaseTemplateResult(TemplateModel singleTemplateListModel, String pagePath) {
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		jsonProvider.setSuccess(true);
-		TemplateResult templateResult = RedisOperator
-				.getTemplateResultFromDefaultDB(singleTemplateListModel
-						.getTemplateId());
-		String templateUrl = singleTemplateListModel.getBasicInfoViewModel()
-				.getUrl();
+		TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(singleTemplateListModel.getTemplateId());
+		String templateUrl = singleTemplateListModel.getBasicInfoViewModel().getUrl();
 		ParseResult parseResult = null;
 		byte[] input = null;
 		String encoding = null;
@@ -690,28 +624,21 @@ public class CrawlToolResource {
 			input = DownloadHtml.getHtml(templateUrl);
 		} catch (Exception e) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\""
-					+ pagePath + "pages/template-main.html?templateGuid="
-					+ singleTemplateListModel.getTemplateId() + "\">"
-					+ singleTemplateListModel.getBasicInfoViewModel().getName()
-					+ "</a>】,无法访问该网站！");
+			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\"" + pagePath + "pages/template-main.html?templateGuid=" + singleTemplateListModel.getTemplateId() + "\">"
+					+ singleTemplateListModel.getBasicInfoViewModel().getName() + "</a>】,无法访问该网站！");
 			return jsonProvider;
 		}
 		try {
 			encoding = sniffCharacterEncoding(input);
 		} catch (Exception e) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\""
-					+ pagePath + "pages/template-main.html?templateGuid="
-					+ singleTemplateListModel.getTemplateId() + "\">"
-					+ singleTemplateListModel.getBasicInfoViewModel().getName()
-					+ "</a>】无法获取该网站编码格式！请检查！");
+			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\"" + pagePath + "pages/template-main.html?templateGuid=" + singleTemplateListModel.getTemplateId() + "\">"
+					+ singleTemplateListModel.getBasicInfoViewModel().getName() + "</a>】无法获取该网站编码格式！请检查！");
 			return jsonProvider;
 		}
 
 		try {
-			parseResult = RedisOperator.getParseResultFromDefaultDB(input,
-					encoding, templateUrl);
+			parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
 		} catch (Exception e) {
 			parseResult = null;
 			e.printStackTrace();
@@ -719,32 +646,19 @@ public class CrawlToolResource {
 
 		if (parseResult == null) {
 			jsonProvider.setSuccess(false);
-			jsonProvider
-					.setErrorMsg("模板名称【<a target=\"_blank\" href=\""
-							+ pagePath
-							+ "pages/template-main.html?templateGuid="
-							+ singleTemplateListModel.getTemplateId()
-							+ "\">"
-							+ singleTemplateListModel.getBasicInfoViewModel()
-									.getName()
-							+ "</a>】，调用TemplateFactory.process方法出错！无法解析出parseResult，请检查页面各项配置是否正确！确认选择器和过滤器表达式完全正确，重新保存模板后，重试！");
+			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\"" + pagePath + "pages/template-main.html?templateGuid=" + singleTemplateListModel.getTemplateId() + "\">"
+					+ singleTemplateListModel.getBasicInfoViewModel().getName() + "</a>】，调用TemplateFactory.process方法出错！无法解析出parseResult，请检查页面各项配置是否正确！确认选择器和过滤器表达式完全正确，重新保存模板后，重试！");
 			return jsonProvider;
 		}
-		String pageSort = singleTemplateListModel
-				.getTemplateIncreaseViewModel().getPageSort();
-		String pageCounts = singleTemplateListModel
-				.getTemplateIncreaseViewModel().getPageCounts();
+		String pageSort = singleTemplateListModel.getTemplateIncreaseViewModel().getPageSort();
+		String pageCounts = singleTemplateListModel.getTemplateIncreaseViewModel().getPageCounts();
 
-		ArrayList<String> paginationOutlinkArray = TemplateFactory
-				.getPaginationOutlink(parseResult);
+		ArrayList<String> paginationOutlinkArray = TemplateFactory.getPaginationOutlink(parseResult);
 
 		if (pageCounts.equals("")) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\""
-					+ pagePath + "pages/template-main.html?templateGuid="
-					+ singleTemplateListModel.getTemplateId() + "\">"
-					+ singleTemplateListModel.getBasicInfoViewModel().getName()
-					+ "</a>】中，增量配置的中页数值不能为空！");
+			jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\"" + pagePath + "pages/template-main.html?templateGuid=" + singleTemplateListModel.getTemplateId() + "\">"
+					+ singleTemplateListModel.getBasicInfoViewModel().getName() + "</a>】中，增量配置的中页数值不能为空！");
 			return jsonProvider;
 		} else {
 			int counts = Integer.parseInt(pageCounts);
@@ -753,8 +667,7 @@ public class CrawlToolResource {
 			String templateGuid = singleTemplateListModel.getTemplateId();
 			// 删除之前的增量模板
 			if (singleTemplateListModel.getTemplateIncreaseIdList() != null) {
-				for (String oldIncreaseTemplateId : singleTemplateListModel
-						.getTemplateIncreaseIdList()) {
+				for (String oldIncreaseTemplateId : singleTemplateListModel.getTemplateIncreaseIdList()) {
 					RedisOperator.delFromIncreaseDB(oldIncreaseTemplateId);
 				}
 			}
@@ -765,66 +678,41 @@ public class CrawlToolResource {
 					List<String> increaseTemplateIdList = new ArrayList<String>();
 					if (pageSort.equals("升序")) {
 						for (int i = 0; i < counts - 1; i++) {
-							String paginationUrl = paginationOutlinkArray
-									.get(i);
-							String paginationUrlGuid = MD5Utils
-									.MD5(paginationUrl);
+							String paginationUrl = paginationOutlinkArray.get(i);
+							String paginationUrlGuid = MD5Utils.MD5(paginationUrl);
 							increaseTemplateIdList.add(paginationUrlGuid);
 							// 修改模板的guid
 							templateResult.setTemplateGuid(paginationUrlGuid);
-							RedisOperator.saveTemplateToIncreaseDB(
-									templateResult, paginationUrlGuid);
+							RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);
 						}
 					} else {
 						for (int i = 0; i < counts - 1; i++) {
-							String paginationUrl = paginationOutlinkArray
-									.get(paginationOutlinkArray.size()
-											- (i + 1));
-							String paginationUrlGuid = MD5Utils
-									.MD5(paginationUrl);
+							String paginationUrl = paginationOutlinkArray.get(paginationOutlinkArray.size() - (i + 1));
+							String paginationUrlGuid = MD5Utils.MD5(paginationUrl);
 							increaseTemplateIdList.add(paginationUrlGuid);
 							// 修改模板的guid
 							templateResult.setTemplateGuid(paginationUrlGuid);
-							RedisOperator.saveTemplateToIncreaseDB(
-									templateResult, paginationUrlGuid);
+							RedisOperator.saveTemplateToIncreaseDB(templateResult, paginationUrlGuid);
 						}
 					}
 					// 保存增量的首页模板
 					increaseTemplateIdList.add(templateGuid);
 					templateResult.setTemplateGuid(templateGuid);
-					RedisOperator.saveTemplateToIncreaseDB(templateResult,
-							templateGuid);
+					RedisOperator.saveTemplateToIncreaseDB(templateResult, templateGuid);
 
 					// 保存新的增量模板列表
-					singleTemplateListModel
-							.setTemplateIncreaseIdList(increaseTemplateIdList);
-					RedisOperator
-							.setToDefaultDB(
-									templateGuid
-											+ WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN,
-									getTemplateModelToJSONString(singleTemplateListModel));
+					singleTemplateListModel.setTemplateIncreaseIdList(increaseTemplateIdList);
+					RedisOperator.setToDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN, getTemplateModelToJSONString(singleTemplateListModel));
 				} else {
 					jsonProvider.setSuccess(false);
-					jsonProvider
-							.setErrorMsg("模板名称【<a target=\"_blank\" href=\""
-									+ pagePath
-									+ "pages/template-main.html?templateGuid="
-									+ singleTemplateListModel.getTemplateId()
-									+ "\">"
-									+ singleTemplateListModel
-											.getBasicInfoViewModel().getName()
-									+ "</a>】，请检查配置是否正确，解析到pagination_outlink个数不应该小于增量配置中的页数量，配置信息错误！");
+					jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\"" + pagePath + "pages/template-main.html?templateGuid=" + singleTemplateListModel.getTemplateId() + "\">"
+							+ singleTemplateListModel.getBasicInfoViewModel().getName() + "</a>】，请检查配置是否正确，解析到pagination_outlink个数不应该小于增量配置中的页数量，配置信息错误！");
 					return jsonProvider;
 				}
 			} else {
 				jsonProvider.setSuccess(false);
-				jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\""
-						+ pagePath
-						+ "pages/template-main.html?templateGuid="
-						+ singleTemplateListModel.getTemplateId()
-						+ "\">"
-						+ singleTemplateListModel.getBasicInfoViewModel()
-								.getName() + "</a>】，没有解析到分页链接，请检查列表分页配置是否正确！");
+				jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\"" + pagePath + "pages/template-main.html?templateGuid=" + singleTemplateListModel.getTemplateId() + "\">"
+						+ singleTemplateListModel.getBasicInfoViewModel().getName() + "</a>】，没有解析到分页链接，请检查列表分页配置是否正确！");
 				return jsonProvider;
 			}
 		}
@@ -841,8 +729,7 @@ public class CrawlToolResource {
 		TemplateModel templateModel = setTemplateStatus(pageModel, status);
 		StringBuilder str = new StringBuilder();
 		str.append(getTemplateModelToJSONString(templateModel));
-		RedisOperator.setToDefaultDB(templateGuid
-				+ WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN, str.toString());
+		RedisOperator.setToDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN, str.toString());
 	}
 
 	/**
@@ -853,57 +740,43 @@ public class CrawlToolResource {
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		String templateGuid = MD5Utils.MD5(templateUrl);
 		templateModel.setTemplateId(templateGuid);
-		templateModel.setDescription(pageModel.getBasicInfoViewModel()
-				.getName());
+		templateModel.setDescription(pageModel.getBasicInfoViewModel().getName());
 
 		BasicInfoViewModel basicInfoViewModel = new BasicInfoViewModel();
 		basicInfoViewModel.setName(pageModel.getBasicInfoViewModel().getName());
 		basicInfoViewModel.setUrl(pageModel.getBasicInfoViewModel().getUrl());
-		basicInfoViewModel.setTemplateType(pageModel.getBasicInfoViewModel()
-				.getTemplateType());
-		basicInfoViewModel.setCurrentString(pageModel.getBasicInfoViewModel()
-				.getCurrentString());
+		basicInfoViewModel.setTemplateType(pageModel.getBasicInfoViewModel().getTemplateType());
+		basicInfoViewModel.setCurrentString(pageModel.getBasicInfoViewModel().getCurrentString());
 		templateModel.setBasicInfoViewModel(basicInfoViewModel);
 
 		ScheduleDispatchViewModel scheduleDispatchViewModel = new ScheduleDispatchViewModel();
-		scheduleDispatchViewModel.setPeriod(pageModel
-				.getScheduleDispatchViewModel().getPeriod());
-		scheduleDispatchViewModel.setSequence(pageModel
-				.getScheduleDispatchViewModel().getSequence());
-		scheduleDispatchViewModel.setUseProxy(pageModel
-				.getScheduleDispatchViewModel().getUseProxy());
+		scheduleDispatchViewModel.setPeriod(pageModel.getScheduleDispatchViewModel().getPeriod());
+		scheduleDispatchViewModel.setSequence(pageModel.getScheduleDispatchViewModel().getSequence());
+		scheduleDispatchViewModel.setUseProxy(pageModel.getScheduleDispatchViewModel().getUseProxy());
 		templateModel.setScheduleDispatchViewModel(scheduleDispatchViewModel);
 
 		TemplateIncreaseViewModel templateIncreaseViewModel = new TemplateIncreaseViewModel();
-		templateIncreaseViewModel.setPeriod(pageModel
-				.getTemplateIncreaseViewModel().getPeriod());
-		templateIncreaseViewModel.setPageCounts(pageModel
-				.getTemplateIncreaseViewModel().getPageCounts());
-		templateIncreaseViewModel.setPageSort(pageModel
-				.getTemplateIncreaseViewModel().getPageSort());
+		templateIncreaseViewModel.setPeriod(pageModel.getTemplateIncreaseViewModel().getPeriod());
+		templateIncreaseViewModel.setPageCounts(pageModel.getTemplateIncreaseViewModel().getPageCounts());
+		templateIncreaseViewModel.setPageSort(pageModel.getTemplateIncreaseViewModel().getPageSort());
 		templateModel.setTemplateIncreaseViewModel(templateIncreaseViewModel);
 
 		// 这里必须先取之前的模板列表JSON字符串，因为增量模板列表可能因为修改操作而被覆盖
-		String singleTemplateListModel = RedisOperator
-				.getFromDefaultDB(templateGuid
-						+ WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
+		String singleTemplateListModel = RedisOperator.getFromDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
 		TemplateModel oldTemplateModel = null;
 		// bug:第一次保存没有列表模板文件，保存报错
-		if (singleTemplateListModel != null
-				&& !singleTemplateListModel.equals("")) {
+		if (singleTemplateListModel != null && !singleTemplateListModel.equals("")) {
 			oldTemplateModel = getTemplateModelByJSONString(singleTemplateListModel);
 			// 修改操作时，保存原来的增量模板列表
 			if (oldTemplateModel.getTemplateIncreaseIdList() != null) {
-				templateModel.setTemplateIncreaseIdList(oldTemplateModel
-						.getTemplateIncreaseIdList());
+				templateModel.setTemplateIncreaseIdList(oldTemplateModel.getTemplateIncreaseIdList());
 			}
 			// 修改操作时，时间不变
 			if (!oldTemplateModel.getAddedTime().equals("")) {
 				templateModel.setAddedTime(oldTemplateModel.getAddedTime());
 			} else {
 				Date currentDate = new Date();
-				SimpleDateFormat dateFormat = new SimpleDateFormat(
-						"yyyy-MM-dd HH:mm:ss");
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				String nowDateString = dateFormat.format(currentDate);
 				templateModel.setAddedTime(nowDateString);
 			}
@@ -929,16 +802,13 @@ public class CrawlToolResource {
 	public void setTemplateStatus(String templateUrl, String name, String status) {
 		String templateGuid = MD5Utils.MD5(templateUrl);
 		// 先取之前的模板列表JSON字符串
-		String singleTemplateListModel = RedisOperator
-				.getFromDefaultDB(templateGuid
-						+ WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
+		String singleTemplateListModel = RedisOperator.getFromDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
 		TemplateModel templateModel = getTemplateModelByJSONString(singleTemplateListModel);
 		templateModel.setStatus(status);
 
 		StringBuilder str = new StringBuilder();
 		str.append(getTemplateModelToJSONString(templateModel));
-		RedisOperator.setToDefaultDB(templateGuid
-				+ WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN, str.toString());
+		RedisOperator.setToDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN, str.toString());
 	}
 
 	/**
@@ -964,8 +834,7 @@ public class CrawlToolResource {
 	 * 
 	 * 产生过滤器
 	 * */
-	private SelectorFilter getFieldFilter(String filterString,
-			String filterCategory, String filterReplaceTo) {
+	private SelectorFilter getFieldFilter(String filterString, String filterCategory, String filterReplaceTo) {
 		SelectorFilter filter = new SelectorFilter();
 		if (filterString.equals("")) {
 			filter = null;
@@ -988,8 +857,7 @@ public class CrawlToolResource {
 	 * 
 	 * 产生格式化器
 	 * */
-	private SelectorFormat getFieldFormatter(String formatString,
-			String formatCategory) {
+	private SelectorFormat getFieldFormatter(String formatString, String formatCategory) {
 		SelectorFormat format = new SelectorFormat();
 		if (formatString.equals("")) {
 			format = null;
@@ -1008,8 +876,7 @@ public class CrawlToolResource {
 	 * 获取搜索引擎类型
 	 * */
 	public String getSearchEngineType(PageModel pageModel) {
-		BasicInfoViewModel basicInfoViewModel = pageModel
-				.getBasicInfoViewModel();
+		BasicInfoViewModel basicInfoViewModel = pageModel.getBasicInfoViewModel();
 		String templateType = basicInfoViewModel.getTemplateType();
 		if (templateType.equals("百度新闻搜索")) {
 			return WebtoolConstants.BAIDU_NEWS_ENGINE;
@@ -1029,8 +896,7 @@ public class CrawlToolResource {
 		// 请求相应体
 		String responseBody = "";
 		SearchKeyWordModel searchKeyWordModel = null;
-		String keyWordURL = Config
-				.getValue(WebtoolConstants.SEARCH_KEYWORD_API_URL);
+		String keyWordURL = Config.getValue(WebtoolConstants.SEARCH_KEYWORD_API_URL);
 		if (StringUtils.isBlank(keyWordURL)) {
 			return searchKeyWordModel;
 		}
@@ -1043,24 +909,20 @@ public class CrawlToolResource {
 			// getMethod = new GetMethod(url);
 			getMethod = new GetMethod(EncodeUtils.formatUrl(keyWordURL, ""));
 			// 使用系统提供的默认的恢复策略
-			getMethod.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
-					new DefaultHttpMethodRetryHandler());
+			getMethod.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler());
 			// 设置 get 请求超时为 10秒
-			getMethod.getParams().setParameter(HttpMethodParams.SO_TIMEOUT,
-					10000);
+			getMethod.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 10000);
 
 			// 执行getMethod
 			int status = httpClient.executeMethod(getMethod);
 
 			// 连接返回的状态码
 			if (HttpStatus.SC_OK == status) {
-				System.out.println("Connection to " + getMethod.getURI()
-						+ " Success!");
+				System.out.println("Connection to " + getMethod.getURI() + " Success!");
 				// 获取到的内容
 				InputStream resStream = getMethod.getResponseBodyAsStream();
 
-				BufferedReader br = new BufferedReader(new InputStreamReader(
-						resStream));
+				BufferedReader br = new BufferedReader(new InputStreamReader(resStream));
 				StringBuffer resBuffer = new StringBuffer();
 				char[] chars = new char[4096];
 				int length = 0;
@@ -1087,8 +949,7 @@ public class CrawlToolResource {
 		if (!responseBody.equals("")) {
 			try {
 				ObjectMapper objectmapper = new ObjectMapper();
-				searchKeyWordModel = objectmapper.readValue(responseBody,
-						SearchKeyWordModel.class);
+				searchKeyWordModel = objectmapper.readValue(responseBody, SearchKeyWordModel.class);
 			} catch (JsonParseException e) {
 				e.printStackTrace();
 			} catch (JsonMappingException e) {
@@ -1117,8 +978,7 @@ public class CrawlToolResource {
 
 		// 处理模板tag静态属性
 		HashMap<String, String> dictionary = new HashMap<String, String>();
-		List<TemplateTagModel> tempalteTags = pageModel
-				.getTemplateTagsViewModel();
+		List<TemplateTagModel> tempalteTags = pageModel.getTemplateTagsViewModel();
 		for (TemplateTagModel model : tempalteTags) {
 			dictionary.put(model.getTagKey(), model.getTagValue());
 		}
@@ -1137,15 +997,12 @@ public class CrawlToolResource {
 		indexer = new SelectorIndexer();
 		selector = new Selector();
 		if (!pageModel.getListOutLinkViewModel().getSelector().equals("")) {
-			indexer.initJsoupIndexer(pageModel.getListOutLinkViewModel()
-					.getSelector(), pageModel.getListOutLinkViewModel()
-					.getSelectorAttr());
+			indexer.initJsoupIndexer(pageModel.getListOutLinkViewModel().getSelector(), pageModel.getListOutLinkViewModel().getSelectorAttr());
 			selector.initContentSelector(indexer, null);
 		}
 
 		// 处理列表自定义属性 以时间为例
-		List<CustomerAttrModel> listCustomerAttrViewModel = pageModel
-				.getListCustomerAttrViewModel();
+		List<CustomerAttrModel> listCustomerAttrViewModel = pageModel.getListCustomerAttrViewModel();
 		for (CustomerAttrModel model : listCustomerAttrViewModel) {
 			Selector label = new Selector();
 			label.setType(Constants.SELECTOR_LABEL);
@@ -1157,16 +1014,14 @@ public class CrawlToolResource {
 			String filterString = model.getFilter();
 			String filterCategory = model.getFilterCategory();
 			String filterReplaceTo = model.getFilterReplaceTo();
-			filter = getFieldFilter(filterString, filterCategory,
-					filterReplaceTo);
+			filter = getFieldFilter(filterString, filterCategory, filterReplaceTo);
 
 			// 处理列表自定义属性格式化器
 			String formatString = model.getFormatter();
 			String formatCategory = model.getFormatCategory();
 			format = getFieldFormatter(formatString, formatCategory);
 
-			label.initLabelSelector(model.getTarget(), "", indexer, filter,
-					format);
+			label.initLabelSelector(model.getTarget(), "", indexer, filter, format);
 			selector.setLabel(label);
 		}
 		list.add(selector);
@@ -1175,23 +1030,16 @@ public class CrawlToolResource {
 		// pagitation outlink js翻页无法处理
 		indexer = new SelectorIndexer();
 		selector = new Selector();
-		indexer.initJsoupIndexer(pageModel.getListPaginationViewModel()
-				.getSelector(), pageModel.getListPaginationViewModel()
-				.getSelectorAttr());
+		indexer.initJsoupIndexer(pageModel.getListPaginationViewModel().getSelector(), pageModel.getListPaginationViewModel().getSelectorAttr());
 
 		// 处理分页过滤器
-		String paginationFilter = pageModel.getListPaginationViewModel()
-				.getFilter();
-		String paginationFilterCategory = pageModel
-				.getListPaginationViewModel().getFilterCategory();
-		String filterReplaceToString = pageModel.getListPaginationViewModel()
-				.getFilterReplaceTo();
-		filter = getFieldFilter(paginationFilter, paginationFilterCategory,
-				filterReplaceToString);
+		String paginationFilter = pageModel.getListPaginationViewModel().getFilter();
+		String paginationFilterCategory = pageModel.getListPaginationViewModel().getFilterCategory();
+		String filterReplaceToString = pageModel.getListPaginationViewModel().getFilterReplaceTo();
+		filter = getFieldFilter(paginationFilter, paginationFilterCategory, filterReplaceToString);
 
 		// 处理分页类型
-		String paginationType = pageModel.getListPaginationViewModel()
-				.getPaginationType();
+		String paginationType = pageModel.getListPaginationViewModel().getPaginationType();
 		if (paginationType.equals("分页的末尾页数")) {
 			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER;
 		} else if (paginationType.equals("分页步进数")) {
@@ -1210,8 +1058,7 @@ public class CrawlToolResource {
 		int paginationInterval = 0;
 		if (!pageModel.getListPaginationViewModel().getInterval().equals("")) {
 			try {
-				paginationInterval = Integer.parseInt(pageModel
-						.getListPaginationViewModel().getInterval());
+				paginationInterval = Integer.parseInt(pageModel.getListPaginationViewModel().getInterval());
 			} catch (Exception e) {
 				e.printStackTrace();
 				paginationInterval = 0;
@@ -1221,33 +1068,17 @@ public class CrawlToolResource {
 		// 按照是否使用分页进步数,调用不同的方法
 		if (paginationInterval != 0) {
 			if (paginationType == Constants.PAGINATION_TYPE_CUSTOM) {
-				selector.initPagitationSelector(paginationType, pageModel
-						.getListPaginationViewModel().getCurrentString(),
-						pageModel.getListPaginationViewModel().getReplaceTo(),
-						pageModel.getListPaginationViewModel()
-								.getPaginationUrl(), pageModel
-								.getListPaginationViewModel().getStart(),
-						pageModel.getListPaginationViewModel().getLastNumber(),
-						paginationInterval);
+				selector.initPagitationSelector(paginationType, pageModel.getListPaginationViewModel().getCurrentString(), pageModel.getListPaginationViewModel().getReplaceTo(), pageModel
+						.getListPaginationViewModel().getPaginationUrl(), pageModel.getListPaginationViewModel().getStart(), pageModel.getListPaginationViewModel().getLastNumber(), paginationInterval);
 			} else if (paginationType == Constants.PAGINATION_TYPE_PAGENUMBER_INTERVAL) {
 				// Constants.PAGINATION_TYPE_PAGENUMBER 分页步进数
-				selector.initPagitationSelector(paginationType, pageModel
-						.getListPaginationViewModel().getCurrentString(),
-						pageModel.getListPaginationViewModel().getReplaceTo(),
-						pageModel.getListPaginationViewModel()
-								.getPaginationUrl(), pageModel
-								.getListPaginationViewModel().getStart(),
-						pageModel.getListPaginationViewModel().getRecords(),
-						paginationInterval, indexer, filter, null);
+				selector.initPagitationSelector(paginationType, pageModel.getListPaginationViewModel().getCurrentString(), pageModel.getListPaginationViewModel().getReplaceTo(), pageModel
+						.getListPaginationViewModel().getPaginationUrl(), pageModel.getListPaginationViewModel().getStart(), pageModel.getListPaginationViewModel().getRecords(), paginationInterval,
+						indexer, filter, null);
 			}
 		} else {// 调用分页进步数方法或分页URL方法
-			selector.initPagitationSelector(paginationType, pageModel
-					.getListPaginationViewModel().getCurrentString(), pageModel
-					.getListPaginationViewModel().getReplaceTo(), pageModel
-					.getListPaginationViewModel().getPaginationUrl(), pageModel
-					.getListPaginationViewModel().getStart(), pageModel
-					.getListPaginationViewModel().getRecords(), indexer,
-					filter, null);
+			selector.initPagitationSelector(paginationType, pageModel.getListPaginationViewModel().getCurrentString(), pageModel.getListPaginationViewModel().getReplaceTo(), pageModel
+					.getListPaginationViewModel().getPaginationUrl(), pageModel.getListPaginationViewModel().getStart(), pageModel.getListPaginationViewModel().getRecords(), indexer, filter, null);
 		}
 
 		if (!pageModel.getListPaginationViewModel().getSelector().equals("")) {
@@ -1264,9 +1095,7 @@ public class CrawlToolResource {
 		indexer = new SelectorIndexer();
 		selector = new Selector();
 		if (!pageModel.getNewsTitleViewModel().getSelector().equals("")) {
-			indexer.initJsoupIndexer(pageModel.getNewsTitleViewModel()
-					.getSelector(), pageModel.getNewsTitleViewModel()
-					.getSelectorAttr());
+			indexer.initJsoupIndexer(pageModel.getNewsTitleViewModel().getSelector(), pageModel.getNewsTitleViewModel().getSelectorAttr());
 			selector.initFieldSelector("title", "", indexer, null, null);
 			news.add(selector);
 		}
@@ -1275,9 +1104,7 @@ public class CrawlToolResource {
 		indexer = new SelectorIndexer();
 		selector = new Selector();
 		if (!pageModel.getNewsContentViewModel().getSelector().equals("")) {
-			indexer.initJsoupIndexer(pageModel.getNewsContentViewModel()
-					.getSelector(), pageModel.getNewsContentViewModel()
-					.getSelectorAttr());
+			indexer.initJsoupIndexer(pageModel.getNewsContentViewModel().getSelector(), pageModel.getNewsContentViewModel().getSelectorAttr());
 			selector.initFieldSelector("content", "", indexer, null, null);
 			news.add(selector);
 		}
@@ -1287,25 +1114,17 @@ public class CrawlToolResource {
 		selector = new Selector();
 		if (!pageModel.getNewsPublishTimeViewModel().getSelector().equals("")) {
 			// 处理发布时间过滤器
-			String filterString = pageModel.getNewsPublishTimeViewModel()
-					.getFilter();
-			String filterCategory = pageModel.getNewsPublishTimeViewModel()
-					.getFilterCategory();
-			String filterReplaceTo = pageModel.getNewsPublishTimeViewModel()
-					.getFilterReplaceTo();
-			filter = getFieldFilter(filterString, filterCategory,
-					filterReplaceTo);
+			String filterString = pageModel.getNewsPublishTimeViewModel().getFilter();
+			String filterCategory = pageModel.getNewsPublishTimeViewModel().getFilterCategory();
+			String filterReplaceTo = pageModel.getNewsPublishTimeViewModel().getFilterReplaceTo();
+			filter = getFieldFilter(filterString, filterCategory, filterReplaceTo);
 
 			// 处理发布时间格式化器
-			String formatString = pageModel.getNewsPublishTimeViewModel()
-					.getFormatter();
-			String formatCategory = pageModel.getNewsPublishTimeViewModel()
-					.getFormatCategory();
+			String formatString = pageModel.getNewsPublishTimeViewModel().getFormatter();
+			String formatCategory = pageModel.getNewsPublishTimeViewModel().getFormatCategory();
 			format = getFieldFormatter(formatString, formatCategory);
 
-			indexer.initJsoupIndexer(pageModel.getNewsPublishTimeViewModel()
-					.getSelector(), pageModel.getNewsPublishTimeViewModel()
-					.getSelectorAttr());
+			indexer.initJsoupIndexer(pageModel.getNewsPublishTimeViewModel().getSelector(), pageModel.getNewsPublishTimeViewModel().getSelectorAttr());
 			selector.initFieldSelector("tstamp", "", indexer, filter, format);
 			news.add(selector);
 		}
@@ -1314,16 +1133,13 @@ public class CrawlToolResource {
 		indexer = new SelectorIndexer();
 		selector = new Selector();
 		if (!pageModel.getNewsSourceViewModel().getSelector().equals("")) {
-			indexer.initJsoupIndexer(pageModel.getNewsSourceViewModel()
-					.getSelector(), pageModel.getNewsSourceViewModel()
-					.getSelectorAttr());
+			indexer.initJsoupIndexer(pageModel.getNewsSourceViewModel().getSelector(), pageModel.getNewsSourceViewModel().getSelectorAttr());
 			selector.initFieldSelector("source", "", indexer, null, null);
 			news.add(selector);
 		}
 
 		// 处理内容自定义属性 以时间为例
-		List<CustomerAttrModel> newsCustomerAttrViewModel = pageModel
-				.getNewsCustomerAttrViewModel();
+		List<CustomerAttrModel> newsCustomerAttrViewModel = pageModel.getNewsCustomerAttrViewModel();
 		for (CustomerAttrModel model : newsCustomerAttrViewModel) {
 			indexer = new SelectorIndexer();
 			selector = new Selector();
@@ -1332,8 +1148,7 @@ public class CrawlToolResource {
 			String filterString = model.getFilter();
 			String filterCategory = model.getFilterCategory();
 			String filterReplaceTo = model.getFilterReplaceTo();
-			filter = getFieldFilter(filterString, filterCategory,
-					filterReplaceTo);
+			filter = getFieldFilter(filterString, filterCategory, filterReplaceTo);
 
 			// 处理内容自定义属性格式化器
 			String formatString = model.getFormatter();
@@ -1342,8 +1157,7 @@ public class CrawlToolResource {
 
 			if (!model.getSelector().equals("")) {
 				indexer.initJsoupIndexer(model.getSelector(), model.getAttr());
-				selector.initFieldSelector(model.getTarget(), "", indexer,
-						filter, format);
+				selector.initFieldSelector(model.getTarget(), "", indexer, filter, format);
 				news.add(selector);
 			}
 		}
@@ -1358,14 +1172,9 @@ public class CrawlToolResource {
 	// (e.g. http://cn.promo.yahoo.com/customcare/music.html)
 	private static final int CHUNK_SIZE = 8000;
 	// NUTCH-1006 Meta equiv with single quotes not accepted
-	private static Pattern metaPattern = Pattern.compile(
-			"<meta\\s+([^>]*http-equiv=(\"|')?content-type(\"|')?[^>]*)>",
-			Pattern.CASE_INSENSITIVE);
-	private static Pattern charsetPattern = Pattern.compile(
-			"charset=\\s*([a-z][_\\-0-9a-z]*)", Pattern.CASE_INSENSITIVE);
-	private static Pattern charsetPatternHTML5 = Pattern.compile(
-			"<meta\\s+charset\\s*=\\s*[\"']?([a-z][_\\-0-9a-z]*)[^>]*>",
-			Pattern.CASE_INSENSITIVE);
+	private static Pattern metaPattern = Pattern.compile("<meta\\s+([^>]*http-equiv=(\"|')?content-type(\"|')?[^>]*)>", Pattern.CASE_INSENSITIVE);
+	private static Pattern charsetPattern = Pattern.compile("charset=\\s*([a-z][_\\-0-9a-z]*)", Pattern.CASE_INSENSITIVE);
+	private static Pattern charsetPatternHTML5 = Pattern.compile("<meta\\s+charset\\s*=\\s*[\"']?([a-z][_\\-0-9a-z]*)[^>]*>", Pattern.CASE_INSENSITIVE);
 
 	public static String sniffCharacterEncoding(byte[] content) {
 		if (content == null) {
@@ -1375,8 +1184,7 @@ public class CrawlToolResource {
 		String str = "";
 		try {
 			// System.out.println("content:"+new String(content,"utf-8"));
-			str = new String(content, 0, length, Charset.forName("ASCII")
-					.toString());
+			str = new String(content, 0, length, Charset.forName("ASCII").toString());
 			// System.out.println("str:"+str);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -1386,8 +1194,7 @@ public class CrawlToolResource {
 		Matcher metaMatcher = metaPattern.matcher(str);
 		String encoding = null;
 		if (metaMatcher.find()) {
-			Matcher charsetMatcher = charsetPattern.matcher(metaMatcher
-					.group(1));
+			Matcher charsetMatcher = charsetPattern.matcher(metaMatcher.group(1));
 			if (charsetMatcher.find())
 				encoding = new String(charsetMatcher.group(1));
 		}
@@ -1406,14 +1213,12 @@ public class CrawlToolResource {
 		}
 		if (encoding == null) {
 			// check for BOM
-			if (content.length >= 3 && content[0] == (byte) 0xEF
-					&& content[1] == (byte) 0xBB && content[2] == (byte) 0xBF) {
+			if (content.length >= 3 && content[0] == (byte) 0xEF && content[1] == (byte) 0xBB && content[2] == (byte) 0xBF) {
 				encoding = "UTF-8";
 			} else if (content.length >= 2) {
 				if (content[0] == (byte) 0xFF && content[1] == (byte) 0xFE) {
 					encoding = "UTF-16LE";
-				} else if (content[0] == (byte) 0xFE
-						&& content[1] == (byte) 0xFF) {
+				} else if (content[0] == (byte) 0xFE && content[1] == (byte) 0xFF) {
 					encoding = "UTF-16BE";
 				} else {
 					encoding = "UTF-8";
