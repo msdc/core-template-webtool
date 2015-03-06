@@ -35,6 +35,7 @@ import com.isoftstone.crawl.template.utils.DownloadHtml;
 import com.isoftstone.crawl.template.utils.EncodeUtils;
 import com.isoftstone.crawl.template.utils.MD5Utils;
 import com.isoftstone.crawl.template.utils.RedisOperator;
+import com.isoftstone.crawl.template.utils.SeedsEffectiveModelComparator;
 import com.isoftstone.crawl.template.utils.TemplateModelComparator;
 
 /**
@@ -735,10 +736,34 @@ public class CrawlToolService {
 	@Path("/getSeedsEffectiveStatusList")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getSeedsEffectiveStatusList() {
-		SeedsEffectiveStatusList seedsEffectiveStatusList = new SeedsEffectiveStatusList();
-		List<SeedsEffectiveStatusModel> SeedsEffectiveStatusModelList = new ArrayList<SeedsEffectiveStatusModel>();
+		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();
 		jsonProvider.setSuccess(true);
+
+		SeedsEffectiveStatusList seedsEffectiveStatusList = new SeedsEffectiveStatusList();
+		List<SeedsEffectiveStatusModel> SeedsEffectiveStatusModelList = new ArrayList<SeedsEffectiveStatusModel>();
+		try {
+			Set<String> listKeys = RedisOperator.searchKeysFromDefaultDB("*" + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
+			if (listKeys != null) {
+				for (String key : listKeys) {
+					String templateString = RedisOperator.getFromDefaultDB(key);
+					TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateString);
+					SeedsEffectiveStatusModel seedsEffectiveStatusModel = new SeedsEffectiveStatusModel();
+					seedsEffectiveStatusModel.setTemplateId(templateModel.getTemplateId());
+					seedsEffectiveStatusModel.setUrl(templateModel.getBasicInfoViewModel().getUrl());
+					seedsEffectiveStatusModel.setDescription(templateModel.getDescription());
+					seedsEffectiveStatusModel.setName(templateModel.getBasicInfoViewModel().getName());
+					seedsEffectiveStatusModel.setEffectiveStatus("暂无状态");
+					SeedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
+				}
+			}
+		} catch (Exception e) {
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("Redis操作异常！");
+			e.printStackTrace();
+		}
+		// 列表按名称排序
+		Collections.sort(SeedsEffectiveStatusModelList, new SeedsEffectiveModelComparator());
 		seedsEffectiveStatusList.setSeedsEffectiveStatusList(SeedsEffectiveStatusModelList);
 		jsonProvider.setData(seedsEffectiveStatusList);
 		return jsonProvider.toJSON();

@@ -14,11 +14,11 @@
                         <td>操作</td>
                     </tr>
                     </thead>
-                    <tbody data-bind="foreach: urls">
+                    <tbody data-bind="foreach: paginationUrls">
                     <tr>
                         <td data-bind="text: ($index()+1)"></td>
                         <td data-bind="text: name"></td>
-                        <td data-bind="text: description"></td>
+                        <td data-bind="text: url" style="width: 400px;word-break: break-all"></td>
                         <td data-bind="text: effectiveStatus"></td>
                         <td>
                             <a role="button" class="btn btn-primary" data-bind="attr: {href:updateUrl,target:targetWindow}">设置</a>

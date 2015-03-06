@@ -2,26 +2,28 @@
  * Created by lenovo on 2015/3/5.
  */
 //web网站的虚拟路径
-var virtualWebPath="/crawl-template-webtool";
+var virtualWebPath = "/crawl-template-webtool";
 //列表中每页显示记录数
-var paginationItemCounts=10;
+var paginationItemCounts = 10;
 
 /*************************View-Model Definition Start**********************************/
 /**
  *
  * @summary 种子有效性View-Model
  * */
-var seedEffectiveVM=function(urlData){
-    var urlInitData=updateUrlData(urlData);
-    this.urls=ko.observableArray(urlInitData);
+var seedEffectiveVM = function (urlData) {
+    var urlInitData = updateUrlData(urlData);
+    this.urls = ko.observableArray(urlInitData);
 };
 
 /**
  *
  * @summary 页面主体View-Model类
  * */
-var masterVM=function(urlData){
-    this.seedEffectiveVM=new seedEffectiveVM(urlData);
+var masterVM = function (urlData) {
+    this.seedEffectiveVM = new seedEffectiveVM(urlData);
+    //分页显示的url列表
+    self.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
 };
 /*************************View-Model Definition End**********************************/
 
@@ -30,42 +32,42 @@ var masterVM=function(urlData){
  * 初始化列表数据
  * @param {Array} urlData url列表
  * */
-function updateUrlData(urlData){
-    var seedsUrlInitData=[];
-    if(urlData){
-        for(var i=0;i<urlData.length;i++){
-            var model=urlData[i];
-            if(model==null){
+function updateUrlData(urlData) {
+    var seedsUrlInitData = [];
+    if (urlData) {
+        for (var i = 0; i < urlData.length; i++) {
+            var model = urlData[i];
+            if (model == null) {
                 continue;
             }
-            model.updateUrl="../template-main.html?templateGuid="+model.templateId;
-            model.targetWindow="_blank";
+            model.updateUrl = "../template-main.html?templateGuid=" + model.templateId;
+            model.targetWindow = "_blank";
             seedsUrlInitData.push(model);
         }
     }
     return seedsUrlInitData;
 }
 
-$(function(){
+$(function () {
     $.ajax2({
         url: virtualWebPath + '/webapi/crawlToolResource/getSeedsEffectiveStatusList',
         type: 'GET',
         success: function (data) {
-            var json=JSON.parse(data);
-            if(json.success){
-                if(json.data.seedsEffectiveStatusList!=null){
+            var json = JSON.parse(data);
+            if (json.success) {
+                if (json.data.seedsEffectiveStatusList != null) {
                     initPageContent(json.data.seedsEffectiveStatusList);
-                }else{
+                } else {
                     initPageContent([]);
                 }
-            }else{
+            } else {
                 initPageContent([]);
             }
         },
         error: function (error) {
             initPageContent([]);
         }
-    },'#seedEffective_table');
+    }, '#seedEffective_table');
 });
 
 /**
@@ -73,9 +75,9 @@ $(function(){
  * @summary 加载页面主体内容
  * @param {Object} urlData 初始化数据
  * */
-function initPageContent(urlData){
-    $('#seeds_effective').load('status-seeds.html',function(){
-        var mainViewModel=new masterVM(urlData);
+function initPageContent(urlData) {
+    $('#seeds_effective').load('status-seeds.html', function () {
+        var mainViewModel = new masterVM(urlData);
         ko.applyBindings(mainViewModel);
         //加载分页控件
         loadPaginationComponent(mainViewModel.seedEffectiveVM);
@@ -88,14 +90,19 @@ function initPageContent(urlData){
  * @param {Object} result
  * */
 function loadPaginationComponent(seedEffectiveVM) {
-    //var totalCount = seedEffectiveVM.urls().length;
+    var totalCount = seedEffectiveVM.urls().length;
     $('#seeds_effective_pagination').pagination({
-        items: 10,
+        items: totalCount,
         itemsOnPage: paginationItemCounts,
         cssStyle: 'light-theme',
         prevText: '上一页',
         nextText: '下一页',
         onPageClick: function (pageNumber, eTarget) {
+            var originalUrls = seedEffectiveVM.urls();
+            var dataIndex = (pageNumber - 1) * paginationItemCounts;
+            var itemsCounts = dataIndex + paginationItemCounts;
+            var nextPageUrls = originalUrls.slice(dataIndex, itemsCounts);
+            seedEffectiveVM.paginationUrls(nextPageUrls);
         }
     });
 }
@@ -140,8 +147,12 @@ $.ajax2 = function (options, aimDiv) {
         "position": PositionStyle,
         "top": "40%",
         "left": "50%",
-        "margin-top": function () { return -1 * img.height() / 2; },
-        "margin-left": function () { return -1 * img.width() / 2; }
+        "margin-top": function () {
+            return -1 * img.height() / 2;
+        },
+        "margin-left": function () {
+            return -1 * img.width() / 2;
+        }
     });
     mask.show().css("opacity", "0.1");
     $.ajax(options);

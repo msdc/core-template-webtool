@@ -2,23 +2,23 @@
  * Created by wang on 2014/12/9.
  */
 //web网站的虚拟路径
-var virtualWebPath="/crawl-template-webtool";
+var virtualWebPath = "/crawl-template-webtool";
 //列表中每页显示记录数
-var paginationItemCounts=10;
+var paginationItemCounts = 10;
 
-$(function(){
+$(function () {
     $.ajax2({
         url: virtualWebPath + '/webapi/crawlToolResource/getTemplateList',
         type: 'GET',
         success: function (data) {
-            var json=JSON.parse(data);
-            if(json.success){
-                if(json.data.templateList!=null){
+            var json = JSON.parse(data);
+            if (json.success) {
+                if (json.data.templateList != null) {
                     pageInit(json.data.templateList);
-                }else{
+                } else {
                     pageInit([]);
                 }
-            }else{
+            } else {
                 pageInit([]);
             }
         },
@@ -26,7 +26,7 @@ $(function(){
             pageInit([]);
         }
     });
-    
+
 
 });
 
@@ -34,8 +34,8 @@ $(function(){
  *
  * 页面初始化
  * */
-function pageInit(templateList){
-   var pageViewModel=new templateViewModel(templateList);
+function pageInit(templateList) {
+    var pageViewModel = new templateViewModel(templateList);
     //绑定并显示
     ko.applyBindings(pageViewModel);
     //加载分页
@@ -44,7 +44,7 @@ function pageInit(templateList){
     registerExportModalEvent();
 }
 
-function registerExportModalEvent(){
+function registerExportModalEvent() {
     $('#model_export').on('hidden', function () {
         $('#export_result').text('');//清空错误信息
     });
@@ -53,26 +53,26 @@ function registerExportModalEvent(){
         var button = $(event.relatedTarget); // Button that triggered the modal
         var optionType = button.data('optiontype');// Extract info from data-* attributes
         var modal = $(this);
-        var modalTitle=modal.find('#model_export_title');
-        var btnConfirm=modal.find('#btn_modalexport_confirm');
+        var modalTitle = modal.find('#model_export_title');
+        var btnConfirm = modal.find('#btn_modalexport_confirm');
         btnConfirm.unbind();//移除按钮之前绑定的事件
-        if(optionType=="file_export"){//导出
+        if (optionType == "file_export") {//导出
             modalTitle.text('导出模板到文件');
             btnConfirm.click(btnModalExportConfirmHandler);
         }
-        if(optionType=="file_import"){//导入
+        if (optionType == "file_import") {//导入
             modalTitle.text('导入模板文件');
             btnConfirm.click(btnModalImportConfirmHandler);
         }
     });
 }
 
-function btnModalImportConfirmHandler(){
-    var filePath=$('#file_path').val();
-    var modalBody=$('#model_export').find('.modal-body');
-    var modalBodyHtml=modalBody.html();
-    var modalFooter=$('#model_export').find('.modal-footer');
-    var modalFooterHtml=modalFooter.html();
+function btnModalImportConfirmHandler() {
+    var filePath = $('#file_path').val();
+    var modalBody = $('#model_export').find('.modal-body');
+    var modalBodyHtml = modalBody.html();
+    var modalFooter = $('#model_export').find('.modal-footer');
+    var modalFooterHtml = modalFooter.html();
     //清空modalBody内容
     modalBody.html('');
     modalBody.html('<div class=\"text-center\"><img src=\"image/load.gif\"></div>');
@@ -81,17 +81,17 @@ function btnModalImportConfirmHandler(){
         url: virtualWebPath + '/webapi/crawlToolResource/importAllTemplates',
         type: 'POST',
         data: {
-            filePath:filePath
+            filePath: filePath
         },
         success: function (data) {
-            var json=JSON.parse(data);
-            if(json.success){
-                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作成功！请刷新该页面！");
-            }else{
-                if(json.errorMsg=="pathInvalid"){
-                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作失败！导入文件路径无效！");
-                }else{
-                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作失败！");
+            var json = JSON.parse(data);
+            if (json.success) {
+                optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作成功！请刷新该页面！");
+            } else {
+                if (json.errorMsg == "pathInvalid") {
+                    optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作失败！导入文件路径无效！");
+                } else {
+                    optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作失败！");
                 }
             }
             $('#model_export').modal('hide');
@@ -102,17 +102,17 @@ function btnModalImportConfirmHandler(){
             modalBody.html(modalBodyHtml);
             modalFooter.html(modalFooterHtml);
             $('#export_result').text('');
-            $('#export_result').text("操作失败！错误信息:"+error.responseText);
+            $('#export_result').text("操作失败！错误信息:" + error.responseText);
         }
     });
 }
 
-function btnModalExportConfirmHandler(){
-    var filePath=$('#file_path').val();
-    var modalBody=$('#model_export').find('.modal-body');
-    var modalBodyHtml=modalBody.html();
-    var modalFooter=$('#model_export').find('.modal-footer');
-    var modalFooterHtml=modalFooter.html();
+function btnModalExportConfirmHandler() {
+    var filePath = $('#file_path').val();
+    var modalBody = $('#model_export').find('.modal-body');
+    var modalBodyHtml = modalBody.html();
+    var modalFooter = $('#model_export').find('.modal-footer');
+    var modalFooterHtml = modalFooter.html();
     //清空modalBody内容
     modalBody.html('');
     modalBody.html('<div class=\"text-center\"><img src=\"image/load.gif\"></div>');
@@ -121,17 +121,17 @@ function btnModalExportConfirmHandler(){
         url: virtualWebPath + '/webapi/crawlToolResource/exportAllTemplates',
         type: 'POST',
         data: {
-            filePath:filePath
+            filePath: filePath
         },
         success: function (data) {
-            var json=JSON.parse(data);
-            if(json.success){
-                optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作成功！");
-            }else{
-                if(json.errorMsg=="pathInvalid"){
-                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作失败！导出文件路径无效！");
-                }else{
-                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作失败！");
+            var json = JSON.parse(data);
+            if (json.success) {
+                optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作成功！");
+            } else {
+                if (json.errorMsg == "pathInvalid") {
+                    optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作失败！导出文件路径无效！");
+                } else {
+                    optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作失败！");
                 }
             }
             $('#model_export').modal('hide');
@@ -142,7 +142,7 @@ function btnModalExportConfirmHandler(){
             modalBody.html(modalBodyHtml);
             modalFooter.html(modalFooterHtml);
             $('#export_result').text('');
-            $('#export_result').text("操作失败！错误信息:"+error.responseText);
+            $('#export_result').text("操作失败！错误信息:" + error.responseText);
         }
     });
 }
@@ -161,100 +161,100 @@ function loadPaginationComponent(listViewModel) {
         prevText: '上一页',
         nextText: '下一页',
         onPageClick: function (pageNumber, eTarget) {
-            var originalUrls=listViewModel.urls();
-            var dataIndex=(pageNumber-1)*paginationItemCounts;
-            var itemsCounts=dataIndex+paginationItemCounts;
-            var nextPageUrls=originalUrls.slice(dataIndex,itemsCounts);
+            var originalUrls = listViewModel.urls();
+            var dataIndex = (pageNumber - 1) * paginationItemCounts;
+            var itemsCounts = dataIndex + paginationItemCounts;
+            var nextPageUrls = originalUrls.slice(dataIndex, itemsCounts);
             listViewModel.paginationUrls(nextPageUrls);
         }
     });
 }
 
 /*****************View-Model***********************/
-function templateViewModel(templateList){
-    var self=this;
-    var templateListInitData=updateTemplateListInitData(templateList);
-    self.urls=ko.observableArray(templateListInitData);
-    self.searchString=ko.observable('');
+function templateViewModel(templateList) {
+    var self = this;
+    var templateListInitData = updateTemplateListInitData(templateList);
+    self.urls = ko.observableArray(templateListInitData);
+    self.searchString = ko.observable('');
     //分页显示的url列表
-    self.paginationUrls=ko.observableArray(templateListInitData.slice(0,paginationItemCounts));
-    self.addNew=function(){
-        window.location.href="pages/template-main.html";
+    self.paginationUrls = ko.observableArray(templateListInitData.slice(0, paginationItemCounts));
+    self.addNew = function () {
+        window.location.href = "pages/template-main.html";
     };
     //搜索
-    self.search=function(){
+    self.search = function () {
         $.ajax2({
-            url:virtualWebPath + '/webapi/crawlToolResource/searchTemplateList',
-            type:'POST',
-            data:{
-                searchString:self.searchString()
+            url: virtualWebPath + '/webapi/crawlToolResource/searchTemplateList',
+            type: 'POST',
+            data: {
+                searchString: self.searchString()
             },
-            success:function(data){
-                var json=JSON.parse(data);
-                if(json.success){
-                    if(json.data.templateList!=null){
-                        var templateLists=json.data.templateList;
-                        var searchData=updateTemplateListInitData(templateLists);
+            success: function (data) {
+                var json = JSON.parse(data);
+                if (json.success) {
+                    if (json.data.templateList != null) {
+                        var templateLists = json.data.templateList;
+                        var searchData = updateTemplateListInitData(templateLists);
                         self.urls(searchData);
-                        self.paginationUrls(searchData.slice(0,paginationItemCounts));
+                        self.paginationUrls(searchData.slice(0, paginationItemCounts));
                         //重新加载分页组件
                         loadPaginationComponent(self);
                     }
                 }
             },
-            error:function(error){
+            error: function (error) {
                 self.urls([]);
-                if(error){
-                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;搜索操作执行失败！");
+                if (error) {
+                    optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;搜索操作执行失败！");
                 }
             }
-        },'#template_list_table');
+        }, '#template_list_table');
     };
     //批量生成增量模板
-    self.generateAllIncreaseTemplates=function(){
-        var increaseModel=$('#modal_generate_increase');
-        var informationBody=increaseModel.find('.modal-body');
+    self.generateAllIncreaseTemplates = function () {
+        var increaseModel = $('#modal_generate_increase');
+        var informationBody = increaseModel.find('.modal-body');
         informationBody.html('');
         $.ajax2({
             url: virtualWebPath + '/webapi/crawlToolResource/generateAllIncreaseTemplates',
             type: 'GET',
             success: function (data) {
-                var json=JSON.parse(data);
+                var json = JSON.parse(data);
                 informationBody.html(json.data);
                 increaseModel.modal('show');
             },
             error: function (error) {
-                informationBody.html("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;批量生成增量模板失败！<br/>");
+                informationBody.html("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;批量生成增量模板失败！<br/>");
                 increaseModel.modal('show');
             }
         });
     };
     //删除对话框中的【确定】按钮
-    self.modalDelete=function(){
-        var item=self.tempData();
-        if(item){
-            var templateUrl=item.basicInfoViewModel.url;
+    self.modalDelete = function () {
+        var item = self.tempData();
+        if (item) {
+            var templateUrl = item.basicInfoViewModel.url;
             $.ajax({
                 url: virtualWebPath + '/webapi/crawlToolResource/deleteTemplate',
                 type: 'POST',
-                data:{
-                    templateUrl:templateUrl
+                data: {
+                    templateUrl: templateUrl
                 },
                 success: function (data) {
-                    var json=JSON.parse(data);
-                    if(json.success){
+                    var json = JSON.parse(data);
+                    if (json.success) {
                         self.paginationUrls.remove(item);
                         self.urls.remove(item);
-                        optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;删除成功！");
-                    }else{
-                        optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;删除失败！");
+                        optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;删除成功！");
+                    } else {
+                        optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;删除失败！");
                     }
                     //手工关闭对话框
                     $('#modal_delete_info').modal('hide');
                 },
                 error: function (error) {
-                    if(error){
-                        optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;删除失败！");
+                    if (error) {
+                        optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;删除失败！");
                     }
                     //手工关闭对话框
                     $('#modal_delete_info').modal('hide');
@@ -262,76 +262,76 @@ function templateViewModel(templateList){
             });
         }
     };
-    self.tempData=ko.observable();
+    self.tempData = ko.observable();
     //显示删除对话框
-    self.showDeleteModal=function(item){
+    self.showDeleteModal = function (item) {
         $('#modal_delete_info').modal('show');
         self.tempData(item);
     };
-    self.updateItem=function(){
-        var that=this;
-        var templateUrl=that.basicInfoViewModel.url;
+    self.updateItem = function () {
+        var that = this;
+        var templateUrl = that.basicInfoViewModel.url;
         $.ajax({
             url: virtualWebPath + '/webapi/crawlToolResource/getTemplateGuid',
             type: 'POST',
-            data:{
-                templateUrl:templateUrl
+            data: {
+                templateUrl: templateUrl
             },
             success: function (data) {
-                var json=JSON.parse(data);
-                if(json.success){
-                    window.location.href="pages/template-main.html?templateGuid="+json.data;
-                }else{
-                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;修改操作失败！");
+                var json = JSON.parse(data);
+                if (json.success) {
+                    window.location.href = "pages/template-main.html?templateGuid=" + json.data;
+                } else {
+                    optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;修改操作失败！");
                 }
             },
             error: function (error) {
-                if(error){
-                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;修改操作失败！");
+                if (error) {
+                    optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;修改操作失败！");
                 }
             }
         });
     };
-    self.disableTemplate=function(){
-        var that=this;
-        var templateUrl=that.basicInfoViewModel.url;
-        var name=that.basicInfoViewModel.name;
+    self.disableTemplate = function () {
+        var that = this;
+        var templateUrl = that.basicInfoViewModel.url;
+        var name = that.basicInfoViewModel.name;
         $.ajax({
             url: virtualWebPath + '/webapi/crawlToolResource/disableTemplate',
             type: 'POST',
-            data:{
-                templateUrl:templateUrl,
-                name:name
+            data: {
+                templateUrl: templateUrl,
+                name: name
             },
             success: function (data) {
                 that.statusText('停用');
                 that.status(false);
             },
             error: function (error) {
-                if(error){
-                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;停用模板操作失败！");
+                if (error) {
+                    optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;停用模板操作失败！");
                 }
             }
         });
     };
-    self.enableTemplate=function(){
-        var that=this;
-        var templateUrl=that.basicInfoViewModel.url;
-        var name=that.basicInfoViewModel.name;
+    self.enableTemplate = function () {
+        var that = this;
+        var templateUrl = that.basicInfoViewModel.url;
+        var name = that.basicInfoViewModel.name;
         $.ajax({
             url: virtualWebPath + '/webapi/crawlToolResource/enableTemplate',
             type: 'POST',
-            data:{
-                templateUrl:templateUrl,
-                name:name
+            data: {
+                templateUrl: templateUrl,
+                name: name
             },
             success: function (data) {
                 that.statusText('启用');
                 that.status(true);
             },
             error: function (error) {
-                if(error){
-                    optionExecuteInfo("操作信息","&nbsp;&nbsp;&nbsp;&nbsp;启用模板操作失败！");
+                if (error) {
+                    optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;启用模板操作失败！");
                 }
             }
         });
@@ -343,15 +343,15 @@ function templateViewModel(templateList){
  *
  * ajax post请求
  * */
-function ajaxPostRequest(url,postData,successHandler,errorHandler){
+function ajaxPostRequest(url, postData, successHandler, errorHandler) {
     $.ajax({
         url: virtualWebPath + url,
         type: 'POST',
-        data:postData,
-        success: function(data){
+        data: postData,
+        success: function (data) {
             successHandler(data);
         },
-        error: function(error){
+        error: function (error) {
             errorHandler(error);
         }
     });
@@ -361,14 +361,14 @@ function ajaxPostRequest(url,postData,successHandler,errorHandler){
  *
  * ajax Get 请求
  * */
-function ajaxGetRequest(url,successHandler,errorHandler){
+function ajaxGetRequest(url, successHandler, errorHandler) {
     $.ajax({
         url: virtualWebPath + url,
         type: 'GET',
-        success: function(data){
+        success: function (data) {
             successHandler(data);
         },
-        error: function(error){
+        error: function (error) {
             errorHandler(error);
         }
     });
@@ -379,23 +379,23 @@ function ajaxGetRequest(url,successHandler,errorHandler){
  * 初始化模板列表数据
  * @param {Array} templateList 模板列表
  * */
-function updateTemplateListInitData(templateList){
-    var templateListInitData=[];
-    if(templateList){
-        for(var i=0;i<templateList.length;i++){
-            var model=templateList[i];
-            if(model==null){
+function updateTemplateListInitData(templateList) {
+    var templateListInitData = [];
+    if (templateList) {
+        for (var i = 0; i < templateList.length; i++) {
+            var model = templateList[i];
+            if (model == null) {
                 continue;
             }
-            if(model.status=="true"){
-                model.statusText=ko.observable("启用");
-                model.status=ko.observable(true);
-            }else{
-                model.statusText=ko.observable("停用");
-                model.status=ko.observable(false);
+            if (model.status == "true") {
+                model.statusText = ko.observable("启用");
+                model.status = ko.observable(true);
+            } else {
+                model.statusText = ko.observable("停用");
+                model.status = ko.observable(false);
             }
-            model.updateUrl="pages/template-main.html?templateGuid="+model.templateId;
-            model.targetWindow="_blank";
+            model.updateUrl = "pages/template-main.html?templateGuid=" + model.templateId;
+            model.targetWindow = "_blank";
             templateListInitData.push(model);
         }
     }
@@ -405,9 +405,9 @@ function updateTemplateListInitData(templateList){
 /**
  * 操作提示
  * */
-function optionExecuteInfo(title,message){
+function optionExecuteInfo(title, message) {
     $('#option_alert').html('')
-        .html("<div class=\"alert alert-warning alert-dismissible\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button><strong>"+title+"</strong>"+message+"</div>");
+        .html("<div class=\"alert alert-warning alert-dismissible\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button><strong>" + title + "</strong>" + message + "</div>");
 }
 
 /******重写Ajax操作,做成通用Loading操作*******/
@@ -450,8 +450,12 @@ $.ajax2 = function (options, aimDiv) {
         "position": PositionStyle,
         "top": "40%",
         "left": "50%",
-        "margin-top": function () { return -1 * img.height() / 2; },
-        "margin-left": function () { return -1 * img.width() / 2; }
+        "margin-top": function () {
+            return -1 * img.height() / 2;
+        },
+        "margin-left": function () {
+            return -1 * img.width() / 2;
+        }
     });
     mask.show().css("opacity", "0.1");
     $.ajax(options);
