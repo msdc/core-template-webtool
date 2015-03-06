@@ -14,6 +14,8 @@ var paginationItemCounts = 10;
 var seedEffectiveVM = function (urlData) {
     var urlInitData = updateUrlData(urlData);
     this.urls = ko.observableArray(urlInitData);
+    //分页显示的url列表
+    this.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
 };
 
 /**
@@ -22,8 +24,6 @@ var seedEffectiveVM = function (urlData) {
  * */
 var masterVM = function (urlData) {
     this.seedEffectiveVM = new seedEffectiveVM(urlData);
-    //分页显示的url列表
-    self.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
 };
 /*************************View-Model Definition End**********************************/
 
