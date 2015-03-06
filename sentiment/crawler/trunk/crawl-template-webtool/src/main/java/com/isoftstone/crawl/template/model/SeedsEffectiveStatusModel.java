@@ -1,0 +1,44 @@
+package com.isoftstone.crawl.template.model;
+
+/**
+ * 
+ * 种子有效性Model
+ * */
+public class SeedsEffectiveStatusModel {
+	private String templateId = "";
+	private String name = "";
+	private String description = "";
+	private String effectiveStatus = "";
+
+	public String getTemplateId() {
+		return templateId;
+	}
+
+	public void setTemplateId(String templateId) {
+		this.templateId = templateId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getEffectiveStatus() {
+		return effectiveStatus;
+	}
+
+	public void setEffectiveStatus(String effectiveStatus) {
+		this.effectiveStatus = effectiveStatus;
+	}
+}

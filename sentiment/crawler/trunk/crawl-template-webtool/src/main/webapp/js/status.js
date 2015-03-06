@@ -12,7 +12,8 @@ var paginationItemCounts=10;
  * @summary 种子有效性View-Model
  * */
 var seedEffectiveVM=function(urlData){
-    this.urls=ko.observableArray(urlData);
+    var urlInitData=updateUrlData(urlData);
+    this.urls=ko.observableArray(urlInitData);
 };
 
 /**
@@ -24,11 +25,54 @@ var masterVM=function(urlData){
 };
 /*************************View-Model Definition End**********************************/
 
+/**
+ *
+ * 初始化列表数据
+ * @param {Array} urlData url列表
+ * */
+function updateUrlData(urlData){
+    var seedsUrlInitData=[];
+    if(urlData){
+        for(var i=0;i<urlData.length;i++){
+            var model=urlData[i];
+            if(model==null){
+                continue;
+            }
+            model.updateUrl="../template-main.html?templateGuid="+model.templateId;
+            model.targetWindow="_blank";
+            seedsUrlInitData.push(model);
+        }
+    }
+    return seedsUrlInitData;
+}
+
 $(function(){
-    //加载页面主体内容
-    initPageContent();
+    $.ajax2({
+        url: virtualWebPath + '/webapi/crawlToolResource/getSeedsEffectiveStatusList',
+        type: 'GET',
+        success: function (data) {
+            var json=JSON.parse(data);
+            if(json.success){
+                if(json.data.seedsEffectiveStatusList!=null){
+                    initPageContent(json.data.seedsEffectiveStatusList);
+                }else{
+                    initPageContent([]);
+                }
+            }else{
+                initPageContent([]);
+            }
+        },
+        error: function (error) {
+            initPageContent([]);
+        }
+    },'#seedEffective_table');
 });
 
+/**
+ *
+ * @summary 加载页面主体内容
+ * @param {Object} urlData 初始化数据
+ * */
 function initPageContent(urlData){
     $('#seeds_effective').load('status-seeds.html',function(){
         var mainViewModel=new masterVM(urlData);
@@ -58,7 +102,7 @@ function loadPaginationComponent(seedEffectiveVM) {
 
 /******重写Ajax操作,做成通用Loading操作*******/
 $.ajax2 = function (options, aimDiv) {
-    var img = $("<img id=\"progressImgage\"  src=\"../image/load.gif\" />"); //Loading小图标
+    var img = $("<img id=\"progressImgage\"  src=\"../../image/load.gif\" />"); //Loading小图标
     var mask = $("<div id=\"maskOfProgressImage\"></div>").addClass("mask"); //Div遮罩
     var PositionStyle = "fixed";
     //是否将Loading固定在aimDiv中操作,否则默认为全屏Loading遮罩

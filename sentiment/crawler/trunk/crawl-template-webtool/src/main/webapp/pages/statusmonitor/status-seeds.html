@@ -14,34 +14,14 @@
                         <td>操作</td>
                     </tr>
                     </thead>
-                    <!--<tbody data-bind="foreach: urls">-->
-                    <!--<tr>-->
-                        <!--<td data-bind="text: ($index()+1)"></td>-->
-                        <!--<td data-bind="text: basicInfoViewModel.name"></td>-->
-                        <!--<td data-bind="text: description"></td>-->
-                        <!--<td data-bind="text: basicInfoViewModel.url"></td>-->
-                        <!--<td>-->
-                            <!--<a role="button" class="btn btn-primary" data-bind="attr: {href:updateUrl,target:targetWindow}">设置</a>-->
-                        <!--</td>-->
-                    <!--</tr>-->
-                    <!--</tbody>-->
-                    <tbody>
+                    <tbody data-bind="foreach: urls">
                     <tr>
-                        <td>1</td>
-                        <td>上海证券报-信托研究</td>
-                        <td>http://caifu.cnstock.com/list/xingtuo_yanjiu</td>
-                        <td>有效</td>
+                        <td data-bind="text: ($index()+1)"></td>
+                        <td data-bind="text: name"></td>
+                        <td data-bind="text: description"></td>
+                        <td data-bind="text: effectiveStatus"></td>
                         <td>
-                            <a role="button" class="btn btn-primary">设置</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>上海证券报-信托调查</td>
-                        <td>http://caifu.cnstock.com/list/xingtuo_diaocha</td>
-                        <td>有效</td>
-                        <td>
-                            <a role="button" class="btn btn-primary">设置</a>
+                            <a role="button" class="btn btn-primary" data-bind="attr: {href:updateUrl,target:targetWindow}">设置</a>
                         </td>
                     </tr>
                     </tbody>

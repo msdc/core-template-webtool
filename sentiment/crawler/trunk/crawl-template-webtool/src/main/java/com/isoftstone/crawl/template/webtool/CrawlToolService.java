@@ -15,6 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
+
 import com.isoftstone.crawl.template.consts.WebtoolConstants;
 import com.isoftstone.crawl.template.impl.ParseResult;
 import com.isoftstone.crawl.template.impl.TemplateFactory;
@@ -25,6 +26,8 @@ import com.isoftstone.crawl.template.model.PageModel;
 import com.isoftstone.crawl.template.model.ResponseJSONProvider;
 import com.isoftstone.crawl.template.model.SearchKeyWordDataModel;
 import com.isoftstone.crawl.template.model.SearchKeyWordModel;
+import com.isoftstone.crawl.template.model.SeedsEffectiveStatusList;
+import com.isoftstone.crawl.template.model.SeedsEffectiveStatusModel;
 import com.isoftstone.crawl.template.model.TemplateModel;
 import com.isoftstone.crawl.template.model.TemplateTagModel;
 import com.isoftstone.crawl.template.utils.Config;
@@ -721,6 +724,23 @@ public class CrawlToolService {
 		}
 
 		jsonProvider.setData(sbString.toString());
+		return jsonProvider.toJSON();
+	}
+
+	/**
+	 * 
+	 * 根据关键字，自动批量生成增量模板
+	 * */
+	@GET
+	@Path("/getSeedsEffectiveStatusList")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getSeedsEffectiveStatusList() {
+		SeedsEffectiveStatusList seedsEffectiveStatusList = new SeedsEffectiveStatusList();
+		List<SeedsEffectiveStatusModel> SeedsEffectiveStatusModelList = new ArrayList<SeedsEffectiveStatusModel>();
+		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();
+		jsonProvider.setSuccess(true);
+		seedsEffectiveStatusList.setSeedsEffectiveStatusList(SeedsEffectiveStatusModelList);
+		jsonProvider.setData(seedsEffectiveStatusList);
 		return jsonProvider.toJSON();
 	}
 }
