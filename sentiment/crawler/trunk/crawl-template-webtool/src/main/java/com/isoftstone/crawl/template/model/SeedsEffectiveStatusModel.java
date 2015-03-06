@@ -8,6 +8,7 @@ public class SeedsEffectiveStatusModel {
 	private String templateId = "";
 	private String name = "";
 	private String description = "";
+	private String url = "";
 	private String effectiveStatus = "";
 
 	public String getTemplateId() {
@@ -40,5 +41,13 @@ public class SeedsEffectiveStatusModel {
 
 	public void setEffectiveStatus(String effectiveStatus) {
 		this.effectiveStatus = effectiveStatus;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 }
