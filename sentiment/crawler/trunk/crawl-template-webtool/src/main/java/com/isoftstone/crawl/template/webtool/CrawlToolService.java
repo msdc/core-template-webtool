@@ -617,11 +617,11 @@ public class CrawlToolService {
 			// 处理URL及名称
 			BasicInfoViewModel basicInfoViewModel = pageModel.getBasicInfoViewModel();
 			String templateType = basicInfoViewModel.getTemplateType();
-			if (templateType.equals("百度新闻搜索")) {
+			if (templateType.equals(WebtoolConstants.BAIDU_SEARCH_NAME)) {
 				basicInfoViewModel.setName(WebtoolConstants.BAIDU_SEARCH_NAME + "-" + searchKeyWord);
-			} else if (templateType.equals("Bing新闻搜索")) {
+			} else if (templateType.equals(WebtoolConstants.BING_SEARCH_NAME)) {
 				basicInfoViewModel.setName(WebtoolConstants.BING_SEARCH_NAME + "-" + searchKeyWord);
-			} else if (templateType.equals("搜狗新闻搜索")) {
+			} else if (templateType.equals(WebtoolConstants.SOUGOU_SEARCH_NAME)) {
 				basicInfoViewModel.setName(WebtoolConstants.SOUGOU_SEARCH_NAME + "-" + searchKeyWord);
 			}
 			String encodedSearchKeyWord = "";
@@ -753,8 +753,17 @@ public class CrawlToolService {
 					seedsEffectiveStatusModel.setUrl(templateModel.getBasicInfoViewModel().getUrl());
 					seedsEffectiveStatusModel.setDescription(templateModel.getDescription());
 					seedsEffectiveStatusModel.setName(templateModel.getBasicInfoViewModel().getName());
-					seedsEffectiveStatusModel.setEffectiveStatus("暂无状态");
-					SeedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
+					TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateModel.getTemplateId());
+					PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
+					ResponseJSONProvider<ParseResult> middleJsonProvider=serviceHelper.getResponseJSONProviderObj(verifyNewContent(serviceHelper.getPageModeJSONString(pageModel)));
+					if(middleJsonProvider.getSuccess()==false){
+						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
+						//目前只显示无效的
+						SeedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
+					}else{
+						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_VALID_STATUS);
+					}					
+					
 				}
 			}
 		} catch (Exception e) {

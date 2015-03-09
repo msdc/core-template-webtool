@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,6 +42,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.JavaType;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -55,7 +58,9 @@ import com.isoftstone.crawl.template.impl.SelectorIndexer;
 import com.isoftstone.crawl.template.impl.TemplateFactory;
 import com.isoftstone.crawl.template.impl.TemplateResult;
 import com.isoftstone.crawl.template.model.BasicInfoViewModel;
+import com.isoftstone.crawl.template.model.CommonAttrViewModel;
 import com.isoftstone.crawl.template.model.CustomerAttrModel;
+import com.isoftstone.crawl.template.model.ListPaginationViewModel;
 import com.isoftstone.crawl.template.model.PageModel;
 import com.isoftstone.crawl.template.model.ResponseJSONProvider;
 import com.isoftstone.crawl.template.model.ScheduleDispatchViewModel;
@@ -361,22 +366,22 @@ public class CrawlToolResource {
 	public void getSearchEngineTagsViewModel(List<TemplateTagModel> searchEngineTagsViewModel, String searchKeyWord, String templateType) {
 		for (int i = 0; i < searchEngineTagsViewModel.size(); i++) {
 			if (searchEngineTagsViewModel.get(i).getTagKey().equals("分类")) {
-				if (templateType.equals("百度新闻搜索")) {
+				if (templateType.equals(WebtoolConstants.BAIDU_SEARCH_NAME)) {
 					searchEngineTagsViewModel.get(i).setTagValue(WebtoolConstants.BAIDU_SEARCH_NAME + "-" + searchKeyWord);
-				} else if (templateType.equals("Bing新闻搜索")) {
+				} else if (templateType.equals(WebtoolConstants.BING_SEARCH_NAME)) {
 					searchEngineTagsViewModel.get(i).setTagValue(WebtoolConstants.BING_SEARCH_NAME + "-" + searchKeyWord);
-				} else if (templateType.equals("搜狗新闻搜索")) {
+				} else if (templateType.equals(WebtoolConstants.SOUGOU_SEARCH_NAME)) {
 					searchEngineTagsViewModel.get(i).setTagValue(WebtoolConstants.SOUGOU_SEARCH_NAME + "-" + searchKeyWord);
 				}
 			} else {// 没有设置标签为“分类”的时候，自己添加
 				if (i == (searchEngineTagsViewModel.size() - 1)) {
 					TemplateTagModel templateTagModel = new TemplateTagModel();
-					templateTagModel.setTagKey("分类");
-					if (templateType.equals("百度新闻搜索")) {
+					templateTagModel.setTagKey(WebtoolConstants.SEARCH_ENGINE_TAGS_CATAGRAY);
+					if (templateType.equals(WebtoolConstants.BAIDU_SEARCH_NAME)) {
 						templateTagModel.setTagValue(WebtoolConstants.BAIDU_SEARCH_NAME + "-" + searchKeyWord);
-					} else if (templateType.equals("Bing新闻搜索")) {
+					} else if (templateType.equals(WebtoolConstants.BING_SEARCH_NAME)) {
 						templateTagModel.setTagValue(WebtoolConstants.BING_SEARCH_NAME + "-" + searchKeyWord);
-					} else if (templateType.equals("搜狗新闻搜索")) {
+					} else if (templateType.equals(WebtoolConstants.SOUGOU_SEARCH_NAME)) {
 						templateTagModel.setTagValue(WebtoolConstants.SOUGOU_SEARCH_NAME + "-" + searchKeyWord);
 					}
 					searchEngineTagsViewModel.add(templateTagModel);
@@ -425,7 +430,7 @@ public class CrawlToolResource {
 		// System.out.println("导出模板文件保存路径:" + filePath);
 	}
 
-	private String getTemplateModelToJSONString(TemplateModel templateModel) {
+	private String getTemplateModelJSONString(TemplateModel templateModel) {
 		String json = null;
 
 		ObjectMapper objectmapper = new ObjectMapper();
@@ -457,6 +462,26 @@ public class CrawlToolResource {
 			e.printStackTrace();
 		}
 		return templateModel;
+	}
+
+	/**
+	 * JSON 字符转换为对象
+	 * */
+	@SuppressWarnings("unchecked")
+	public ResponseJSONProvider<ParseResult> getResponseJSONProviderObj(String jsonString) {
+		ResponseJSONProvider<ParseResult> responseJSONProvider = null;
+		try {
+			ObjectMapper objectmapper = new ObjectMapper();
+			JavaType javaType = objectmapper.getTypeFactory().constructParametricType(ResponseJSONProvider.class, ParseResult.class);
+			responseJSONProvider = (ResponseJSONProvider<ParseResult>) objectmapper.readValue(jsonString, javaType);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return responseJSONProvider;
 	}
 
 	/**
@@ -592,7 +617,7 @@ public class CrawlToolResource {
 
 					// 保存新的增量模板列表
 					singleTemplateModel.setTemplateIncreaseIdList(increaseTemplateIdList);
-					RedisOperator.setToDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN, getTemplateModelToJSONString(singleTemplateModel));
+					RedisOperator.setToDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN, getTemplateModelJSONString(singleTemplateModel));
 				} else {
 					jsonProvider.setSuccess(false);
 					jsonProvider.setErrorMsg("请检查配置是否正确，解析到pagination_outlink个数不应该小于增量配置中的页数量，配置信息错误！");
@@ -702,7 +727,7 @@ public class CrawlToolResource {
 
 					// 保存新的增量模板列表
 					singleTemplateListModel.setTemplateIncreaseIdList(increaseTemplateIdList);
-					RedisOperator.setToDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN, getTemplateModelToJSONString(singleTemplateListModel));
+					RedisOperator.setToDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN, getTemplateModelJSONString(singleTemplateListModel));
 				} else {
 					jsonProvider.setSuccess(false);
 					jsonProvider.setErrorMsg("模板名称【<a target=\"_blank\" href=\"" + pagePath + "pages/template-main.html?templateGuid=" + singleTemplateListModel.getTemplateId() + "\">"
@@ -728,7 +753,7 @@ public class CrawlToolResource {
 		String templateGuid = MD5Utils.MD5(templateUrl);
 		TemplateModel templateModel = setTemplateStatus(pageModel, status);
 		StringBuilder str = new StringBuilder();
-		str.append(getTemplateModelToJSONString(templateModel));
+		str.append(getTemplateModelJSONString(templateModel));
 		RedisOperator.setToDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN, str.toString());
 	}
 
@@ -807,7 +832,7 @@ public class CrawlToolResource {
 		templateModel.setStatus(status);
 
 		StringBuilder str = new StringBuilder();
-		str.append(getTemplateModelToJSONString(templateModel));
+		str.append(getTemplateModelJSONString(templateModel));
 		RedisOperator.setToDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN, str.toString());
 	}
 
@@ -830,6 +855,21 @@ public class CrawlToolResource {
 		return pageModel;
 	}
 
+	public String getPageModeJSONString(PageModel pageModel) {
+		String json = null;
+		ObjectMapper objectmapper = new ObjectMapper();
+		try {
+			json = objectmapper.writeValueAsString(pageModel);
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return json;
+	}
+
 	/**
 	 * 
 	 * 产生过滤器
@@ -839,11 +879,11 @@ public class CrawlToolResource {
 		if (filterString.equals("")) {
 			filter = null;
 		} else {
-			if (filterCategory.equals("匹配")) {
+			if (filterCategory.equals(WebtoolConstants.FILTER_MATCH)) {
 				filter.initMatchFilter(filterString);
-			} else if (filterCategory.equals("替换")) {
+			} else if (filterCategory.equals(WebtoolConstants.FILTER_REPLACE)) {
 				filter.initReplaceFilter(filterString, filterReplaceTo);
-			} else if (filterCategory.equals("移除")) {
+			} else if (filterCategory.equals(WebtoolConstants.FILTER_REMOVE)) {
 				filter.initRemoveFilter(filterString);
 			} else {
 				filter = null;
@@ -862,7 +902,7 @@ public class CrawlToolResource {
 		if (formatString.equals("")) {
 			format = null;
 		} else {
-			if (formatCategory.equals("日期")) {
+			if (formatCategory.equals(WebtoolConstants.FORMAT_DATE)) {
 				format.initDateFormat(formatString);
 			} else {
 				format = null;
@@ -878,11 +918,11 @@ public class CrawlToolResource {
 	public String getSearchEngineType(PageModel pageModel) {
 		BasicInfoViewModel basicInfoViewModel = pageModel.getBasicInfoViewModel();
 		String templateType = basicInfoViewModel.getTemplateType();
-		if (templateType.equals("百度新闻搜索")) {
+		if (templateType.equals(WebtoolConstants.BAIDU_SEARCH_NAME)) {
 			return WebtoolConstants.BAIDU_NEWS_ENGINE;
-		} else if (templateType.equals("Bing新闻搜索")) {
+		} else if (templateType.equals(WebtoolConstants.BING_SEARCH_NAME)) {
 			return WebtoolConstants.BING_NEWS_ENGINE;
-		} else if (templateType.equals("搜狗新闻搜索")) {
+		} else if (templateType.equals(WebtoolConstants.SOUGOU_SEARCH_NAME)) {
 			return WebtoolConstants.SOUGOU_NEWS_ENGINE;
 		}
 		return null;
@@ -1040,15 +1080,15 @@ public class CrawlToolResource {
 
 		// 处理分页类型
 		String paginationType = pageModel.getListPaginationViewModel().getPaginationType();
-		if (paginationType.equals("分页的末尾页数")) {
+		if (paginationType.equals(WebtoolConstants.PAGINATION_PAGENUMBER)) {
 			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER;
-		} else if (paginationType.equals("分页步进数")) {
+		} else if (paginationType.equals(WebtoolConstants.PAGINATION_PAGENUMBER_INTERVAL)) {
 			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER_INTERVAL;
-		} else if (paginationType.equals("获取分页的记录数")) {
+		} else if (paginationType.equals(WebtoolConstants.PAGINATION_PAGERECORD)) {
 			paginationType = Constants.PAGINATION_TYPE_PAGERECORD;
-		} else if (paginationType.equals("获取分页URL")) {
+		} else if (paginationType.equals(WebtoolConstants.PAGINATION_PAGE)) {
 			paginationType = Constants.PAGINATION_TYPE_PAGE;
-		} else if (paginationType.equals("自定义分页")) {
+		} else if (paginationType.equals(WebtoolConstants.PAGINATION_CUSTOM)) {
 			paginationType = Constants.PAGINATION_TYPE_CUSTOM;
 		} else {
 			paginationType = Constants.PAGINATION_TYPE_PAGENUMBER;
@@ -1095,8 +1135,14 @@ public class CrawlToolResource {
 		indexer = new SelectorIndexer();
 		selector = new Selector();
 		if (!pageModel.getNewsTitleViewModel().getSelector().equals("")) {
+			// 标题过滤器
+			String filterString = pageModel.getNewsTitleViewModel().getFilter();
+			String filterCategory = pageModel.getNewsTitleViewModel().getFilterCategory();
+			String filterReplaceTo = pageModel.getNewsTitleViewModel().getFilterReplaceTo();
+			filter = getFieldFilter(filterString, filterCategory, filterReplaceTo);
+
 			indexer.initJsoupIndexer(pageModel.getNewsTitleViewModel().getSelector(), pageModel.getNewsTitleViewModel().getSelectorAttr());
-			selector.initFieldSelector("title", "", indexer, null, null);
+			selector.initFieldSelector("title", "", indexer, filter, null);
 			news.add(selector);
 		}
 
@@ -1104,8 +1150,14 @@ public class CrawlToolResource {
 		indexer = new SelectorIndexer();
 		selector = new Selector();
 		if (!pageModel.getNewsContentViewModel().getSelector().equals("")) {
+			// 内容过滤器
+			String filterString = pageModel.getNewsContentViewModel().getFilter();
+			String filterCategory = pageModel.getNewsContentViewModel().getFilterCategory();
+			String filterReplaceTo = pageModel.getNewsContentViewModel().getFilterReplaceTo();
+			filter = getFieldFilter(filterString, filterCategory, filterReplaceTo);
+
 			indexer.initJsoupIndexer(pageModel.getNewsContentViewModel().getSelector(), pageModel.getNewsContentViewModel().getSelectorAttr());
-			selector.initFieldSelector("content", "", indexer, null, null);
+			selector.initFieldSelector("content", "", indexer, filter, null);
 			news.add(selector);
 		}
 
@@ -1133,8 +1185,14 @@ public class CrawlToolResource {
 		indexer = new SelectorIndexer();
 		selector = new Selector();
 		if (!pageModel.getNewsSourceViewModel().getSelector().equals("")) {
+			// 来源过滤器
+			String filterString = pageModel.getNewsSourceViewModel().getFilter();
+			String filterCategory = pageModel.getNewsSourceViewModel().getFilterCategory();
+			String filterReplaceTo = pageModel.getNewsSourceViewModel().getFilterReplaceTo();
+			filter = getFieldFilter(filterString, filterCategory, filterReplaceTo);
+
 			indexer.initJsoupIndexer(pageModel.getNewsSourceViewModel().getSelector(), pageModel.getNewsSourceViewModel().getSelectorAttr());
-			selector.initFieldSelector("source", "", indexer, null, null);
+			selector.initFieldSelector("source", "", indexer, filter, null);
 			news.add(selector);
 		}
 
@@ -1165,6 +1223,278 @@ public class CrawlToolResource {
 		template.setNews(news);
 		// System.out.println("templateResult:"+template.toJSON());
 		return template;
+	}
+
+	/**
+	 * 
+	 * 将TemplateResult对象转换为PageModel对象
+	 * */
+	public PageModel convertTemplateResultToPageModel(TemplateModel templateModel, TemplateResult templateResult) {
+		PageModel pageModel = new PageModel();
+		pageModel.setBasicInfoViewModel(templateModel.getBasicInfoViewModel());
+
+		// 转换静态属性
+		HashMap<String, String> tags = templateResult.getTags();
+		if (tags != null) {
+			TemplateTagModel templateTagModel = new TemplateTagModel();
+			List<TemplateTagModel> tempalteTags = new ArrayList<TemplateTagModel>();
+			Iterator<Entry<String, String>> it = tags.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry<String, String> entry = (Map.Entry<String, String>) it.next();
+				templateTagModel.setTagKey(entry.getKey());
+				templateTagModel.setTagValue(entry.getValue());
+				tempalteTags.add(templateTagModel);
+			}
+			pageModel.setTemplateTagsViewModel(tempalteTags);
+		}
+
+		// 转换外链接
+		CommonAttrViewModel listOutLinkViewModel = new CommonAttrViewModel();
+		// 转换列表自定义属性
+		CustomerAttrModel listCustomerAttrModel = new CustomerAttrModel();
+		List<CustomerAttrModel> listCustomerAttrViewModel = new ArrayList<CustomerAttrModel>();
+		List<Selector> lists = templateResult.getList();
+
+		if (lists != null) {
+			if (lists.size() > 0) {
+				Selector selector = lists.get(0);
+				List<SelectorIndexer> listIndexers = selector.getIndexers();
+				// 填充列表外链接
+				if (listIndexers != null) {
+					if (listIndexers.size() > 0) {
+						SelectorIndexer selectorIndexer = listIndexers.get(0);
+						listOutLinkViewModel.setSelector(selectorIndexer.getValue());
+						listOutLinkViewModel.setSelectorAttr(selectorIndexer.getAttribute());
+					}
+				}
+
+				// 填充列表自定义属性
+				List<Selector> labels = selector.getLabels();
+				if (labels != null) {
+					for (Selector customerAtrr : labels) {
+						listCustomerAttrModel.setTarget(customerAtrr.getName());
+						List<SelectorIndexer> customerAtrrIndexers = customerAtrr.getIndexers();
+						if (customerAtrrIndexers != null) {
+							if (customerAtrrIndexers.size() > 0) {
+								SelectorIndexer selectorIndexer = listIndexers.get(0);
+								listCustomerAttrModel.setSelector(selectorIndexer.getValue());
+								listCustomerAttrModel.setAttr(selectorIndexer.getAttribute());
+							}
+						}
+						//列表页 过滤器
+						convertViewModelFilter(listCustomerAttrModel, customerAtrr);
+						//格式化器
+						convertViewModelFormatter(listCustomerAttrModel, customerAtrr);
+						listCustomerAttrViewModel.add(listCustomerAttrModel);
+					}
+				}
+			}
+		}
+		pageModel.setListOutLinkViewModel(listOutLinkViewModel);
+		pageModel.setListCustomerAttrViewModel(listCustomerAttrViewModel);
+
+		ListPaginationViewModel listPaginationViewModel = new ListPaginationViewModel();
+		// 列表分页
+		List<Selector> paginationList = templateResult.getPagination();
+		if (paginationList != null) {
+			if (paginationList.size() > 0) {
+				Selector paginationSelector = paginationList.get(0);
+				List<SelectorIndexer> paginationIndexers = paginationSelector.getIndexers();
+				// 填充列表外链接
+				if (paginationIndexers != null) {
+					if (paginationIndexers.size() > 0) {
+						SelectorIndexer selectorIndexer = paginationIndexers.get(0);
+						listPaginationViewModel.setSelector(selectorIndexer.getValue());
+						listPaginationViewModel.setSelectorAttr(selectorIndexer.getAttribute());
+					}
+				}
+
+				if (paginationSelector.getPagitationType().equals(Constants.PAGINATION_TYPE_PAGENUMBER)) {
+					listPaginationViewModel.setPaginationType(WebtoolConstants.PAGINATION_PAGENUMBER);
+				} else if (paginationSelector.getPagitationType().equals(Constants.PAGINATION_TYPE_PAGENUMBER_INTERVAL)) {
+					listPaginationViewModel.setPaginationType(WebtoolConstants.PAGINATION_PAGENUMBER_INTERVAL);
+				} else if (paginationSelector.getPagitationType().equals(Constants.PAGINATION_TYPE_PAGERECORD)) {
+					listPaginationViewModel.setPaginationType(WebtoolConstants.PAGINATION_PAGERECORD);
+				} else if (paginationSelector.getPagitationType().equals(Constants.PAGINATION_TYPE_PAGE)) {
+					listPaginationViewModel.setPaginationType(WebtoolConstants.PAGINATION_PAGE);
+				} else if (paginationSelector.getPagitationType().equals(Constants.PAGINATION_TYPE_CUSTOM)) {
+					listPaginationViewModel.setPaginationType(WebtoolConstants.PAGINATION_CUSTOM);
+				}
+				listPaginationViewModel.setCurrentString(paginationSelector.getCurrent());
+				listPaginationViewModel.setReplaceTo(paginationSelector.getReplaceTo());
+				listPaginationViewModel.setPaginationUrl(paginationSelector.getPagitationUrl());
+				listPaginationViewModel.setStart(paginationSelector.getStartNumber());
+				listPaginationViewModel.setLastNumber(paginationSelector.getLastNumber());
+				listPaginationViewModel.setRecords(paginationSelector.getRecordNumber());
+				listPaginationViewModel.setInterval(Integer.toString(paginationSelector.getInterval()));
+
+				List<SelectorFilter> paginationSelectorFilters = paginationSelector.getFilters();
+				if (paginationSelectorFilters != null) {
+					if (paginationSelectorFilters.size() > 0) {
+						SelectorFilter selectorFilter = paginationSelectorFilters.get(0);
+						listPaginationViewModel.setFilter(selectorFilter.getValue());
+						if (selectorFilter.getType().equals(Constants.FILTER_REPLACE)) {
+							listPaginationViewModel.setFilterCategory(WebtoolConstants.FILTER_REPLACE);
+						} else if (selectorFilter.getType().equals(Constants.FILTER_MATCH)) {
+							listPaginationViewModel.setFilterCategory(WebtoolConstants.FILTER_MATCH);
+						} else if (selectorFilter.getType().equals(Constants.FILTER_REMOVE)) {
+							listPaginationViewModel.setFilterCategory(WebtoolConstants.FILTER_REMOVE);
+						}
+						listPaginationViewModel.setFilterReplaceTo(selectorFilter.getReplaceTo());
+					}
+				}
+			}
+		}
+		pageModel.setListPaginationViewModel(listPaginationViewModel);
+
+		// 转换内容页
+		CommonAttrViewModel newsTitleViewModel = new CommonAttrViewModel();
+		CommonAttrViewModel newsContentViewModel = new CommonAttrViewModel();
+		CommonAttrViewModel newsPublishTimeViewModel = new CommonAttrViewModel();
+		CommonAttrViewModel newsSourceViewModel = new CommonAttrViewModel();
+		List<CustomerAttrModel> newsCustomerAttrViewModel = new ArrayList<CustomerAttrModel>();
+		CustomerAttrModel newsCustomerAttrModel = new CustomerAttrModel();
+
+		List<Selector> newsList = templateResult.getNews();
+		if (newsList != null) {
+			if (newsList.size() > 0) {
+				for (Selector newsField : newsList) {
+					List<SelectorIndexer> newsIndexers = newsField.getIndexers();
+					if (newsIndexers != null) {
+						if (newsIndexers.size() > 0) {
+							SelectorIndexer selectorIndexer = newsIndexers.get(0);
+							// 转换内容页普通属性
+							if (newsField.getName().equals("title")) {
+								newsTitleViewModel.setSelector(selectorIndexer.getValue());
+								newsTitleViewModel.setSelectorAttr(selectorIndexer.getAttribute());
+								convertViewModelFilter(newsTitleViewModel, newsField);
+							} else if (newsField.getName().equals("content")) {
+								newsContentViewModel.setSelector(selectorIndexer.getValue());
+								newsContentViewModel.setSelectorAttr(selectorIndexer.getAttribute());
+								convertViewModelFilter(newsContentViewModel, newsField);
+							} else if (newsField.getName().equals("tstamp")) {
+								newsPublishTimeViewModel.setSelector(selectorIndexer.getValue());
+								newsPublishTimeViewModel.setSelectorAttr(selectorIndexer.getAttribute());
+								convertViewModelFilter(newsPublishTimeViewModel, newsField);
+								// 转换时间格式化器
+								convertViewModelFormatter(newsPublishTimeViewModel, newsField);
+							} else if (newsField.getName().equals("source")) {
+								newsSourceViewModel.setSelector(selectorIndexer.getValue());
+								newsSourceViewModel.setSelectorAttr(selectorIndexer.getAttribute());
+								convertViewModelFilter(newsSourceViewModel, newsField);
+							} else {// 转换内容页的自定义属性
+								newsCustomerAttrModel.setSelector(selectorIndexer.getValue());
+								newsCustomerAttrModel.setAttr(selectorIndexer.getAttribute());
+								// 过滤器
+								convertViewModelFilter(newsCustomerAttrModel, newsField);
+								// 格式化器
+								convertViewModelFormatter(newsCustomerAttrModel, newsField);
+								newsCustomerAttrViewModel.add(newsCustomerAttrModel);
+							}
+						}
+					}
+				}
+			}
+		}
+		pageModel.setNewsTitleViewModel(newsTitleViewModel);
+		pageModel.setNewsContentViewModel(newsContentViewModel);
+		pageModel.setNewsPublishTimeViewModel(newsPublishTimeViewModel);
+		pageModel.setNewsSourceViewModel(newsSourceViewModel);
+		pageModel.setNewsCustomerAttrViewModel(newsCustomerAttrViewModel);
+
+		return pageModel;
+	}
+
+	/**
+	 * 
+	 * 转换内容页自定义属性格式化器
+	 * 
+	 * @param newsCustomerAttrModel
+	 * @param viewModelSelecter
+	 */
+	private void convertViewModelFormatter(CustomerAttrModel newsCustomerAttrModel, Selector viewModelSelecter) {
+		List<SelectorFormat> customerAtrrFormats = viewModelSelecter.getFormats();
+		if (customerAtrrFormats != null) {
+			if (customerAtrrFormats.size() > 0) {
+				SelectorFormat selectorFormat = customerAtrrFormats.get(0);
+				newsCustomerAttrModel.setFormatter(selectorFormat.getValue());
+				if (selectorFormat.getType().equals(com.isoftstone.crawl.template.global.Constants.FORMAT_DATE)) {
+					newsCustomerAttrModel.setFormatCategory(WebtoolConstants.FORMAT_DATE);
+				}
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * 转换内容页自定义属性过滤器
+	 * 
+	 * @param newsCustomerAttrModel
+	 * @param viewModelSelecter
+	 */
+	private void convertViewModelFilter(CustomerAttrModel newsCustomerAttrModel, Selector viewModelSelecter) {
+		List<SelectorFilter> customerAtrrFilters = viewModelSelecter.getFilters();
+		if (customerAtrrFilters != null) {
+			if (customerAtrrFilters.size() > 0) {
+				SelectorFilter selectorFilter = customerAtrrFilters.get(0);
+				newsCustomerAttrModel.setFilter(selectorFilter.getValue());
+				if (selectorFilter.getType().equals(com.isoftstone.crawl.template.global.Constants.FILTER_REPLACE)) {
+					newsCustomerAttrModel.setFilterCategory(WebtoolConstants.FILTER_REPLACE);
+				} else if (selectorFilter.getType().equals(com.isoftstone.crawl.template.global.Constants.FILTER_MATCH)) {
+					newsCustomerAttrModel.setFilterCategory(WebtoolConstants.FILTER_MATCH);
+				} else if (selectorFilter.getType().equals(com.isoftstone.crawl.template.global.Constants.FILTER_REMOVE)) {
+					newsCustomerAttrModel.setFilterCategory(WebtoolConstants.FILTER_REMOVE);
+				}
+				newsCustomerAttrModel.setFilterReplaceTo(selectorFilter.getReplaceTo());
+
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * 将templateResult中的格式化器转换为pageModel中的格式化器
+	 * 
+	 * @param commonAttrViewModel
+	 * @param viewModelSelecter
+	 */
+	private void convertViewModelFormatter(CommonAttrViewModel commonAttrViewModel, Selector viewModelSelecter) {
+		List<SelectorFormat> customerAtrrFormats = viewModelSelecter.getFormats();
+		if (customerAtrrFormats != null) {
+			if (customerAtrrFormats.size() > 0) {
+				SelectorFormat selectorFormat = customerAtrrFormats.get(0);
+				commonAttrViewModel.setFormatter(selectorFormat.getValue());
+				if (selectorFormat.getType().equals(com.isoftstone.crawl.template.global.Constants.FORMAT_DATE)) {
+					commonAttrViewModel.setFormatCategory(WebtoolConstants.FORMAT_DATE);
+				}
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * 将templateResult中的过滤器转换为pageModel中的过滤器
+	 * 
+	 * @param commonAttrViewModel
+	 * @param viewModelSelecter
+	 */
+	private void convertViewModelFilter(CommonAttrViewModel commonAttrViewModel, Selector viewModelSelecter) {
+		// 转换标题过滤器
+		List<SelectorFilter> commonViewModelFilters = viewModelSelecter.getFilters();
+		if (commonViewModelFilters != null) {
+			if (commonViewModelFilters.size() > 0) {
+				SelectorFilter selectorFilter = commonViewModelFilters.get(0);
+				commonAttrViewModel.setFilter(selectorFilter.getValue());
+				if (selectorFilter.getType().equals(com.isoftstone.crawl.template.global.Constants.FILTER_REPLACE)) {
+					commonAttrViewModel.setFilterCategory(WebtoolConstants.FILTER_REPLACE);
+				} else if (selectorFilter.getType().equals(com.isoftstone.crawl.template.global.Constants.FILTER_MATCH)) {
+					commonAttrViewModel.setFilterCategory(WebtoolConstants.FILTER_MATCH);
+				} else if (selectorFilter.getType().equals(com.isoftstone.crawl.template.global.Constants.FILTER_REMOVE)) {
+					commonAttrViewModel.setFilterCategory(WebtoolConstants.FILTER_REMOVE);
+				}
+				commonAttrViewModel.setFilterReplaceTo(selectorFilter.getReplaceTo());
+			}
+		}
 	}
 
 	// I used 1000 bytes at first, but found that some documents have

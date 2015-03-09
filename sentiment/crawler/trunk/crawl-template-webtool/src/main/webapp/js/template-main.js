@@ -521,6 +521,9 @@ function addNewTemplateDataInit(pageViewModel){
     pageViewModel.listPaginationViewModel.selectorAttrSelected('text');
     pageViewModel.listPaginationViewModel.currentString('##');
     pageViewModel.listPaginationViewModel.start('2');
+
+    pageViewModel.scheduleDispatchViewModel.sequence('1');
+    pageViewModel.templateIncreaseViewModel.pageCounts('2');
 }
 
 /**
@@ -718,9 +721,17 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
             if(newsFieldName=="title"){
                 pageViewModel.newsTitleViewModel.selector(newsFieldIndexer.value);
                 pageViewModel.newsTitleViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
+                if(newsField.filters!=null){
+                    var newsTitleViewModelFilter=newsField.filters[0];
+                    setViewModelFilter(pageViewModel.newsTitleViewModel,newsTitleViewModelFilter);
+                }
             }else if(newsFieldName=="content"){
                 pageViewModel.newsContentViewModel.selector(newsFieldIndexer.value);
                 pageViewModel.newsContentViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
+                if(newsField.filters!=null){
+                    var newsContentViewModelFilter=newsField.filters[0];
+                    setViewModelFilter(pageViewModel.newsContentViewModel,newsContentViewModelFilter);
+                }
             }else if(newsFieldName=="tstamp"){
                 pageViewModel.newsPublishTimeViewModel.selector(newsFieldIndexer.value);
                 pageViewModel.newsPublishTimeViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
@@ -735,6 +746,10 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
             }else if(newsFieldName=="source"){
                 pageViewModel.newsSourceViewModel.selector(newsFieldIndexer.value);
                 pageViewModel.newsSourceViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
+                if(newsField.filters!=null){
+                    var newsSourceViewModelFilter=newsField.filters[0];
+                    setViewModelFilter(pageViewModel.newsSourceViewModel,newsSourceViewModelFilter);
+                }
             }else{
                 //内容页的自定义属性
                 var customerViewModel=new singleCustomerViewModel();
@@ -959,7 +974,10 @@ function getJSONString(obj){
         newsCustomerAttrViewModel:obj.newsAttrModels(),
         newsTitleViewModel:{
             selector:obj.newsTitleViewModel.selector(),
-            selectorAttr:obj.newsTitleViewModel.selectorAttrSelected()
+            selectorAttr:obj.newsTitleViewModel.selectorAttrSelected(),
+            filterCategory:obj.newsTitleViewModel.filterCategorySelected(),
+            filter:obj.newsTitleViewModel.filter(),
+            filterReplaceTo:obj.newsTitleViewModel.filterReplaceTo()
         },
         newsPublishTimeViewModel:{
             selector:obj.newsPublishTimeViewModel.selector(),
@@ -972,11 +990,17 @@ function getJSONString(obj){
         },
         newsSourceViewModel:{
             selector:obj.newsSourceViewModel.selector(),
-            selectorAttr:obj.newsSourceViewModel.selectorAttrSelected()
+            selectorAttr:obj.newsSourceViewModel.selectorAttrSelected(),
+            filterCategory:obj.newsSourceViewModel.filterCategorySelected(),
+            filter:obj.newsSourceViewModel.filter(),
+            filterReplaceTo:obj.newsSourceViewModel.filterReplaceTo()
         },
         newsContentViewModel:{
             selector:obj.newsContentViewModel.selector(),
-            selectorAttr:obj.newsContentViewModel.selectorAttrSelected()
+            selectorAttr:obj.newsContentViewModel.selectorAttrSelected(),
+            filterCategory:obj.newsContentViewModel.filterCategorySelected(),
+            filter:obj.newsContentViewModel.filter(),
+            filterReplaceTo:obj.newsContentViewModel.filterReplaceTo()
         },
         listCustomerAttrViewModel:obj.listAttrModels(),
         listOutLinkViewModel:{

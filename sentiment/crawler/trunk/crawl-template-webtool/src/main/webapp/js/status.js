@@ -49,25 +49,27 @@ function updateUrlData(urlData) {
 }
 
 $(function () {
-    $.ajax2({
-        url: virtualWebPath + '/webapi/crawlToolResource/getSeedsEffectiveStatusList',
-        type: 'GET',
-        success: function (data) {
-            var json = JSON.parse(data);
-            if (json.success) {
-                if (json.data.seedsEffectiveStatusList != null) {
-                    initPageContent(json.data.seedsEffectiveStatusList);
-                } else {
-                    initPageContent([]);
-                }
-            } else {
-                initPageContent([]);
-            }
-        },
-        error: function (error) {
-            initPageContent([]);
-        }
-    }, '#seedEffective_table');
+//    $.ajax2({
+//        url: virtualWebPath + '/webapi/crawlToolResource/getSeedsEffectiveStatusList',
+//        type: 'GET',
+//        success: function (data) {
+//            var json = JSON.parse(data);
+//            if (json.success) {
+//                if (json.data.seedsEffectiveStatusList != null) {
+//                    initPageContent(json.data.seedsEffectiveStatusList);
+//                } else {
+//                    initPageContent([]);
+//                }
+//            } else {
+//                initPageContent([]);
+//            }
+//        },
+//        error: function (error) {
+//            initPageContent([]);
+//        }
+//    });
+
+    initPageContent([]);
 });
 
 /**
