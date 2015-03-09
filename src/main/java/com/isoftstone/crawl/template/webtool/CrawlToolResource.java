@@ -1402,6 +1402,12 @@ public class CrawlToolResource {
 		pageModel.setNewsSourceViewModel(newsSourceViewModel);
 		pageModel.setNewsCustomerAttrViewModel(newsCustomerAttrViewModel);
 
+		//调度和增量viewModel
+		TemplateIncreaseViewModel templateIncreaseViewModel=templateModel.getTemplateIncreaseViewModel();
+		ScheduleDispatchViewModel scheduleDispatchViewModel=templateModel.getScheduleDispatchViewModel();
+		pageModel.setTemplateIncreaseViewModel(templateIncreaseViewModel);
+		pageModel.setScheduleDispatchViewModel(scheduleDispatchViewModel);	
+		
 		return pageModel;
 	}
 
