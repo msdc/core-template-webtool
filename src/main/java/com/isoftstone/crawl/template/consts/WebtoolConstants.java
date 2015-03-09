@@ -45,6 +45,9 @@ public class WebtoolConstants {
     public static final String BING_SEARCH_NAME="Bing新闻搜索";
     public static final String SOUGOU_SEARCH_NAME="搜狗新闻搜索";
     
+    //批量生成搜索引擎模板时，添加的模板tag属性
+    public static final String SEARCH_ENGINE_TAGS_CATAGRAY="分类";
+    
     public static final String BAIDU_NEWS_ENGINE="baidu_news";
     public static final String BING_NEWS_ENGINE="bing_news";
     public static final String SOUGOU_NEWS_ENGINE="sogou_news";
@@ -58,4 +61,20 @@ public class WebtoolConstants {
     
     //-- 增量文件夹命名标识.
   	public static final String INCREMENT_FILENAME_SIGN = "increment";
+  	
+  	public static final String FILTER_REPLACE = "替换";
+  	public static final String FILTER_MATCH = "匹配";
+  	public static final String FILTER_REMOVE = "移除";
+  	public static final String FORMAT_DATE = "日期";
+  	
+  	//列表分页类型
+  	public static final String PAGINATION_PAGENUMBER = "分页的末尾页数";
+  	public static final String PAGINATION_PAGENUMBER_INTERVAL = "分页步进数";
+  	public static final String PAGINATION_PAGERECORD = "获取分页的记录数";
+  	public static final String PAGINATION_PAGE = "获取分页URL";
+  	public static final String PAGINATION_CUSTOM = "自定义分页";
+  	
+  	//种子有效性
+	public static final String TEMPLATE_VALID_STATUS = "有效";
+	public static final String TEMPLATE_INVALID_STATUS = "无效";
 }
