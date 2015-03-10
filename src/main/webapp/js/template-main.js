@@ -522,8 +522,26 @@ function addNewTemplateDataInit(pageViewModel){
     pageViewModel.listPaginationViewModel.currentString('##');
     pageViewModel.listPaginationViewModel.start('2');
 
+    //调度配置初始值
     pageViewModel.scheduleDispatchViewModel.sequence('1');
     pageViewModel.templateIncreaseViewModel.pageCounts('2');
+
+    //模板静态属性预置
+    var mediaTypeTagViewModel=new singleTemplateTagViewModel();
+    mediaTypeTagViewModel.tagKey('mediaType');
+    pageViewModel.templateTagsViewModel.tags.push(mediaTypeTagViewModel);
+    var subMediaTypeTagViewModel=new singleTemplateTagViewModel();
+    subMediaTypeTagViewModel.tagKey('subMediaType');
+    pageViewModel.templateTagsViewModel.tags.push(subMediaTypeTagViewModel);
+    var languageTagViewModel=new singleTemplateTagViewModel();
+    languageTagViewModel.tagKey('language');
+    pageViewModel.templateTagsViewModel.tags.push(languageTagViewModel);
+    var isOverseaTagViewModel=new singleTemplateTagViewModel();
+    isOverseaTagViewModel.tagKey('isOversea');
+    pageViewModel.templateTagsViewModel.tags.push(isOverseaTagViewModel);
+    var dataSourceTagViewModel=new singleTemplateTagViewModel();
+    dataSourceTagViewModel.tagKey('dataSource');
+    pageViewModel.templateTagsViewModel.tags.push(dataSourceTagViewModel);
 }
 
 /**
