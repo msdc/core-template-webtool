@@ -493,6 +493,10 @@ public class CrawlToolResource {
 		TemplateResult templateResult = getTemplateResult(pageModel);
 		String templateGuid = MD5Utils.MD5(templateUrl);
 		ParseResult parseResult = null;
+		ResponseJSONProvider<String> jsonProvider = validPageModelBeforeSave(pageModel);
+		if (jsonProvider.getSuccess() == false) {
+			return parseResult;
+		}
 		byte[] input = DownloadHtml.getHtml(templateUrl);
 		String encoding = sniffCharacterEncoding(input);
 		RedisOperator.saveTemplateToDefaultDB(templateResult, templateGuid);
@@ -530,13 +534,18 @@ public class CrawlToolResource {
 	 * 
 	 * 只保存[模板配置]到redis
 	 * */
-	public void saveTemplateResultToRedis(PageModel pageModel) {
+	public ResponseJSONProvider<String> saveTemplateResultToRedis(PageModel pageModel) {
+		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
-		TemplateResult templateResult = getTemplateResult(pageModel);
-		String templateGuid = MD5Utils.MD5(templateUrl);
-		RedisOperator.saveTemplateToDefaultDB(templateResult, templateGuid);
-		// 保存数据源列表所需要的key值 模板默认为启用状态
-		saveTemplateToList(pageModel, "true");
+		jsonProvider = validPageModelBeforeSave(pageModel);
+		if (jsonProvider.getSuccess() == true) {
+			TemplateResult templateResult = getTemplateResult(pageModel);
+			String templateGuid = MD5Utils.MD5(templateUrl);
+			RedisOperator.saveTemplateToDefaultDB(templateResult, templateGuid);
+			// 保存数据源列表所需要的key值 模板默认为启用状态
+			saveTemplateToList(pageModel, "true");
+		}
+		return jsonProvider;
 	}
 
 	/**
@@ -545,7 +554,10 @@ public class CrawlToolResource {
 	 * */
 	public ResponseJSONProvider<String> saveIncreaseTemplateResult(PageModel pageModel) {
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
-		jsonProvider.setSuccess(true);
+		jsonProvider = validPageModelBeforeSave(pageModel);
+		if (jsonProvider.getSuccess() == false) {
+			return jsonProvider;
+		}
 		TemplateResult templateResult = getTemplateResult(pageModel);
 		String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
 		ParseResult parseResult = null;
@@ -629,6 +641,7 @@ public class CrawlToolResource {
 				return jsonProvider;
 			}
 		}
+		jsonProvider.setSuccess(true);
 		jsonProvider.setData("增量模板保存成功!");
 		return jsonProvider;
 	}
@@ -1227,6 +1240,136 @@ public class CrawlToolResource {
 
 	/**
 	 * 
+	 * 验证PageModel的合法性
+	 * */
+	public ResponseJSONProvider<String> validPageModelBeforeSave(PageModel pageModel) {
+		ResponseJSONProvider<String> responseJSONProvider = new ResponseJSONProvider<String>();
+		responseJSONProvider.setSuccess(false);
+
+		if (pageModel.getBasicInfoViewModel().getUrl().equals("")) {
+			responseJSONProvider.setErrorMsg("基本信息中的模板url字段不能为空！");
+			return responseJSONProvider;
+		}
+
+		if (pageModel.getBasicInfoViewModel().getName().equals("")) {
+			responseJSONProvider.setErrorMsg("基本信息中的名称字段不能为空！");
+			return responseJSONProvider;
+		}
+
+		if (pageModel.getListOutLinkViewModel().getSelector().equals("")) {
+			responseJSONProvider.setErrorMsg("列表页中的列表外链接选择器不能为空！");
+			return responseJSONProvider;
+		}
+
+		// 普通模板校验
+		if (pageModel.getBasicInfoViewModel().getTemplateType().equals(WebtoolConstants.NORMAL_TEMPLATE_NAME)) {
+			if (pageModel.getNewsTitleViewModel().getSelector().equals("")) {
+				responseJSONProvider.setErrorMsg("内容页中的标题选择器不能为空！");
+				return responseJSONProvider;
+			}
+
+			if (pageModel.getNewsPublishTimeViewModel().getSelector().equals("")) {
+				responseJSONProvider.setErrorMsg("内容页中的发布时间选择器不能为空！");
+				return responseJSONProvider;
+			}
+
+			if (pageModel.getNewsSourceViewModel().getSelector().equals("")) {
+				responseJSONProvider.setErrorMsg("内容页中的来源选择器不能为空！");
+				return responseJSONProvider;
+			}
+		} else {// 搜索引擎模板
+			if (pageModel.getBasicInfoViewModel().getCurrentString().equals("")) {
+				responseJSONProvider.setErrorMsg("基本信息中的模板URL查询关键字不能为空！");
+				return responseJSONProvider;
+			}
+		}
+
+		// 搜索引擎和普通模板 内容选择器都不能为空
+		if (pageModel.getNewsContentViewModel().getSelector().equals("")) {
+			responseJSONProvider.setErrorMsg("内容页中的内容选择器不能为空！");
+			return responseJSONProvider;
+		}
+
+		// 调度和增量配置
+		if (pageModel.getScheduleDispatchViewModel().getSequence().equals("")) {
+			responseJSONProvider.setErrorMsg("调度配置中的调度时序值不能为空！");
+			return responseJSONProvider;
+		}
+
+		// 调度和增量配置
+		if (pageModel.getTemplateIncreaseViewModel().getPageCounts().equals("")) {
+			responseJSONProvider.setErrorMsg("增量配置中的页数值不能为空！");
+			return responseJSONProvider;
+		}
+
+		// 校验预置的tags属性
+		boolean isMediaType = false;
+		boolean isSubMediaType = false;
+		boolean isLanguage = false;
+		boolean isOversea = false;
+		boolean isDataSource = false;
+		List<TemplateTagModel> tempalteTags = pageModel.getTemplateTagsViewModel();
+		if (tempalteTags.size() == 0) {
+			responseJSONProvider.setErrorMsg("模板静态属性不能为空！");
+			return responseJSONProvider;
+		}
+
+		for (TemplateTagModel model : tempalteTags) {
+			String tagKey = model.getTagKey();
+			if (tagKey == "mediaType") {
+				isMediaType = true;
+			} else if (tagKey == "subMediaType") {
+				isSubMediaType = true;
+			} else if (tagKey == "language") {
+				isLanguage = true;
+			} else if (tagKey == "isOversea") {
+				isOversea = true;
+			} else if (tagKey == "dataSource") {
+				isDataSource = true;
+			}
+		}
+
+		if (isMediaType == false) {
+			responseJSONProvider.setErrorMsg("模板静态Tag属性，缺少mediaType属性！请配置！");
+			return responseJSONProvider;
+		}
+
+		if (isSubMediaType == false) {
+			responseJSONProvider.setErrorMsg("模板静态Tag属性，缺少subMediaType属性！请配置！");
+			return responseJSONProvider;
+		}
+
+		if (isOversea == false) {
+			responseJSONProvider.setErrorMsg("模板静态Tag属性，缺少language属性！请配置！");
+			return responseJSONProvider;
+		}
+
+		if (isLanguage == false) {
+			responseJSONProvider.setErrorMsg("模板静态Tag属性，缺少isOversea属性！请配置！");
+			return responseJSONProvider;
+		}
+
+		if (isDataSource == false) {
+			responseJSONProvider.setErrorMsg("模板静态Tag属性，缺少dataSource属性！请配置！");
+			return responseJSONProvider;
+		}
+
+		for (TemplateTagModel model : tempalteTags) {
+			String tagKey = model.getTagKey();
+			String tagValueString = model.getTagValue();
+			if (tagValueString.equals("")) {
+				responseJSONProvider.setErrorMsg("模板静态Tag属性[" + tagKey + "]值不能为空！请配置！");
+				return responseJSONProvider;
+			}
+		}
+
+		responseJSONProvider.setSuccess(true);
+		responseJSONProvider.setData("模板保存成功！");
+		return responseJSONProvider;
+	}
+
+	/**
+	 * 
 	 * 将TemplateResult对象转换为PageModel对象
 	 * */
 	public PageModel convertTemplateResultToPageModel(TemplateModel templateModel, TemplateResult templateResult) {
@@ -1281,9 +1424,9 @@ public class CrawlToolResource {
 								listCustomerAttrModel.setAttr(selectorIndexer.getAttribute());
 							}
 						}
-						//列表页 过滤器
+						// 列表页 过滤器
 						convertViewModelFilter(listCustomerAttrModel, customerAtrr);
-						//格式化器
+						// 格式化器
 						convertViewModelFormatter(listCustomerAttrModel, customerAtrr);
 						listCustomerAttrViewModel.add(listCustomerAttrModel);
 					}
@@ -1402,12 +1545,12 @@ public class CrawlToolResource {
 		pageModel.setNewsSourceViewModel(newsSourceViewModel);
 		pageModel.setNewsCustomerAttrViewModel(newsCustomerAttrViewModel);
 
-		//调度和增量viewModel
-		TemplateIncreaseViewModel templateIncreaseViewModel=templateModel.getTemplateIncreaseViewModel();
-		ScheduleDispatchViewModel scheduleDispatchViewModel=templateModel.getScheduleDispatchViewModel();
+		// 调度和增量viewModel
+		TemplateIncreaseViewModel templateIncreaseViewModel = templateModel.getTemplateIncreaseViewModel();
+		ScheduleDispatchViewModel scheduleDispatchViewModel = templateModel.getScheduleDispatchViewModel();
 		pageModel.setTemplateIncreaseViewModel(templateIncreaseViewModel);
-		pageModel.setScheduleDispatchViewModel(scheduleDispatchViewModel);	
-		
+		pageModel.setScheduleDispatchViewModel(scheduleDispatchViewModel);
+
 		return pageModel;
 	}
 
