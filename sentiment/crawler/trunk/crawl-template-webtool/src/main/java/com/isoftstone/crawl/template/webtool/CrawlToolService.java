@@ -761,13 +761,11 @@ public class CrawlToolService {
 					PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
 					ResponseJSONProvider<ParseResult> middleJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyNewContent(serviceHelper.getPageModeJSONString(pageModel)));
 					if (middleJsonProvider.getSuccess() == false) {
-						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
-						// 目前只显示无效的
-						SeedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
+						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);						
 					} else {
 						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_VALID_STATUS);
 					}
-
+					SeedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
 				}
 			}
 		} catch (Exception e) {
