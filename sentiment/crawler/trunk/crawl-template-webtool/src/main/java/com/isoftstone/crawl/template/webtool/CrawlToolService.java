@@ -377,7 +377,7 @@ public class CrawlToolService {
 					TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateString);
 					if (StringUtils.isBlank(searchString)) {
 						templateListArrayList.add(templateModel);
-					} else if (searchString == "false" || searchString == "true") {
+					} else if (searchString.equals("false") || searchString.equals("true")) {
 						if (templateModel.getStatus().equals(searchString)) {
 							templateListArrayList.add(templateModel);
 						}

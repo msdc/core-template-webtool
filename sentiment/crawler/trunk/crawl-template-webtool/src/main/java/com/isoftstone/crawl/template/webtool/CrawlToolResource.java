@@ -1120,10 +1120,10 @@ public class CrawlToolResource {
 
 		// 按照是否使用分页进步数,调用不同的方法
 		if (paginationInterval != 0) {
-			if (paginationType == Constants.PAGINATION_TYPE_CUSTOM) {
+			if (paginationType.equals(Constants.PAGINATION_TYPE_CUSTOM)) {
 				selector.initPagitationSelector(paginationType, pageModel.getListPaginationViewModel().getCurrentString(), pageModel.getListPaginationViewModel().getReplaceTo(), pageModel
 						.getListPaginationViewModel().getPaginationUrl(), pageModel.getListPaginationViewModel().getStart(), pageModel.getListPaginationViewModel().getLastNumber(), paginationInterval);
-			} else if (paginationType == Constants.PAGINATION_TYPE_PAGENUMBER_INTERVAL) {
+			} else if (paginationType.equals(Constants.PAGINATION_TYPE_PAGENUMBER_INTERVAL)) {
 				// Constants.PAGINATION_TYPE_PAGENUMBER 分页步进数
 				selector.initPagitationSelector(paginationType, pageModel.getListPaginationViewModel().getCurrentString(), pageModel.getListPaginationViewModel().getReplaceTo(), pageModel
 						.getListPaginationViewModel().getPaginationUrl(), pageModel.getListPaginationViewModel().getStart(), pageModel.getListPaginationViewModel().getRecords(), paginationInterval,
@@ -1138,7 +1138,7 @@ public class CrawlToolResource {
 			pagination.add(selector);
 		} else {
 			// 当选择自定义分页时，选择器可以为空
-			if (paginationType == Constants.PAGINATION_TYPE_CUSTOM) {
+			if (paginationType.equals(Constants.PAGINATION_TYPE_CUSTOM)) {
 				pagination.add(selector);
 			}
 		}
@@ -1316,15 +1316,15 @@ public class CrawlToolResource {
 
 		for (TemplateTagModel model : tempalteTags) {
 			String tagKey = model.getTagKey();
-			if (tagKey == "mediaType") {
+			if (tagKey.equals("mediaType")) {
 				isMediaType = true;
-			} else if (tagKey == "subMediaType") {
+			} else if (tagKey.equals("subMediaType")) {
 				isSubMediaType = true;
-			} else if (tagKey == "language") {
+			} else if (tagKey.equals("language")) {
 				isLanguage = true;
-			} else if (tagKey == "isOversea") {
+			} else if (tagKey.equals("isOversea")) {
 				isOversea = true;
-			} else if (tagKey == "dataSource") {
+			} else if (tagKey.equals("dataSource")) {
 				isDataSource = true;
 			}
 		}
