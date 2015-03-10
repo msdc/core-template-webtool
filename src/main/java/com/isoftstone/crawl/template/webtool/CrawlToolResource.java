@@ -1340,12 +1340,12 @@ public class CrawlToolResource {
 		}
 
 		if (isOversea == false) {
-			responseJSONProvider.setErrorMsg("模板静态Tag属性，缺少language属性！请配置！");
+			responseJSONProvider.setErrorMsg("模板静态Tag属性，缺少isOversea属性！请配置！");
 			return responseJSONProvider;
 		}
 
 		if (isLanguage == false) {
-			responseJSONProvider.setErrorMsg("模板静态Tag属性，缺少isOversea属性！请配置！");
+			responseJSONProvider.setErrorMsg("模板静态Tag属性，缺少language属性！请配置！");
 			return responseJSONProvider;
 		}
 
