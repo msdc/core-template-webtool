@@ -103,7 +103,7 @@ public class CrawlToolResource {
 		// --2.保存到redis中.
 		String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
 
-		DispatchVo dispatchVo = getDispatchResult(redisKey, WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+		DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey, WebtoolConstants.DISPATCH_REDIS_DBINDEX);
 		if (dispatchVo == null) {
 			dispatchVo = new DispatchVo();
 		}
@@ -126,7 +126,7 @@ public class CrawlToolResource {
 			seedList.add(seed);
 		}
 		dispatchVo.setSeed(seedList);
-		setDispatchResult(dispatchVo, redisKey, WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+		RedisOperator.setDispatchResult(dispatchVo, redisKey, WebtoolConstants.DISPATCH_REDIS_DBINDEX);
 	}
 
 	public void setSeedListResult(List<String> seedList, String guid, int dbindex) {
@@ -164,43 +164,6 @@ public class CrawlToolResource {
 			RedisUtils.returnResource(pool, jedis);
 		}
 		return null;
-	}
-
-	public DispatchVo getDispatchResult(String guid, int dbindex) {
-		JedisPool pool = null;
-		Jedis jedis = null;
-		try {
-			pool = RedisUtils.getPool();
-			jedis = pool.getResource();
-			jedis.select(dbindex);
-			String json = jedis.get(guid);
-			if (json != null)
-				return JSON.parseObject(json, DispatchVo.class);
-		} catch (Exception e) {
-			pool.returnBrokenResource(jedis);
-			LOG.error("", e);
-		} finally {
-			RedisUtils.returnResource(pool, jedis);
-		}
-		return null;
-	}
-
-	private void setDispatchResult(DispatchVo dispatchVo, String guid, int dbindex) {
-		JedisPool pool = null;
-		Jedis jedis = null;
-		try {
-			StringBuilder str = new StringBuilder();
-			str.append(JSON.toJSONString(dispatchVo));
-			pool = RedisUtils.getPool();
-			jedis = pool.getResource();
-			jedis.select(dbindex);
-			jedis.set(guid, str.toString());
-		} catch (Exception e) {
-			pool.returnBrokenResource(jedis);
-			LOG.error("", e);
-		} finally {
-			RedisUtils.returnResource(pool, jedis);
-		}
 	}
 
 	public TemplateModel getTemplateModel(String guid) {
