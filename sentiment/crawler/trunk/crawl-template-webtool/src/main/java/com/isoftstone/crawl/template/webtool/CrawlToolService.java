@@ -201,10 +201,7 @@ public class CrawlToolService {
 	public String saveTemplate(@DefaultValue("") @FormParam("data") String data) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		PageModel pageModel = serviceHelper.getPageModelByJsonString(data);
-		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
-		serviceHelper.saveTemplateResultToRedis(pageModel);
-		jsonProvider.setSuccess(true);
-		jsonProvider.setData("模板保存成功!");
+		ResponseJSONProvider<String> jsonProvider = serviceHelper.saveTemplateResultToRedis(pageModel);
 		return jsonProvider.toJSON();
 	}
 
@@ -601,6 +598,10 @@ public class CrawlToolService {
 			// 搜索关键字
 			String searchKeyWord = model.getTagWords();
 			PageModel pageModel = serviceHelper.getPageModelByJsonString(data);
+			jsonProvider = serviceHelper.validPageModelBeforeSave(pageModel);
+			if (jsonProvider.getSuccess() == false) {
+				return jsonProvider.toJSON();
+			}
 
 			// 根据words关键字，处理pageModel中的相关信息:URL,名称,Tags,查询关键字,并重新赋值
 			String templateURL = pageModel.getBasicInfoViewModel().getUrl();
@@ -761,7 +762,7 @@ public class CrawlToolService {
 					PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
 					ResponseJSONProvider<ParseResult> middleJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyNewContent(serviceHelper.getPageModeJSONString(pageModel)));
 					if (middleJsonProvider.getSuccess() == false) {
-						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);						
+						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
 					} else {
 						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_VALID_STATUS);
 					}

@@ -44,6 +44,7 @@ public class WebtoolConstants {
     public static final String BAIDU_SEARCH_NAME="百度新闻搜索";
     public static final String BING_SEARCH_NAME="Bing新闻搜索";
     public static final String SOUGOU_SEARCH_NAME="搜狗新闻搜索";
+    public static final String NORMAL_TEMPLATE_NAME="普通模板";
     
     //批量生成搜索引擎模板时，添加的模板tag属性
     public static final String SEARCH_ENGINE_TAGS_CATAGRAY="分类";
