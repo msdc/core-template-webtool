@@ -12,10 +12,33 @@ var paginationItemCounts = 10;
  * @summary 种子有效性View-Model
  * */
 var seedEffectiveVM = function (urlData) {
-    var urlInitData = updateUrlData(urlData);
+    var urlInitData = updateSeedsEffectiveData(urlData);
     this.urls = ko.observableArray(urlInitData);
     //分页显示的url列表
     this.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
+    //检查种子有效性
+    this.checkSeedsEffective = function () {
+        $.ajax2({
+            url: virtualWebPath + '/webapi/crawlToolResource/getSeedsEffectiveStatusList',
+            type: 'GET',
+            success: function (data) {
+                var json = JSON.parse(data);
+                if (json.success) {
+                    if (json.data.seedsEffectiveStatusList != null) {
+                        var dataUpdated=updateSeedsEffectiveData(json.data.seedsEffectiveStatusList);
+                        initSeedsEffectiveList(dataUpdated);
+                    } else {
+                        initSeedsEffectiveList([]);
+                    }
+                } else {
+                    initSeedsEffectiveList([]);
+                }
+            },
+            error: function (error) {
+                initSeedsEffectiveList([]);
+            }
+        });
+    }.bind(this);
 };
 
 /**
@@ -43,9 +66,9 @@ var crawlDataVM = function (urlData) {
  * @summary 页面主体View-Model类
  * */
 var masterVM = function (urlData) {
-    this.seedEffectiveVM = new seedEffectiveVM(seedEffectiveSampleData());
-    this.crawlStatusVM = new crawlStatusVM(crawlStatusSampleData());
-    this.crawlDataVM = new crawlDataVM(crawlDataSampleData());
+    this.seedEffectiveVM = new seedEffectiveVM(urlData);
+    this.crawlStatusVM = new crawlStatusVM(urlData);
+    this.crawlDataVM = new crawlDataVM(urlData);
 };
 /*************************View-Model Definition End**********************************/
 
@@ -54,7 +77,7 @@ var masterVM = function (urlData) {
  * 初始化列表数据
  * @param {Array} urlData url列表
  * */
-function updateUrlData(urlData) {
+function updateSeedsEffectiveData(urlData) {
     var seedsUrlInitData = [];
     if (urlData) {
         for (var i = 0; i < urlData.length; i++) {
@@ -71,41 +94,77 @@ function updateUrlData(urlData) {
 }
 
 $(function () {
-//    $.ajax2({
-//        url: virtualWebPath + '/webapi/crawlToolResource/getSeedsEffectiveStatusList',
-//        type: 'GET',
-//        success: function (data) {
-//            var json = JSON.parse(data);
-//            if (json.success) {
-//                if (json.data.seedsEffectiveStatusList != null) {
-//                    initPageContent(json.data.seedsEffectiveStatusList);
-//                } else {
-//                    initPageContent([]);
-//                }
-//            } else {
-//                initPageContent([]);
-//            }
-//        },
-//        error: function (error) {
-//            initPageContent([]);
-//        }
-//    });
+    var mainViewModel = new masterVM([]);
+    ko.applyBindings(mainViewModel);
 
-    initPageContent([]);
+    //添加种子有效性测试数据
+    var sampleData=seedEffectiveSampleData();
+    var updatedSampleData=updateSeedsEffectiveData(sampleData);
+    mainViewModel.seedEffectiveVM.urls(updatedSampleData);
+    mainViewModel.seedEffectiveVM.paginationUrls(mainViewModel.seedEffectiveVM.urls().slice(0, paginationItemCounts));
+    //页面加载时，同步加载种子有效性页面分页控件
+    loadPaginationComponent('#seeds_effective_pagination', mainViewModel.seedEffectiveVM);
+    //注册Tab显示事件
+    registerTabShownEvent(mainViewModel);
 });
 
 /**
  *
- * @summary 加载页面主体内容
- * @param {Object} urlData 初始化数据
+ * 注册Tab显示事件
  * */
-function initPageContent(urlData) {
-    var mainViewModel = new masterVM(urlData);
-    ko.applyBindings(mainViewModel);
+function registerTabShownEvent(mainViewModel) {
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var target = e.target.hash; // newly activated tab
+        if (target == "#seeds_effective") {
+            //初始化种子有效性列表
+            initSeedsEffectiveList(mainViewModel);
+        }
+        else if (target == '#crawl_status') {
+            //初始化爬取状态列表
+            initCrawlStatusList(mainViewModel);
+        } else if (target == '#crawl_data') {
+            //初始化爬取数据列表
+            initCrawlDataList(mainViewModel);
+        }
+    });
+}
+
+/**
+ *
+ * @summary 种子有效性列表
+ * @param {Object} mainViewModel 整个页面的View-Model对象
+ * */
+function initSeedsEffectiveList(mainViewModel) {
+    var sampleData=seedEffectiveSampleData();
+    var updatedSampleData=updateSeedsEffectiveData(sampleData);
+    mainViewModel.seedEffectiveVM.urls(updatedSampleData);
+    mainViewModel.seedEffectiveVM.paginationUrls(mainViewModel.seedEffectiveVM.urls().slice(0, paginationItemCounts));
     //加载种子有效性页面分页控件
     loadPaginationComponent('#seeds_effective_pagination', mainViewModel.seedEffectiveVM);
+}
+
+/**
+ *
+ * @summary 爬取状态列表
+ * @param {Object} mainViewModel 整个页面的View-Model对象
+ * */
+function initCrawlStatusList(mainViewModel) {
+    var sampleData=crawlStatusSampleData();
+    mainViewModel.crawlStatusVM.urls(sampleData);
+    mainViewModel.crawlStatusVM.paginationUrls(mainViewModel.crawlStatusVM.urls().slice(0, paginationItemCounts));
     //加载爬取数据页面分页控件
     loadPaginationComponent('#crawl_status_pagination', mainViewModel.crawlStatusVM);
+}
+
+/**
+ *
+ * @summary 爬取数据列表
+ * @param {Object} mainViewModel 整个页面的View-Model对象
+ * */
+function initCrawlDataList(mainViewModel) {
+    var sampleData=crawlDataSampleData();
+    mainViewModel.crawlDataVM.urls(sampleData);
+    mainViewModel.crawlDataVM.paginationUrls(mainViewModel.crawlDataVM.urls().slice(0, paginationItemCounts));
     //加载爬取状态页面分页控件
     loadPaginationComponent('#crawl_data_pagination', mainViewModel.crawlDataVM);
 }
