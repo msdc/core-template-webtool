@@ -20,10 +20,32 @@ var seedEffectiveVM = function (urlData) {
 
 /**
  *
+ * @summary 爬取状态View-model
+ * */
+var crawlStatusVM = function (urlData) {
+    this.urls = ko.observableArray(urlData);
+    //分页显示的url列表
+    this.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
+};
+
+/**
+ *
+ * @summary 爬取数据View-model
+ * */
+var crawlDataVM = function (urlData) {
+    this.urls = ko.observableArray(urlData);
+    //分页显示的url列表
+    this.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
+};
+
+/**
+ *
  * @summary 页面主体View-Model类
  * */
 var masterVM = function (urlData) {
-    this.seedEffectiveVM = new seedEffectiveVM(urlData);
+    this.seedEffectiveVM = new seedEffectiveVM(seedEffectiveSampleData());
+    this.crawlStatusVM=new crawlStatusVM(crawlStatusSampleData());
+    this.crawlDataVM=new crawlDataVM(crawlDataSampleData());
 };
 /*************************View-Model Definition End**********************************/
 
@@ -78,33 +100,73 @@ $(function () {
  * @param {Object} urlData 初始化数据
  * */
 function initPageContent(urlData) {
-    $('#seeds_effective').load('status-seeds.html', function () {
-        var mainViewModel = new masterVM(urlData);
-        ko.applyBindings(mainViewModel);
-        //加载分页控件
-        loadPaginationComponent(mainViewModel.seedEffectiveVM);
-    });
+    var mainViewModel = new masterVM(urlData);
+    ko.applyBindings(mainViewModel);
+    //加载种子有效性页面分页控件
+    loadPaginationComponent('#seeds_effective_pagination',mainViewModel.seedEffectiveVM);
+    //加载爬取数据页面分页控件
+    loadPaginationComponent('#crawl_status_pagination',mainViewModel.seedEffectiveVM);
+    //加载爬取状态页面分页控件
+    loadPaginationComponent('#crawl_data_pagination',mainViewModel.seedEffectiveVM);
+}
+
+/**
+ *
+ * 种子有效性测试数据
+ * */
+function seedEffectiveSampleData(){
+    var sampleData=[
+        {name:'上海证券报-信托研究',url:'http://caifu.cnstock.com/list/xingtuo_yanjiu',effectiveStatus:'有效'},
+        {name:'上海证券报-信托调查',url:'http://caifu.cnstock.com/list/xingtuo_diaocha',effectiveStatus:'有效'}
+    ];
+    return sampleData;
+}
+
+/**
+ *
+ * 爬取状态测试数据
+ * */
+function crawlStatusSampleData(){
+    var sampleData=[
+        {name:'上海证券报-信托研究',url:'http://caifu.cnstock.com/list/xingtuo_yanjiu',crawlStatus:'爬去中'},
+        {name:'上海证券报-信托调查',url:'http://caifu.cnstock.com/list/xingtuo_diaocha',crawlStatus:'注入'}
+    ];
+    return sampleData;
+}
+
+/**
+ *
+ * 爬取数据测试数据
+ * */
+function crawlDataSampleData(){
+    var sampleData=[
+        {name:'上海证券报-信托研究',url:'http://caifu.cnstock.com/list/xingtuo_yanjiu',indexCounts:'2890',todayIndexCounts:'289'},
+        {name:'上海证券报-信托调查',url:'http://caifu.cnstock.com/list/xingtuo_diaocha',indexCounts:'2234',todayIndexCounts:'123'}
+    ];
+    return sampleData;
 }
 
 /**
  *
  * 加载分页组件
- * @param {Object} result
+ * @param {String} paginationDomElement 加载分页的DOM元素
+ * @param {Object} viewModel 需要分页的ViewModel
+ * *
  * */
-function loadPaginationComponent(seedEffectiveVM) {
-    var totalCount = seedEffectiveVM.urls().length;
-    $('#seeds_effective_pagination').pagination({
+function loadPaginationComponent(paginationDomElement,viewModel) {
+    var totalCount = viewModel.urls().length;
+    $(paginationDomElement).pagination({
         items: totalCount,
         itemsOnPage: paginationItemCounts,
         cssStyle: 'light-theme',
         prevText: '上一页',
         nextText: '下一页',
         onPageClick: function (pageNumber, eTarget) {
-            var originalUrls = seedEffectiveVM.urls();
+            var originalUrls = viewModel.urls();
             var dataIndex = (pageNumber - 1) * paginationItemCounts;
             var itemsCounts = dataIndex + paginationItemCounts;
             var nextPageUrls = originalUrls.slice(dataIndex, itemsCounts);
-            seedEffectiveVM.paginationUrls(nextPageUrls);
+            viewModel.paginationUrls(nextPageUrls);
         }
     });
 }
