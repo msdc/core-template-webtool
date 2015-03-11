@@ -115,7 +115,7 @@ function registerTabShownEvent(mainViewModel) {
         if (target == "#seeds_effective") {
             //var sampleData = seedEffectiveSampleData();//测试数据
             //初始化种子有效性列表
-            initSeedsEffectiveList(mainViewModel, null);
+            //initSeedsEffectiveList(mainViewModel, null);
         }
         else if (target == '#crawl_status') {
             var sampleData = crawlStatusSampleData();//测试数据
