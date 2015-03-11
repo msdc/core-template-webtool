@@ -98,8 +98,8 @@ $(function () {
     ko.applyBindings(mainViewModel);
 
     //初始化种子有效性列表测试数据
-    var sampleData = seedEffectiveSampleData();//测试数据
-    initSeedsEffectiveList(mainViewModel, sampleData);
+    //var sampleData = seedEffectiveSampleData();//测试数据
+    initSeedsEffectiveList(mainViewModel, null);
 
     //注册Tab显示事件
     registerTabShownEvent(mainViewModel);
@@ -113,9 +113,9 @@ function registerTabShownEvent(mainViewModel) {
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         var target = e.target.hash; // newly activated tab
         if (target == "#seeds_effective") {
-            var sampleData = seedEffectiveSampleData();//测试数据
+            //var sampleData = seedEffectiveSampleData();//测试数据
             //初始化种子有效性列表
-            initSeedsEffectiveList(mainViewModel, sampleData);
+            initSeedsEffectiveList(mainViewModel, null);
         }
         else if (target == '#crawl_status') {
             var sampleData = crawlStatusSampleData();//测试数据
