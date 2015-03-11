@@ -70,7 +70,7 @@
                                                 <td data-bind="text: ($index()+1)"></td>
                                                 <td data-bind="text: name"></td>
                                                 <td data-bind="text: url" style="width: 400px;word-break: break-all"></td>
-                                                <td data-bind="text: effectiveStatus"></td>
+                                                <td data-bind="text: effectiveStatus, style: { color: effectiveStatus=='无效'?'red':'black'}"></td>
                                                 <td>
                                                     <a role="button" class="btn btn-primary"  data-bind="attr: {href:updateUrl,target:targetWindow}">设置</a>
                                                 </td>
