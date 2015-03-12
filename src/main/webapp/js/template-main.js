@@ -824,11 +824,11 @@ function initUpdateTemplateTags(templateTags){
            isMediaType=true;
        }else if(tagKey=='subMediaType'){
            isSubMediaType=true;
-       }else if(isLanguage=='language'){
+       }else if(tagKey=='language'){
            isLanguage=true;
-       }else if(isOversea=='isOversea'){
+       }else if(tagKey=='isOversea'){
            isOversea=true;
-       }else if(isDataSource=='dataSource'){
+       }else if(tagKey=='dataSource'){
            isDataSource=true;
        }
    }
