@@ -18,25 +18,7 @@ var seedEffectiveVM = function (mainViewModel, urlData) {
     this.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
     //检查种子有效性
     this.checkSeedsEffective = function () {
-        $.ajax2({
-            url: virtualWebPath + '/webapi/crawlToolResource/getSeedsEffectiveStatusList',
-            type: 'GET',
-            success: function (data) {
-                var json = JSON.parse(data);
-                if (json.success) {
-                    if (json.data.seedsEffectiveStatusList != null) {
-                        initSeedsEffectiveList(mainViewModel, json.data.seedsEffectiveStatusList);
-                    } else {
-                        initSeedsEffectiveList(mainViewModel, []);
-                    }
-                } else {
-                    initSeedsEffectiveList(mainViewModel, []);
-                }
-            },
-            error: function (error) {
-                initSeedsEffectiveList(mainViewModel, []);
-            }
-        });
+        fillPageList('seedsEffectiveStatusList','/webapi/crawlToolResource/getSeedsEffectiveStatusList',mainViewModel,initSeedsEffectiveList);
     }.bind(this);
 };
 
@@ -50,25 +32,7 @@ var crawlStatusVM = function (mainViewModel, urlData) {
     this.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
     //刷新爬取状态
     this.refreshCrawStatus=function(){
-        $.ajax2({
-            url: virtualWebPath + '/webapi/crawlToolResource/getCrawlStatusStatusList',
-            type: 'GET',
-            success: function (data) {
-                var json = JSON.parse(data);
-                if (json.success) {
-                    if (json.data.crawlStatusModelList != null) {
-                        initCrawlStatusList(mainViewModel, json.data.crawlStatusModelList);
-                    } else {
-                        initCrawlStatusList(mainViewModel, []);
-                    }
-                } else {
-                    initCrawlStatusList(mainViewModel, []);
-                }
-            },
-            error: function (error) {
-                initCrawlStatusList(mainViewModel, []);
-            }
-        });
+        fillPageList('crawlStatusModelList','/webapi/crawlToolResource/getCrawlStatusList',mainViewModel,initCrawlStatusList);
     }.bind(this);
 };
 
@@ -82,25 +46,7 @@ var crawlDataVM = function (mainViewModel, urlData) {
     this.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
     //刷新抓取数据
     this.refreshCrawlData=function(){
-        $.ajax2({
-            url: virtualWebPath + '/webapi/crawlToolResource/getCrawlDataList',
-            type: 'GET',
-            success: function (data) {
-                var json = JSON.parse(data);
-                if (json.success) {
-                    if (json.data.crawlDataModelList != null) {
-                        initCrawlDataList(mainViewModel, json.data.crawlDataModelList);
-                    } else {
-                        initCrawlDataList(mainViewModel, []);
-                    }
-                } else {
-                    initCrawlDataList(mainViewModel, []);
-                }
-            },
-            error: function (error) {
-                initCrawlDataList(mainViewModel, []);
-            }
-        });
+        fillPageList('crawlDataModelList','/webapi/crawlToolResource/getCrawlDataList',mainViewModel,initCrawlDataList);
     }.bind(this);
 };
 
@@ -115,6 +61,60 @@ var masterVM = function (urlData) {
     this.crawlDataVM = new crawlDataVM(that, urlData);
 };
 /*************************View-Model Definition End**********************************/
+
+/**
+ *
+ * ajax get请求填充页面列表数据
+ * @param {String} listType 需要填充的页面列表类型
+ * @param {String} url 接口调用url
+ * @param {Object} mainViewModel 页面View-Model
+ * @param {Function} callback 回调函数
+ * */
+function fillPageList(listType,url,mainViewModel,callback){
+    $.ajax2({
+        url: virtualWebPath + url,
+        type: 'GET',
+        success: function (data) {
+            var json = JSON.parse(data);
+            if (json.success) {
+                switch (listType){
+                    case 'seedsEffectiveStatusList'://种子有效性列表
+                    {
+                        if (json.data.seedsEffectiveStatusList != null) {
+                            callback(mainViewModel, json.data.seedsEffectiveStatusList);
+                        } else {
+                            callback(mainViewModel, []);
+                        }
+                    }
+                        break;
+                    case 'crawlStatusModelList'://爬取状态
+                    {
+                        if (json.data.crawlStatusModelList != null) {
+                            callback(mainViewModel, json.data.crawlStatusModelList);
+                        } else {
+                            callback(mainViewModel, []);
+                        }
+                    }
+                        break;
+                    case 'crawlDataModelList'://爬取数据
+                    {
+                        if (json.data.crawlDataModelList != null) {
+                            callback(mainViewModel, json.data.crawlDataModelList);
+                        } else {
+                            callback(mainViewModel, []);
+                        }
+                    }
+                        break;
+                }
+            } else {
+                callback(mainViewModel, []);
+            }
+        },
+        error: function (error) {
+            callback(mainViewModel, []);
+        }
+    });
+}
 
 /**
  *
