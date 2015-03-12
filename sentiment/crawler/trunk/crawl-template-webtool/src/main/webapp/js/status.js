@@ -58,6 +58,28 @@ var crawlDataVM = function (mainViewModel, urlData) {
     this.urls = ko.observableArray(urlData);
     //分页显示的url列表
     this.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
+    //刷新抓取数据
+    this.refreshCrawlData=function(){
+        $.ajax2({
+            url: virtualWebPath + '/webapi/crawlToolResource/getCrawlDataList',
+            type: 'GET',
+            success: function (data) {
+                var json = JSON.parse(data);
+                if (json.success) {
+                    if (json.data.crawlDataModelList != null) {
+                        initCrawlDataList(mainViewModel, json.data.crawlDataModelList);
+                    } else {
+                        initCrawlDataList(mainViewModel, []);
+                    }
+                } else {
+                    initCrawlDataList(mainViewModel, []);
+                }
+            },
+            error: function (error) {
+                initCrawlDataList(mainViewModel, []);
+            }
+        });
+    }.bind(this);
 };
 
 /**
@@ -100,6 +122,10 @@ $(function () {
     //初始化种子有效性列表测试数据
     //var sampleData = seedEffectiveSampleData();//测试数据
     initSeedsEffectiveList(mainViewModel, null);
+    //初始化爬取状态列表
+    initCrawlStatusList(mainViewModel, []);
+    //初始化爬取数据列表
+    initCrawlDataList(mainViewModel, []);
 
     //注册Tab显示事件
     registerTabShownEvent(mainViewModel);
@@ -118,13 +144,13 @@ function registerTabShownEvent(mainViewModel) {
             //initSeedsEffectiveList(mainViewModel, null);
         }
         else if (target == '#crawl_status') {
-            var sampleData = crawlStatusSampleData();//测试数据
+            //var sampleData = crawlStatusSampleData();//测试数据
             //初始化爬取状态列表
-            initCrawlStatusList(mainViewModel, sampleData);
+            //initCrawlStatusList(mainViewModel, []);
         } else if (target == '#crawl_data') {
-            var sampleData = crawlDataSampleData();//测试数据
+            //var sampleData = crawlDataSampleData();//测试数据
             //初始化爬取数据列表
-            initCrawlDataList(mainViewModel, sampleData);
+            //initCrawlDataList(mainViewModel, []);
         }
     });
 }
@@ -163,8 +189,7 @@ function initCrawlStatusList(mainViewModel, initData) {
  * @param {Object|Array} initData 初始化数据
  * */
 function initCrawlDataList(mainViewModel, initData) {
-    var sampleData = crawlDataSampleData();
-    mainViewModel.crawlDataVM.urls(sampleData);
+    mainViewModel.crawlDataVM.urls(initData);
     mainViewModel.crawlDataVM.paginationUrls(mainViewModel.crawlDataVM.urls().slice(0, paginationItemCounts));
     //加载爬取状态页面分页控件
     loadPaginationComponent('#crawl_data_pagination', mainViewModel.crawlDataVM);

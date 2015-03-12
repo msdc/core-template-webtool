@@ -15,6 +15,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -1226,20 +1229,20 @@ public class CrawlToolResource {
 
 		// 普通模板校验
 		if (pageModel.getBasicInfoViewModel().getTemplateType().equals(WebtoolConstants.NORMAL_TEMPLATE_NAME)) {
-			if (pageModel.getNewsTitleViewModel().getSelector().equals("")) {
-				responseJSONProvider.setErrorMsg("内容页中的标题选择器不能为空！");
-				return responseJSONProvider;
-			}
-
-			if (pageModel.getNewsPublishTimeViewModel().getSelector().equals("")) {
-				responseJSONProvider.setErrorMsg("内容页中的发布时间选择器不能为空！");
-				return responseJSONProvider;
-			}
-
-			if (pageModel.getNewsSourceViewModel().getSelector().equals("")) {
-				responseJSONProvider.setErrorMsg("内容页中的来源选择器不能为空！");
-				return responseJSONProvider;
-			}
+//			if (pageModel.getNewsTitleViewModel().getSelector().equals("")) {
+//				responseJSONProvider.setErrorMsg("内容页中的标题选择器不能为空！");
+//				return responseJSONProvider;
+//			}
+//
+//			if (pageModel.getNewsPublishTimeViewModel().getSelector().equals("")) {
+//				responseJSONProvider.setErrorMsg("内容页中的发布时间选择器不能为空！");
+//				return responseJSONProvider;
+//			}
+//
+//			if (pageModel.getNewsSourceViewModel().getSelector().equals("")) {
+//				responseJSONProvider.setErrorMsg("内容页中的来源选择器不能为空！");
+//				return responseJSONProvider;
+//			}
 		} else {// 搜索引擎模板
 			if (pageModel.getBasicInfoViewModel().getCurrentString().equals("")) {
 				responseJSONProvider.setErrorMsg("基本信息中的模板URL查询关键字不能为空！");
@@ -1724,5 +1727,38 @@ public class CrawlToolResource {
 		int s = random.nextInt(max) % (max - min + 1) + min;
 		return s;
 	}
-
+	
+	/**
+	 * 
+	 * 获取domain
+	 * */
+	public String getDomainName(String url) {
+		try {
+			URI uri = new URI(url);
+			String domain = uri.getHost();
+			return domain.startsWith("www.") ? domain.substring(4) : domain;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/***
+	 * 
+	 * 产生Domain列表
+	 * */
+	public void fillDomainList(Set<String> listKeys, List<String> domainList) {
+		if (listKeys != null) {
+			for (String key : listKeys) {
+				String templateString = RedisOperator.getFromDefaultDB(key);
+				TemplateModel templateModel = getTemplateModelByJSONString(templateString);
+				String domainName = getDomainName(templateModel.getBasicInfoViewModel().getUrl());
+				if (domainName != null) {
+					if (!domainList.contains(domainName)) {
+						domainList.add(domainName);
+					}
+				}
+			}
+		}
+	}
 }

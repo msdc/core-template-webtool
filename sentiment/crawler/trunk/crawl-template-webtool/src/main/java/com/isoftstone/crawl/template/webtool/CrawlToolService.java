@@ -3,8 +3,12 @@ package com.isoftstone.crawl.template.webtool;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -21,6 +25,10 @@ import com.isoftstone.crawl.template.impl.ParseResult;
 import com.isoftstone.crawl.template.impl.TemplateFactory;
 import com.isoftstone.crawl.template.impl.TemplateResult;
 import com.isoftstone.crawl.template.model.BasicInfoViewModel;
+import com.isoftstone.crawl.template.model.CrawlDataModel;
+import com.isoftstone.crawl.template.model.CrawlDataModelList;
+import com.isoftstone.crawl.template.model.CrawlStatusModel;
+import com.isoftstone.crawl.template.model.CrawlStatusModelList;
 import com.isoftstone.crawl.template.model.ListPaginationViewModel;
 import com.isoftstone.crawl.template.model.PageModel;
 import com.isoftstone.crawl.template.model.ResponseJSONProvider;
@@ -31,11 +39,13 @@ import com.isoftstone.crawl.template.model.SeedsEffectiveStatusModel;
 import com.isoftstone.crawl.template.model.TemplateModel;
 import com.isoftstone.crawl.template.model.TemplateTagModel;
 import com.isoftstone.crawl.template.utils.Config;
+import com.isoftstone.crawl.template.utils.CrawlDataModelComparator;
 import com.isoftstone.crawl.template.utils.DownloadHtml;
 import com.isoftstone.crawl.template.utils.EncodeUtils;
 import com.isoftstone.crawl.template.utils.MD5Utils;
 import com.isoftstone.crawl.template.utils.RedisOperator;
 import com.isoftstone.crawl.template.utils.SeedsEffectiveModelComparator;
+import com.isoftstone.crawl.template.utils.SolrSerach;
 import com.isoftstone.crawl.template.utils.TemplateModelComparator;
 
 /**
@@ -742,8 +752,7 @@ public class CrawlToolService {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getSeedsEffectiveStatusList() {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
-		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();
-		jsonProvider.setSuccess(true);
+		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();		
 
 		SeedsEffectiveStatusList seedsEffectiveStatusList = new SeedsEffectiveStatusList();
 		List<SeedsEffectiveStatusModel> SeedsEffectiveStatusModelList = new ArrayList<SeedsEffectiveStatusModel>();
@@ -777,7 +786,72 @@ public class CrawlToolService {
 		// 列表按名称排序
 		Collections.sort(SeedsEffectiveStatusModelList, new SeedsEffectiveModelComparator());
 		seedsEffectiveStatusList.setSeedsEffectiveStatusList(SeedsEffectiveStatusModelList);
+		jsonProvider.setSuccess(true);
 		jsonProvider.setData(seedsEffectiveStatusList);
+		return jsonProvider.toJSON();
+	}
+	
+	/**
+	 * 
+	 * 获取种子爬取状态
+	 * */
+	@GET
+	@Path("/getCrawlStatusStatusList")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getCrawlStatusStatusList() {
+		CrawlToolResource serviceHelper = new CrawlToolResource();
+		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();
+		
+		CrawlStatusModelList crawlStatusModelList = new CrawlStatusModelList();
+		List<CrawlStatusModel> crawlStatusModelArrayList = new ArrayList<CrawlStatusModel>();
+		
+		
+		jsonProvider.setSuccess(true);
+		return jsonProvider.toJSON();
+	}
+	
+	/**
+	 * 
+	 * 获取种子爬取状态
+	 * */
+	@GET
+	@Path("/getCrawlDataList")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getCrawlDataList() {
+		CrawlToolResource serviceHelper = new CrawlToolResource();
+		ResponseJSONProvider<CrawlDataModelList> jsonProvider = new ResponseJSONProvider<CrawlDataModelList>();
+
+		CrawlDataModelList crawlDataModelList=new CrawlDataModelList();
+		List<CrawlDataModel> crawlDataModelArrayList=new ArrayList<CrawlDataModel>();		
+		// 需要查询的Domain列表
+		List<String> domainList = new ArrayList<String>();
+
+		try {
+			Set<String> listKeys = RedisOperator.searchKeysFromDefaultDB("*" + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
+			// 产生Domain列表
+			serviceHelper.fillDomainList(listKeys, domainList);
+			SolrSerach search = new SolrSerach();
+			HashMap<String, Long> queryResult = search.getQueryResultCount(domainList);
+			if (queryResult != null) {				
+				Iterator<Entry<String, Long>> it = queryResult.entrySet().iterator();
+				while (it.hasNext()) {
+					Map.Entry<String, Long> entry = (Map.Entry<String, Long>) it.next();
+					CrawlDataModel crawlDataModel=new CrawlDataModel();
+					crawlDataModel.setUrl(entry.getKey());
+					crawlDataModel.setIndexCounts(entry.getValue());
+					crawlDataModelArrayList.add(crawlDataModel);
+				}				
+			}
+		} catch (Exception e) {
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("Redis操作异常！");
+			e.printStackTrace();
+		}	
+		// 列表按名称排序
+		Collections.sort(crawlDataModelArrayList, new CrawlDataModelComparator());
+		crawlDataModelList.setCrawlDataModelList(crawlDataModelArrayList);
+        jsonProvider.setSuccess(true);
+        jsonProvider.setData(crawlDataModelList);
 		return jsonProvider.toJSON();
 	}
 }
