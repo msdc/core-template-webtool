@@ -1,8 +1,6 @@
-package com.isoftstone.crawl.template.webtool;
+package com.isoftstone.crawl.template.model;
 
 import java.util.List;
-
-import com.isoftstone.crawl.template.model.TemplateModel;
 
 public class TemplateList {
 	private List<TemplateModel> templateList;

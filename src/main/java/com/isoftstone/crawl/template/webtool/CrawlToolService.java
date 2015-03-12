@@ -36,6 +36,7 @@ import com.isoftstone.crawl.template.model.SearchKeyWordDataModel;
 import com.isoftstone.crawl.template.model.SearchKeyWordModel;
 import com.isoftstone.crawl.template.model.SeedsEffectiveStatusList;
 import com.isoftstone.crawl.template.model.SeedsEffectiveStatusModel;
+import com.isoftstone.crawl.template.model.TemplateList;
 import com.isoftstone.crawl.template.model.TemplateModel;
 import com.isoftstone.crawl.template.model.TemplateTagModel;
 import com.isoftstone.crawl.template.utils.Config;
