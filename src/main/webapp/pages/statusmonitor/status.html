@@ -62,6 +62,7 @@
                                                 <td>名称</td>
                                                 <td>数据源地址</td>
                                                 <td>有效性状态</td>
+                                                <td>检查时间</td>
                                                 <td>操作</td>
                                             </tr>
                                             </thead>
@@ -71,6 +72,7 @@
                                                 <td data-bind="text: name"></td>
                                                 <td data-bind="text: url" style="width: 400px;word-break: break-all"></td>
                                                 <td data-bind="text: effectiveStatus, style: { color: effectiveStatus=='无效'?'red':'black'}"></td>
+                                                <td data-bind="text: checkTime"></td>
                                                 <td>
                                                     <a role="button" class="btn btn-primary"  data-bind="attr: {href:updateUrl,target:targetWindow}">设置</a>
                                                 </td>
@@ -78,7 +80,7 @@
                                             </tbody>
                                             <tfoot>
                                             <tr>
-                                                <td colspan="5">
+                                                <td colspan="6">
                                                     <div id="seeds_effective_pagination"></div>
                                                 </td>
                                             </tr>
@@ -109,6 +111,7 @@
                                                 <td>名称</td>
                                                 <td>数据源地址</td>
                                                 <td>爬取状态</td>
+                                                <td>检查时间</td>
                                                 <td>操作</td>
                                             </tr>
                                             </thead>
@@ -118,6 +121,7 @@
                                                 <td data-bind="text: name"></td>
                                                 <td data-bind="text: url" style="width: 400px;word-break: break-all"></td>
                                                 <td data-bind="text: crawlStatus"></td>
+                                                <td data-bind="text: checkTime"></td>
                                                 <td>
                                                     <a role="button" class="btn btn-primary">停止</a>
                                                     <a role="button" class="btn btn-primary">增量重爬</a>
@@ -128,7 +132,7 @@
                                             </tbody>
                                             <tfoot>
                                             <tr>
-                                                <td colspan="5">
+                                                <td colspan="6">
                                                     <div id="crawl_status_pagination"></div>
                                                 </td>
                                             </tr>
@@ -162,6 +166,7 @@
                                                 <td>数据源地址</td>
                                                 <td>已索引条数</td>
                                                 <td>今日索引条数</td>
+                                                <td>检查时间</td>
                                                 <td>操作</td>
                                             </tr>
                                             </thead>
@@ -172,6 +177,7 @@
                                                 <td data-bind="text: url" style="width: 400px;word-break: break-all"></td>
                                                 <td data-bind="text: indexCounts"></td>
                                                 <td data-bind="text: todayIndexCounts"></td>
+                                                <td data-bind="text: checkTime"></td>
                                                 <td>
                                                     <a role="button" class="btn btn-primary">刷新</a>
                                                 </td>
@@ -179,7 +185,7 @@
                                             </tbody>
                                             <tfoot>
                                             <tr>
-                                                <td colspan="6">
+                                                <td colspan="7">
                                                     <div id="crawl_data_pagination"></div>
                                                 </td>
                                             </tr>

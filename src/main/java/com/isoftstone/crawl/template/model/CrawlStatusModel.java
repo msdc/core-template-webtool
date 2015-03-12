@@ -6,6 +6,8 @@ public class CrawlStatusModel {
 	private String description = "";
 	private String url = "";
 	private String crawlStatus = "";
+	private String checkTime="";
+	
 	public String getTemplateId() {
 		return templateId;
 	}
@@ -35,5 +37,11 @@ public class CrawlStatusModel {
 	}
 	public void setCrawlStatus(String crawlStatus) {
 		this.crawlStatus = crawlStatus;
+	}
+	public String getCheckTime() {
+		return checkTime;
+	}
+	public void setCheckTime(String checkTime) {
+		this.checkTime = checkTime;
 	}
 }

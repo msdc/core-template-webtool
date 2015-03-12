@@ -11,6 +11,8 @@ public class CrawlDataModel {
 	private String url = "";
 	private Long indexCounts;
 	private Long todayIndexCounts;
+	private String checkTime="";
+	
 	public String getTemplateId() {
 		return templateId;
 	}
@@ -52,5 +54,11 @@ public class CrawlDataModel {
 	}
 	public void setTodayIndexCounts(Long todayIndexCounts) {
 		this.todayIndexCounts = todayIndexCounts;
+	}
+	public String getCheckTime() {
+		return checkTime;
+	}
+	public void setCheckTime(String checkTime) {
+		this.checkTime = checkTime;
 	}
 }
