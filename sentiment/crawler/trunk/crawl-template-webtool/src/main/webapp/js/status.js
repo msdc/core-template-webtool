@@ -48,6 +48,28 @@ var crawlStatusVM = function (mainViewModel, urlData) {
     this.urls = ko.observableArray(urlData);
     //分页显示的url列表
     this.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
+    //刷新爬取状态
+    this.refreshCrawStatus=function(){
+        $.ajax2({
+            url: virtualWebPath + '/webapi/crawlToolResource/getCrawlStatusStatusList',
+            type: 'GET',
+            success: function (data) {
+                var json = JSON.parse(data);
+                if (json.success) {
+                    if (json.data.crawlStatusModelList != null) {
+                        initCrawlStatusList(mainViewModel, json.data.crawlStatusModelList);
+                    } else {
+                        initCrawlStatusList(mainViewModel, []);
+                    }
+                } else {
+                    initCrawlStatusList(mainViewModel, []);
+                }
+            },
+            error: function (error) {
+                initCrawlStatusList(mainViewModel, []);
+            }
+        });
+    }.bind(this);
 };
 
 /**

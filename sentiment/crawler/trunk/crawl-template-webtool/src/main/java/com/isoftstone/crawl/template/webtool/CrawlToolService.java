@@ -21,12 +21,14 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
 
 import com.isoftstone.crawl.template.consts.WebtoolConstants;
+import com.isoftstone.crawl.template.crawlstate.CrawlState;
 import com.isoftstone.crawl.template.impl.ParseResult;
 import com.isoftstone.crawl.template.impl.TemplateFactory;
 import com.isoftstone.crawl.template.impl.TemplateResult;
 import com.isoftstone.crawl.template.model.BasicInfoViewModel;
 import com.isoftstone.crawl.template.model.CrawlDataModel;
 import com.isoftstone.crawl.template.model.CrawlDataModelList;
+import com.isoftstone.crawl.template.model.CrawlStateBean;
 import com.isoftstone.crawl.template.model.CrawlStatusModel;
 import com.isoftstone.crawl.template.model.CrawlStatusModelList;
 import com.isoftstone.crawl.template.model.ListPaginationViewModel;
@@ -41,6 +43,7 @@ import com.isoftstone.crawl.template.model.TemplateModel;
 import com.isoftstone.crawl.template.model.TemplateTagModel;
 import com.isoftstone.crawl.template.utils.Config;
 import com.isoftstone.crawl.template.utils.CrawlDataModelComparator;
+import com.isoftstone.crawl.template.utils.CrawlStatusModelComparator;
 import com.isoftstone.crawl.template.utils.DownloadHtml;
 import com.isoftstone.crawl.template.utils.EncodeUtils;
 import com.isoftstone.crawl.template.utils.MD5Utils;
@@ -800,14 +803,25 @@ public class CrawlToolService {
 	@Path("/getCrawlStatusStatusList")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getCrawlStatusStatusList() {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
-		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();
-		
+		ResponseJSONProvider<CrawlStatusModelList> jsonProvider = new ResponseJSONProvider<CrawlStatusModelList>();
+
 		CrawlStatusModelList crawlStatusModelList = new CrawlStatusModelList();
 		List<CrawlStatusModel> crawlStatusModelArrayList = new ArrayList<CrawlStatusModel>();
-		
-		
+
+		CrawlState crawlState = new CrawlState();
+		List<CrawlStateBean> crawlStateResult = crawlState.getCrawlState();
+		for (CrawlStateBean crawlStateBean : crawlStateResult) {
+			CrawlStatusModel crawlStatusModel = new CrawlStatusModel();
+			crawlStatusModel.setUrl(crawlStateBean.getDispatchName());
+			crawlStatusModel.setCrawlStatus(crawlStateBean.getCrawlState());
+			crawlStatusModelArrayList.add(crawlStatusModel);
+		}
+		// 列表按名称排序
+		Collections.sort(crawlStatusModelArrayList, new CrawlStatusModelComparator());
+		crawlStatusModelList.setCrawlStatusModelList(crawlStatusModelArrayList);
+
 		jsonProvider.setSuccess(true);
+		jsonProvider.setData(crawlStatusModelList);
 		return jsonProvider.toJSON();
 	}
 	
