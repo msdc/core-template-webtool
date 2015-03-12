@@ -10,6 +10,7 @@ public class SeedsEffectiveStatusModel {
 	private String description = "";
 	private String url = "";
 	private String effectiveStatus = "";
+	private String checkTime="";
 
 	public String getTemplateId() {
 		return templateId;
@@ -49,5 +50,13 @@ public class SeedsEffectiveStatusModel {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public String getCheckTime() {
+		return checkTime;
+	}
+
+	public void setCheckTime(String checkTime) {
+		this.checkTime = checkTime;
 	}
 }

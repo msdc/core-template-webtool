@@ -1,8 +1,10 @@
 package com.isoftstone.crawl.template.webtool;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -767,11 +769,15 @@ public class CrawlToolService {
 				for (String key : listKeys) {
 					String templateString = RedisOperator.getFromDefaultDB(key);
 					TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateString);
+					Date currentDate = new Date();
+					SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					String nowDateString = dateFormat.format(currentDate);
 					SeedsEffectiveStatusModel seedsEffectiveStatusModel = new SeedsEffectiveStatusModel();
 					seedsEffectiveStatusModel.setTemplateId(templateModel.getTemplateId());
 					seedsEffectiveStatusModel.setUrl(templateModel.getBasicInfoViewModel().getUrl());
 					seedsEffectiveStatusModel.setDescription(templateModel.getDescription());
 					seedsEffectiveStatusModel.setName(templateModel.getBasicInfoViewModel().getName());
+					seedsEffectiveStatusModel.setCheckTime(nowDateString);
 					TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateModel.getTemplateId());
 					PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
 					ResponseJSONProvider<ParseResult> middleJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyNewContent(serviceHelper.getPageModeJSONString(pageModel)));
@@ -829,8 +835,12 @@ public class CrawlToolService {
 		List<CrawlStateBean> crawlStateResult = crawlState.getCrawlState();
 		for (CrawlStateBean crawlStateBean : crawlStateResult) {
 			CrawlStatusModel crawlStatusModel = new CrawlStatusModel();
+			Date currentDate = new Date();
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String nowDateString = dateFormat.format(currentDate);			
 			crawlStatusModel.setUrl(crawlStateBean.getDispatchName());
 			crawlStatusModel.setCrawlStatus(crawlStateBean.getCrawlState());
+			crawlStatusModel.setCheckTime(nowDateString);
 			crawlStatusModelArrayList.add(crawlStatusModel);
 		}
 		// 列表按名称排序
@@ -885,8 +895,12 @@ public class CrawlToolService {
 				while (it.hasNext()) {
 					Map.Entry<String, Long> entry = (Map.Entry<String, Long>) it.next();
 					CrawlDataModel crawlDataModel=new CrawlDataModel();
+					Date currentDate = new Date();
+					SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					String nowDateString = dateFormat.format(currentDate);
 					crawlDataModel.setUrl(entry.getKey());
 					crawlDataModel.setIndexCounts(entry.getValue());
+					crawlDataModel.setCheckTime(nowDateString);
 					crawlDataModelArrayList.add(crawlDataModel);
 				}				
 			}
