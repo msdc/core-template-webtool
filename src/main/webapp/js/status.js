@@ -142,12 +142,11 @@ $(function () {
     ko.applyBindings(mainViewModel);
 
     //初始化种子有效性列表测试数据
-    //var sampleData = seedEffectiveSampleData();//测试数据
-    initSeedsEffectiveList(mainViewModel, null);
+    fillPageList('seedsEffectiveStatusList','/webapi/crawlToolResource/getSeedsEffectiveStatusCache',mainViewModel,initSeedsEffectiveList);
     //初始化爬取状态列表
-    initCrawlStatusList(mainViewModel, []);
+    fillPageList('crawlStatusModelList','/webapi/crawlToolResource/getCrawlStatusCache',mainViewModel,initCrawlStatusList);
     //初始化爬取数据列表
-    initCrawlDataList(mainViewModel, []);
+    fillPageList('crawlDataModelList','/webapi/crawlToolResource/getCrawlDataCache',mainViewModel,initCrawlDataList);
 
     //注册Tab显示事件
     registerTabShownEvent(mainViewModel);
