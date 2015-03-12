@@ -50,6 +50,7 @@ import com.isoftstone.crawl.template.utils.MD5Utils;
 import com.isoftstone.crawl.template.utils.RedisOperator;
 import com.isoftstone.crawl.template.utils.SeedsEffectiveModelComparator;
 import com.isoftstone.crawl.template.utils.SolrSerach;
+import com.isoftstone.crawl.template.utils.StatusMonitorCache;
 import com.isoftstone.crawl.template.utils.TemplateModelComparator;
 
 /**
@@ -790,8 +791,24 @@ public class CrawlToolService {
 		// 列表按名称排序
 		Collections.sort(SeedsEffectiveStatusModelList, new SeedsEffectiveModelComparator());
 		seedsEffectiveStatusList.setSeedsEffectiveStatusList(SeedsEffectiveStatusModelList);
+		//添加到缓存
+		StatusMonitorCache.setSeedsEffectiveStatusListCache(seedsEffectiveStatusList);
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData(seedsEffectiveStatusList);
+		return jsonProvider.toJSON();
+	}
+	
+	/**
+	 * 
+	 * 获取上次检查种子有效性列表
+	 * */
+	@GET
+	@Path("/getSeedsEffectiveStatusCache")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getSeedsEffectiveStatusCache(){
+		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData(StatusMonitorCache.getSeedsEffectiveStatusListCache());
 		return jsonProvider.toJSON();
 	}
 	
@@ -800,9 +817,9 @@ public class CrawlToolService {
 	 * 获取种子爬取状态
 	 * */
 	@GET
-	@Path("/getCrawlStatusStatusList")
+	@Path("/getCrawlStatusList")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String getCrawlStatusStatusList() {
+	public String getCrawlStatusList() {
 		ResponseJSONProvider<CrawlStatusModelList> jsonProvider = new ResponseJSONProvider<CrawlStatusModelList>();
 
 		CrawlStatusModelList crawlStatusModelList = new CrawlStatusModelList();
@@ -819,9 +836,25 @@ public class CrawlToolService {
 		// 列表按名称排序
 		Collections.sort(crawlStatusModelArrayList, new CrawlStatusModelComparator());
 		crawlStatusModelList.setCrawlStatusModelList(crawlStatusModelArrayList);
-
+        //添加到缓存
+		StatusMonitorCache.setCrawlStatusModelListCache(crawlStatusModelList);
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData(crawlStatusModelList);
+		return jsonProvider.toJSON();
+	}
+	
+	
+	/**
+	 * 
+	 * 获取种子爬取状态缓存数据
+	 * */
+	@GET
+	@Path("/getCrawlStatusCache")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getCrawlStatusCache() {
+		ResponseJSONProvider<CrawlStatusModelList> jsonProvider = new ResponseJSONProvider<CrawlStatusModelList>();
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData(StatusMonitorCache.getCrawlStatusModelListCache());
 		return jsonProvider.toJSON();
 	}
 	
@@ -865,8 +898,24 @@ public class CrawlToolService {
 		// 列表按名称排序
 		Collections.sort(crawlDataModelArrayList, new CrawlDataModelComparator());
 		crawlDataModelList.setCrawlDataModelList(crawlDataModelArrayList);
+		//添加到缓存
+		StatusMonitorCache.setCrawlDataModelListCache(crawlDataModelList);
         jsonProvider.setSuccess(true);
         jsonProvider.setData(crawlDataModelList);
+		return jsonProvider.toJSON();
+	}
+	
+	/**
+	 * 
+	 * 获取种子爬取状态缓存数据
+	 * */
+	@GET
+	@Path("/getCrawlDataCache")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getCrawlDataCache() {
+		ResponseJSONProvider<CrawlDataModelList> jsonProvider = new ResponseJSONProvider<CrawlDataModelList>();
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData(StatusMonitorCache.getCrawlDataModelListCache());
 		return jsonProvider.toJSON();
 	}
 }

@@ -796,6 +796,8 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
     //模板的静态属性tag
     var templateTags=initData.tags;
     if(templateTags!=null){
+        //缺少相关属性时，则自动预置
+        initUpdateTemplateTags(templateTags);
         for(var tagKey in templateTags){
             var tagValue=templateTags[tagKey];
             var templateTagModel=new singleTemplateTagViewModel();
@@ -804,6 +806,48 @@ function updateTemplateDataInit(initData,pageViewModel,singleTemplateListJSON){
             pageViewModel.templateTagsViewModel.tags.push(templateTagModel);
         }
     }
+}
+
+/**
+ *
+ * 如果修改时，模板中缺少静态属性，则自动预置
+ * @param {Array} templateTags 静态属性
+ * */
+function initUpdateTemplateTags(templateTags){
+   var isMediaType=false;
+   var isSubMediaType=false;
+   var isLanguage=false;
+   var isOversea=false;
+   var isDataSource=false;
+   for(var tagKey in templateTags){
+       if(tagKey=='mediaType'){
+           isMediaType=true;
+       }else if(tagKey=='subMediaType'){
+           isSubMediaType=true;
+       }else if(isLanguage=='language'){
+           isLanguage=true;
+       }else if(isOversea=='isOversea'){
+           isOversea=true;
+       }else if(isDataSource=='dataSource'){
+           isDataSource=true;
+       }
+   }
+
+   if(!isMediaType){
+       templateTags.mediaType='';
+   }
+   if(!isSubMediaType){
+       templateTags.subMediaType='';
+   }
+   if(!isLanguage){
+       templateTags.language='';
+   }
+   if(!isOversea){
+       templateTags.isOversea='';
+   }
+   if(!isDataSource){
+       templateTags.dataSource='';
+   }
 }
 
 /**
