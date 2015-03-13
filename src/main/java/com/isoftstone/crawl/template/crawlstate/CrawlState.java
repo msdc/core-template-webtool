@@ -46,11 +46,32 @@ public class CrawlState {
             DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey,
                 WebtoolConstants.DISPATCH_REDIS_DBINDEX);
             CrawlStateBean bean = new CrawlStateBean();
-            bean.setDispatchName(redisKey);
-            bean.setCrawlState(dispatchVo.getStatus());
+            bean.setDispatchName(redisKey.substring(0,
+                redisKey.lastIndexOf("_")));
+            String crawlState = "";
+            if ("running".equals(dispatchVo.getStatus())) {
+                crawlState = "爬取中";
+            } else if ("start".equals(dispatchVo.getStatus())) {
+                crawlState = "未开始";
+            } else if ("complete".equals(dispatchVo.getStatus())) {
+                crawlState = "完成";
+            }
+            bean.setCrawlState(crawlState);
             crawlStateList.add(bean);
         }
         return crawlStateList;
+    }
+
+    public void crawlIncrement(String dispatchName) {
+
+    }
+
+    public void crawlFull(String dispatchName) {
+
+    }
+
+    public void stopCrawl(String dispatchName) {
+        
     }
 
     /*

@@ -249,7 +249,8 @@ public class CrawlToolResource {
 			if ("true".equals(isCopy)) {
 				putSeedsFolder(folderName, "local");
 			}
-			HdfsCommon.upFileToHdfs(filePath);
+//			HdfsCommon.upFileToHdfs(filePath);
+			putSeedsFolder(folderName, "deploy");
 		} catch (Exception e) {
 			LOG.error("生成文件错误.", e);
 		} finally {
@@ -284,7 +285,8 @@ public class CrawlToolResource {
 			String desCopyRootFolder = Config.getValue(WebtoolConstants.KEY_DES_FOLDER);
 			command = "scp -r " + folderRoot + File.separator + folderName + " " + desCopyRootFolder;
 		} else {
-			// FIXME:集群模式，执行的命令.
+		    String desHdfsFolderName = Config.getValue("desHdfsFolderName");
+			command = "hadoop fs -put " + folderRoot + File.separator + folderName + " " + desHdfsFolderName;
 		}
 		LOG.info("命令：" + command);
 		runmanager.setCommand(command);
