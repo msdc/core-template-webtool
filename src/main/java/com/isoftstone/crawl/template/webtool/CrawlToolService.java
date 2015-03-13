@@ -148,12 +148,26 @@ public class CrawlToolService {
 		}
 		// 获取内容页链接
 		ArrayList<String> contentOutLinkArrayList = TemplateFactory.getContentOutlink(parseResult);
+		if (contentOutLinkArrayList == null) {
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("列表外链接配置信息不正确！");
+			return jsonProvider.toJSON();
+		}
+
 		if (contentOutLinkArrayList.size() == 0) {
 			jsonProvider.setSuccess(false);
 			jsonProvider.setErrorMsg("列表外链接配置信息不正确！");
 			return jsonProvider.toJSON();
 		}
-		int contentOutLinkIndex = serviceHelper.getRandomNumber(0, contentOutLinkArrayList.size() - 1);
+
+		int maxRandomNumber = contentOutLinkArrayList.size() - 1;
+		if (maxRandomNumber < 0 || maxRandomNumber == 0) {
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("列表外链接配置信息不正确！");
+			return jsonProvider.toJSON();
+		}
+
+		int contentOutLinkIndex = serviceHelper.getRandomNumber(0, maxRandomNumber);
 		String contentOutLink = contentOutLinkArrayList.get(contentOutLinkIndex);
 		byte[] input = DownloadHtml.getHtml(contentOutLink);
 		String encoding = CrawlToolResource.sniffCharacterEncoding(input);
@@ -814,7 +828,12 @@ public class CrawlToolService {
 	public String getSeedsEffectiveStatusCache() {
 		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();
 		jsonProvider.setSuccess(true);
+		List<SeedsEffectiveStatusModel> seedsEffectiveStatusList = StatusMonitorCache.getSeedsEffectiveStatusListCache().getSeedsEffectiveStatusList();
 		jsonProvider.setData(StatusMonitorCache.getSeedsEffectiveStatusListCache());
+		if (seedsEffectiveStatusList != null) {
+			jsonProvider.setTotal(seedsEffectiveStatusList.size());
+		}
+
 		return jsonProvider.toJSON();
 	}
 
