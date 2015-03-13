@@ -759,7 +759,7 @@ public class CrawlToolService {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getSeedsEffectiveStatusList() {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
-		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();		
+		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();
 
 		SeedsEffectiveStatusList seedsEffectiveStatusList = new SeedsEffectiveStatusList();
 		List<SeedsEffectiveStatusModel> SeedsEffectiveStatusModelList = new ArrayList<SeedsEffectiveStatusModel>();
@@ -797,13 +797,13 @@ public class CrawlToolService {
 		// 列表按名称排序
 		Collections.sort(SeedsEffectiveStatusModelList, new SeedsEffectiveModelComparator());
 		seedsEffectiveStatusList.setSeedsEffectiveStatusList(SeedsEffectiveStatusModelList);
-		//添加到缓存
+		// 添加到缓存
 		StatusMonitorCache.setSeedsEffectiveStatusListCache(seedsEffectiveStatusList);
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData(seedsEffectiveStatusList);
 		return jsonProvider.toJSON();
 	}
-	
+
 	/**
 	 * 
 	 * 获取上次检查种子有效性列表
@@ -811,13 +811,13 @@ public class CrawlToolService {
 	@GET
 	@Path("/getSeedsEffectiveStatusCache")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String getSeedsEffectiveStatusCache(){
+	public String getSeedsEffectiveStatusCache() {
 		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData(StatusMonitorCache.getSeedsEffectiveStatusListCache());
 		return jsonProvider.toJSON();
 	}
-	
+
 	/**
 	 * 
 	 * 获取种子爬取状态
@@ -837,7 +837,7 @@ public class CrawlToolService {
 			CrawlStatusModel crawlStatusModel = new CrawlStatusModel();
 			Date currentDate = new Date();
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String nowDateString = dateFormat.format(currentDate);			
+			String nowDateString = dateFormat.format(currentDate);
 			crawlStatusModel.setUrl(crawlStateBean.getDispatchName());
 			crawlStatusModel.setCrawlStatus(crawlStateBean.getCrawlState());
 			crawlStatusModel.setCheckTime(nowDateString);
@@ -846,14 +846,13 @@ public class CrawlToolService {
 		// 列表按名称排序
 		Collections.sort(crawlStatusModelArrayList, new CrawlStatusModelComparator());
 		crawlStatusModelList.setCrawlStatusModelList(crawlStatusModelArrayList);
-        //添加到缓存
+		// 添加到缓存
 		StatusMonitorCache.setCrawlStatusModelListCache(crawlStatusModelList);
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData(crawlStatusModelList);
 		return jsonProvider.toJSON();
 	}
-	
-	
+
 	/**
 	 * 
 	 * 获取种子爬取状态缓存数据
@@ -867,7 +866,7 @@ public class CrawlToolService {
 		jsonProvider.setData(StatusMonitorCache.getCrawlStatusModelListCache());
 		return jsonProvider.toJSON();
 	}
-	
+
 	/**
 	 * 
 	 * 获取种子爬取状态
@@ -879,8 +878,8 @@ public class CrawlToolService {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<CrawlDataModelList> jsonProvider = new ResponseJSONProvider<CrawlDataModelList>();
 
-		CrawlDataModelList crawlDataModelList=new CrawlDataModelList();
-		List<CrawlDataModel> crawlDataModelArrayList=new ArrayList<CrawlDataModel>();		
+		CrawlDataModelList crawlDataModelList = new CrawlDataModelList();
+		List<CrawlDataModel> crawlDataModelArrayList = new ArrayList<CrawlDataModel>();
 		// 需要查询的Domain列表
 		List<String> domainList = new ArrayList<String>();
 
@@ -890,11 +889,11 @@ public class CrawlToolService {
 			serviceHelper.fillDomainList(listKeys, domainList);
 			SolrSerach search = new SolrSerach();
 			HashMap<String, Long> queryResult = search.getQueryResultCount(domainList);
-			if (queryResult != null) {				
+			if (queryResult != null) {
 				Iterator<Entry<String, Long>> it = queryResult.entrySet().iterator();
 				while (it.hasNext()) {
 					Map.Entry<String, Long> entry = (Map.Entry<String, Long>) it.next();
-					CrawlDataModel crawlDataModel=new CrawlDataModel();
+					CrawlDataModel crawlDataModel = new CrawlDataModel();
 					Date currentDate = new Date();
 					SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					String nowDateString = dateFormat.format(currentDate);
@@ -902,23 +901,23 @@ public class CrawlToolService {
 					crawlDataModel.setIndexCounts(entry.getValue());
 					crawlDataModel.setCheckTime(nowDateString);
 					crawlDataModelArrayList.add(crawlDataModel);
-				}				
+				}
 			}
 		} catch (Exception e) {
 			jsonProvider.setSuccess(false);
 			jsonProvider.setErrorMsg("Redis操作异常！");
 			e.printStackTrace();
-		}	
+		}
 		// 列表按名称排序
 		Collections.sort(crawlDataModelArrayList, new CrawlDataModelComparator());
 		crawlDataModelList.setCrawlDataModelList(crawlDataModelArrayList);
-		//添加到缓存
+		// 添加到缓存
 		StatusMonitorCache.setCrawlDataModelListCache(crawlDataModelList);
-        jsonProvider.setSuccess(true);
-        jsonProvider.setData(crawlDataModelList);
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData(crawlDataModelList);
 		return jsonProvider.toJSON();
 	}
-	
+
 	/**
 	 * 
 	 * 获取种子爬取状态缓存数据
@@ -932,7 +931,7 @@ public class CrawlToolService {
 		jsonProvider.setData(StatusMonitorCache.getCrawlDataModelListCache());
 		return jsonProvider.toJSON();
 	}
-	
+
 	/**
 	 * 
 	 * 刷新单条抓取数据
@@ -940,19 +939,31 @@ public class CrawlToolService {
 	@POST
 	@Path("/refreshCrawlData")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String refreshCrawlData(@DefaultValue("") @FormParam("domain") String domain){
+	public String refreshCrawlData(@DefaultValue("") @FormParam("domain") String domain) {
 		ResponseJSONProvider<CrawlDataModel> jsonProvider = new ResponseJSONProvider<CrawlDataModel>();
-		SolrSerach search = new SolrSerach();		
-	    long dataCount=search.getQueryResultCount(domain);	
-	    Date currentDate = new Date();
+		SolrSerach search = new SolrSerach();
+		long dataCount = search.getQueryResultCount(domain);
+		Date currentDate = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String nowDateString = dateFormat.format(currentDate);
-		
-		CrawlDataModel crawlDataModel=new CrawlDataModel();
+
+		CrawlDataModel crawlDataModel = new CrawlDataModel();
 		crawlDataModel.setCheckTime(nowDateString);
 		crawlDataModel.setIndexCounts(dataCount);
-        jsonProvider.setSuccess(true);
-        jsonProvider.setData(crawlDataModel);
-        return jsonProvider.toJSON();
+
+		// 同时更新缓存中想对应的数据
+		List<CrawlDataModel> crawlDataModelList = StatusMonitorCache.getCrawlDataModelListCache().getCrawlDataModelList();
+
+		for (CrawlDataModel model : crawlDataModelList) {
+			if (model.getUrl().equals(domain)) {
+				model.setCheckTime(nowDateString);
+				model.setIndexCounts(dataCount);
+				break;
+			}
+		}
+
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData(crawlDataModel);
+		return jsonProvider.toJSON();
 	}
 }
