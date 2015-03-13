@@ -932,4 +932,20 @@ public class CrawlToolService {
 		jsonProvider.setData(StatusMonitorCache.getCrawlDataModelListCache());
 		return jsonProvider.toJSON();
 	}
+	
+	/**
+	 * 
+	 * 刷新单条抓取数据
+	 * */
+	@POST
+	@Path("/refreshCrawlData")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String refreshCrawlData(@DefaultValue("") @FormParam("domain") String domain){
+		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
+		SolrSerach search = new SolrSerach();
+	    long dataCount=search.getQueryResultCount(domain);	
+        jsonProvider.setSuccess(true);
+        jsonProvider.setData(Long.toString(dataCount));
+        return jsonProvider.toJSON();
+	}
 }
