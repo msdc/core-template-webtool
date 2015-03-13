@@ -941,11 +941,18 @@ public class CrawlToolService {
 	@Path("/refreshCrawlData")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String refreshCrawlData(@DefaultValue("") @FormParam("domain") String domain){
-		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
-		SolrSerach search = new SolrSerach();
+		ResponseJSONProvider<CrawlDataModel> jsonProvider = new ResponseJSONProvider<CrawlDataModel>();
+		SolrSerach search = new SolrSerach();		
 	    long dataCount=search.getQueryResultCount(domain);	
+	    Date currentDate = new Date();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String nowDateString = dateFormat.format(currentDate);
+		
+		CrawlDataModel crawlDataModel=new CrawlDataModel();
+		crawlDataModel.setCheckTime(nowDateString);
+		crawlDataModel.setIndexCounts(dataCount);
         jsonProvider.setSuccess(true);
-        jsonProvider.setData(Long.toString(dataCount));
+        jsonProvider.setData(crawlDataModel);
         return jsonProvider.toJSON();
 	}
 }

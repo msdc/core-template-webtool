@@ -12,14 +12,14 @@ var paginationItemCounts = 10;
  * @summary 种子有效性View-Model
  * */
 var seedEffectiveVM = function (mainViewModel, urlData) {
-    var that=this;
+    var that = this;
     var urlInitData = updateSeedsEffectiveData(urlData);
     that.urls = ko.observableArray(urlInitData);
     //分页显示的url列表
     that.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
     //检查种子有效性
     that.checkSeedsEffective = function () {
-        fillPageList('seedsEffectiveStatusList','/webapi/crawlToolResource/getSeedsEffectiveStatusList',mainViewModel,initSeedsEffectiveList);
+        fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolResource/getSeedsEffectiveStatusList', mainViewModel, initSeedsEffectiveList);
     };
 };
 
@@ -28,13 +28,13 @@ var seedEffectiveVM = function (mainViewModel, urlData) {
  * @summary 爬取状态View-model
  * */
 var crawlStatusVM = function (mainViewModel, urlData) {
-    var that=this;
+    var that = this;
     that.urls = ko.observableArray(urlData);
     //分页显示的url列表
     that.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
     //刷新爬取状态
-    that.refreshCrawStatus=function(){
-        fillPageList('crawlStatusModelList','/webapi/crawlToolResource/getCrawlStatusList',mainViewModel,initCrawlStatusList);
+    that.refreshCrawStatus = function () {
+        fillPageList('crawlStatusModelList', '/webapi/crawlToolResource/getCrawlStatusList', mainViewModel, initCrawlStatusList);
     };
 };
 
@@ -43,17 +43,18 @@ var crawlStatusVM = function (mainViewModel, urlData) {
  * @summary 爬取数据View-model
  * */
 var crawlDataVM = function (mainViewModel, urlData) {
-    var that=this;
+    var that = this;
     that.urls = ko.observableArray(urlData);
     //分页显示的url列表
     that.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
     //刷新抓取数据
-    that.refreshCrawlData=function(){
-        fillPageList('crawlDataModelList','/webapi/crawlToolResource/getCrawlDataList',mainViewModel,initCrawlDataList);
+    that.refreshCrawlData = function () {
+        fillPageList('crawlDataModelList', '/webapi/crawlToolResource/getCrawlDataList', mainViewModel, initCrawlDataList);
     };
     //刷新数据
-    that.refreshSingleData=function(){
-        var that=this;
+    that.refreshSingleData = function () {
+        var that = this;
+        sendPostRequest('/webapi/crawlToolResource/refreshCrawlData', that, refreshSingleDataHandler, refreshSingleDataErrorHandler);
     };
 };
 
@@ -71,20 +72,66 @@ var masterVM = function (urlData) {
 
 /**
  *
+ * 刷新数据成功 回调函数
+ * @param {Object} data
+ * @param {Object} dataModel
+ * */
+function refreshSingleDataHandler(data, dataModel) {
+    var json = JSON.parse(data);
+    if (json.success) {
+        var crawlDataModel=json.data;
+        dataModel.indexCountsString(crawlDataModel.indexCounts);
+        dataModel.checkTimeString(crawlDataModel.checkTime);
+    }
+}
+
+/**
+ *
+ * 刷新数据失败 回调函数
+ * */
+function refreshSingleDataErrorHandler(error) {
+}
+
+/**
+ *
+ * 发送post请求
+ * @param {String} url
+ * @param {Object} dataModel
+ * @param {Function} successHandler
+ * @param {Function} errorHandler
+ * */
+function sendPostRequest(url, dataModel, successHandler, errorHandler) {
+    $.ajax({
+        url: virtualWebPath + url,
+        type: 'POST',
+        data: {
+            domain: dataModel.url
+        },
+        success: function (data) {
+            successHandler(data, dataModel);
+        },
+        error: function (error) {
+            errorHandler(error, dataModel);
+        }
+    });
+}
+
+/**
+ *
  * ajax get请求填充页面列表数据
  * @param {String} listType 需要填充的页面列表类型
  * @param {String} url 接口调用url
  * @param {Object} mainViewModel 页面View-Model
  * @param {Function} callback 回调函数
  * */
-function fillPageList(listType,url,mainViewModel,callback){
+function fillPageList(listType, url, mainViewModel, callback) {
     $.ajax2({
         url: virtualWebPath + url,
         type: 'GET',
         success: function (data) {
             var json = JSON.parse(data);
             if (json.success) {
-                switch (listType){
+                switch (listType) {
                     case 'seedsEffectiveStatusList'://种子有效性列表
                     {
                         if (json.data.seedsEffectiveStatusList != null) {
@@ -149,11 +196,11 @@ $(function () {
     ko.applyBindings(mainViewModel);
 
     //初始化种子有效性列表测试数据
-    fillPageList('seedsEffectiveStatusList','/webapi/crawlToolResource/getSeedsEffectiveStatusCache',mainViewModel,initSeedsEffectiveList);
+    fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolResource/getSeedsEffectiveStatusCache', mainViewModel, initSeedsEffectiveList);
     //初始化爬取状态列表
-    fillPageList('crawlStatusModelList','/webapi/crawlToolResource/getCrawlStatusCache',mainViewModel,initCrawlStatusList);
+    fillPageList('crawlStatusModelList', '/webapi/crawlToolResource/getCrawlStatusCache', mainViewModel, initCrawlStatusList);
     //初始化爬取数据列表
-    fillPageList('crawlDataModelList','/webapi/crawlToolResource/getCrawlDataCache',mainViewModel,initCrawlDataList);
+    fillPageList('crawlDataModelList', '/webapi/crawlToolResource/getCrawlDataCache', mainViewModel, initCrawlDataList);
 
     //注册Tab显示事件
     registerTabShownEvent(mainViewModel);
@@ -212,12 +259,36 @@ function initCrawlStatusList(mainViewModel, initData) {
 
 /**
  *
+ * 构造新的数据ko数据
+ * */
+function updateInitCrawlData(initData) {
+    var crawlDataList = [];
+    if (initData) {
+        for (var i = 0; i < initData.length; i++) {
+            var model = initData[i];
+            if (model == null) {
+                continue;
+            }
+            //添加ko绑定 索引条数
+            model.indexCountsString = ko.observable(model.indexCounts);
+            //添加ko 绑定 检查时间
+            model.checkTimeString=ko.observable(model.checkTime);
+            crawlDataList.push(model);
+        }
+    }
+
+    return crawlDataList;
+}
+
+/**
+ *
  * @summary 爬取数据列表
  * @param {Object} mainViewModel 整个页面的View-Model对象
  * @param {Object|Array} initData 初始化数据
  * */
 function initCrawlDataList(mainViewModel, initData) {
-    mainViewModel.crawlDataVM.urls(initData);
+    var updatedData = updateInitCrawlData(initData);
+    mainViewModel.crawlDataVM.urls(updatedData);
     mainViewModel.crawlDataVM.paginationUrls(mainViewModel.crawlDataVM.urls().slice(0, paginationItemCounts));
     //加载爬取状态页面分页控件
     loadPaginationComponent('#crawl_data_pagination', mainViewModel.crawlDataVM);
