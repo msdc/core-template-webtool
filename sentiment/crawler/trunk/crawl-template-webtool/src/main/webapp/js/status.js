@@ -12,14 +12,15 @@ var paginationItemCounts = 10;
  * @summary 种子有效性View-Model
  * */
 var seedEffectiveVM = function (mainViewModel, urlData) {
+    var that=this;
     var urlInitData = updateSeedsEffectiveData(urlData);
-    this.urls = ko.observableArray(urlInitData);
+    that.urls = ko.observableArray(urlInitData);
     //分页显示的url列表
-    this.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
+    that.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
     //检查种子有效性
-    this.checkSeedsEffective = function () {
+    that.checkSeedsEffective = function () {
         fillPageList('seedsEffectiveStatusList','/webapi/crawlToolResource/getSeedsEffectiveStatusList',mainViewModel,initSeedsEffectiveList);
-    }.bind(this);
+    };
 };
 
 /**
@@ -27,13 +28,14 @@ var seedEffectiveVM = function (mainViewModel, urlData) {
  * @summary 爬取状态View-model
  * */
 var crawlStatusVM = function (mainViewModel, urlData) {
-    this.urls = ko.observableArray(urlData);
+    var that=this;
+    that.urls = ko.observableArray(urlData);
     //分页显示的url列表
-    this.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
+    that.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
     //刷新爬取状态
-    this.refreshCrawStatus=function(){
+    that.refreshCrawStatus=function(){
         fillPageList('crawlStatusModelList','/webapi/crawlToolResource/getCrawlStatusList',mainViewModel,initCrawlStatusList);
-    }.bind(this);
+    };
 };
 
 /**
@@ -41,13 +43,18 @@ var crawlStatusVM = function (mainViewModel, urlData) {
  * @summary 爬取数据View-model
  * */
 var crawlDataVM = function (mainViewModel, urlData) {
-    this.urls = ko.observableArray(urlData);
+    var that=this;
+    that.urls = ko.observableArray(urlData);
     //分页显示的url列表
-    this.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
+    that.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
     //刷新抓取数据
-    this.refreshCrawlData=function(){
+    that.refreshCrawlData=function(){
         fillPageList('crawlDataModelList','/webapi/crawlToolResource/getCrawlDataList',mainViewModel,initCrawlDataList);
-    }.bind(this);
+    };
+    //刷新数据
+    that.refreshSingleData=function(){
+        var that=this;
+    };
 };
 
 /**
@@ -56,9 +63,9 @@ var crawlDataVM = function (mainViewModel, urlData) {
  * */
 var masterVM = function (urlData) {
     var that = this;
-    this.seedEffectiveVM = new seedEffectiveVM(that, urlData);
-    this.crawlStatusVM = new crawlStatusVM(that, urlData);
-    this.crawlDataVM = new crawlDataVM(that, urlData);
+    that.seedEffectiveVM = new seedEffectiveVM(that, urlData);
+    that.crawlStatusVM = new crawlStatusVM(that, urlData);
+    that.crawlDataVM = new crawlDataVM(that, urlData);
 };
 /*************************View-Model Definition End**********************************/
 
