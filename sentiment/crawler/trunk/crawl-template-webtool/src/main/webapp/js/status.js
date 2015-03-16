@@ -21,6 +21,11 @@ var seedEffectiveVM = function (mainViewModel, urlData) {
     that.checkSeedsEffective = function () {
         fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolResource/getSeedsEffectiveStatusList', mainViewModel, initSeedsEffectiveList);
     };
+    //检查单个种子有效性
+    that.checkSingleSeedEffective = function () {
+        var self = this;
+        sendPostRequest('/webapi/crawlToolResource/refreshSeedEffectiveStatus', self, {templateId: self.templateId}, refreshSingleSeedHandler, refreshSingleSeedErrorHandler);
+    };
 };
 
 /**
@@ -53,8 +58,8 @@ var crawlDataVM = function (mainViewModel, urlData) {
     };
     //刷新数据
     that.refreshSingleData = function () {
-        var that = this;
-        sendPostRequest('/webapi/crawlToolResource/refreshCrawlData', that, refreshSingleDataHandler, refreshSingleDataErrorHandler);
+        var self = this;
+        sendPostRequest('/webapi/crawlToolResource/refreshCrawlData', self, {domain: self.url}, refreshSingleDataHandler, refreshSingleDataErrorHandler);
     };
 };
 
@@ -72,14 +77,37 @@ var masterVM = function (urlData) {
 
 /**
  *
- * 刷新数据成功 回调函数
+ * 刷新种子有效性 回调函数
+ * @param {Object} data
+ * @param {Object} dataModel
+ * */
+function refreshSingleSeedHandler(data, dataModel) {
+    var json = JSON.parse(data);
+    if (json.success) {
+        var seedsEffective = json.data;
+        dataModel.effectiveStatusString(seedsEffective.effectiveStatus);
+        dataModel.checkTimeString(seedsEffective.checkTime);
+    }
+}
+
+
+/**
+ *
+ * 刷新数据失败 回调函数
+ * */
+function refreshSingleSeedErrorHandler(error) {
+}
+
+/**
+ *
+ * 刷新爬取状态数据成功 回调函数
  * @param {Object} data
  * @param {Object} dataModel
  * */
 function refreshSingleDataHandler(data, dataModel) {
     var json = JSON.parse(data);
     if (json.success) {
-        var crawlDataModel=json.data;
+        var crawlDataModel = json.data;
         dataModel.indexCountsString(crawlDataModel.indexCounts);
         dataModel.checkTimeString(crawlDataModel.checkTime);
     }
@@ -97,16 +125,15 @@ function refreshSingleDataErrorHandler(error) {
  * 发送post请求
  * @param {String} url
  * @param {Object} dataModel
+ * @param {Object} data
  * @param {Function} successHandler
  * @param {Function} errorHandler
  * */
-function sendPostRequest(url, dataModel, successHandler, errorHandler) {
+function sendPostRequest(url, dataModel, data, successHandler, errorHandler) {
     $.ajax({
         url: virtualWebPath + url,
         type: 'POST',
-        data: {
-            domain: dataModel.url
-        },
+        data: data,
         success: function (data) {
             successHandler(data, dataModel);
         },
@@ -185,6 +212,10 @@ function updateSeedsEffectiveData(urlData) {
             }
             model.updateUrl = "../template-main.html?templateGuid=" + model.templateId;
             model.targetWindow = "_blank";
+            //添加ko绑定 种子有效性
+            model.effectiveStatusString = ko.observable(model.effectiveStatus);
+            //添加ko 绑定 检查时间
+            model.checkTimeString = ko.observable(model.checkTime);
             seedsUrlInitData.push(model);
         }
     }
@@ -272,7 +303,7 @@ function updateInitCrawlData(initData) {
             //添加ko绑定 索引条数
             model.indexCountsString = ko.observable(model.indexCounts);
             //添加ko 绑定 检查时间
-            model.checkTimeString=ko.observable(model.checkTime);
+            model.checkTimeString = ko.observable(model.checkTime);
             crawlDataList.push(model);
         }
     }
