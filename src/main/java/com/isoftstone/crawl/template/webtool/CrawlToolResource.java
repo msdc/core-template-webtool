@@ -285,6 +285,9 @@ public class CrawlToolResource {
 			String desCopyRootFolder = Config.getValue(WebtoolConstants.KEY_DES_FOLDER);
 			command = "scp -r " + folderRoot + File.separator + folderName + " " + desCopyRootFolder;
 		} else {
+		    runmanager.setHostIp("192.168.100.26");
+	        runmanager.setUsername("root");
+	        runmanager.setPassword("123456");
 		    String desHdfsFolderName = Config.getValue("desHdfsFolderName");
 			command = "hadoop fs -put " + folderRoot + File.separator + folderName + " " + desHdfsFolderName;
 		}
