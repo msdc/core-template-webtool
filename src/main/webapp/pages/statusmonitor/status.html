@@ -109,8 +109,7 @@
                                             <thead>
                                             <tr>
                                                 <td>序号</td>
-                                                <td>名称</td>
-                                                <td>数据源地址</td>
+                                                <td>域名</td>
                                                 <td>爬取状态</td>
                                                 <td>上次检查时间</td>
                                                 <td>操作</td>
@@ -119,7 +118,6 @@
                                             <tbody data-bind="foreach: paginationUrls">
                                             <tr>
                                                 <td data-bind="text: ($index()+1)"></td>
-                                                <td data-bind="text: name"></td>
                                                 <td data-bind="text: url" style="width: 400px;word-break: break-all"></td>
                                                 <td data-bind="text: crawlStatusString"></td>
                                                 <td data-bind="text: checkTimeString"></td>
@@ -133,7 +131,7 @@
                                             </tbody>
                                             <tfoot>
                                             <tr>
-                                                <td colspan="6">
+                                                <td colspan="5">
                                                     <div id="crawl_status_pagination"></div>
                                                 </td>
                                             </tr>
@@ -163,8 +161,7 @@
                                             <thead>
                                             <tr>
                                                 <td>序号</td>
-                                                <td>名称</td>
-                                                <td>数据源地址</td>
+                                                <td>域名</td>
                                                 <td>已索引条数</td>
                                                 <td>今日索引条数</td>
                                                 <td>上次检查时间</td>
@@ -174,7 +171,6 @@
                                             <tbody data-bind="foreach: paginationUrls">
                                             <tr>
                                                 <td data-bind="text: ($index()+1)"></td>
-                                                <td data-bind="text: name"></td>
                                                 <td data-bind="text: url" style="width: 400px;word-break: break-all"></td>
                                                 <td data-bind="text: indexCountsString"></td>
                                                 <td data-bind="text: todayIndexCounts"></td>
@@ -186,7 +182,7 @@
                                             </tbody>
                                             <tfoot>
                                             <tr>
-                                                <td colspan="7">
+                                                <td colspan="6">
                                                     <div id="crawl_data_pagination"></div>
                                                 </td>
                                             </tr>
