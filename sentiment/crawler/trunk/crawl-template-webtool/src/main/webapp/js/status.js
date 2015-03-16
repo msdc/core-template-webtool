@@ -39,11 +39,8 @@ var crawlStatusVM = function (mainViewModel, urlData) {
     that.urls = ko.observableArray(urlData);
     //分页显示的url列表
     that.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
-    //刷新爬取状态
+    //刷新所有的爬取状态
     that.refreshCrawStatus = function () {
-        var self = this;
-        self.crawlStatusString('执行中..');
-        self.checkTimeString('执行中..');
         fillPageList('crawlStatusModelList', '/webapi/crawlToolResource/getCrawlStatusList', mainViewModel, initCrawlStatusList);
     };
 };
@@ -57,11 +54,11 @@ var crawlDataVM = function (mainViewModel, urlData) {
     that.urls = ko.observableArray(urlData);
     //分页显示的url列表
     that.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
-    //刷新抓取数据
+    //刷新所有的抓取数据
     that.refreshCrawlData = function () {
         fillPageList('crawlDataModelList', '/webapi/crawlToolResource/getCrawlDataList', mainViewModel, initCrawlDataList);
     };
-    //刷新数据
+    //刷新单条抓取数据
     that.refreshSingleData = function () {
         var self = this;
         self.indexCountsString('执行中..');
