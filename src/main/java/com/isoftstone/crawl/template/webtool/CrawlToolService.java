@@ -794,12 +794,21 @@ public class CrawlToolService {
 					seedsEffectiveStatusModel.setCheckTime(nowDateString);
 					TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateModel.getTemplateId());
 					PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
-					ResponseJSONProvider<ParseResult> middleJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyNewContent(serviceHelper.getPageModeJSONString(pageModel)));
-					if (middleJsonProvider.getSuccess() == false) {
+					// 检查列表页
+					ResponseJSONProvider<ParseResult> listJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyListContent(serviceHelper.getPageModeJSONString(pageModel)));
+					if (listJsonProvider.getSuccess() == false) {
 						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
-					} else {
-						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_VALID_STATUS);
+						SeedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
+						continue;
 					}
+					// 检查内容页
+					ResponseJSONProvider<ParseResult> newsContentJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyNewContent(serviceHelper.getPageModeJSONString(pageModel)));
+					if (newsContentJsonProvider.getSuccess() == false) {
+						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
+						SeedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
+						continue;
+					}
+					seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_VALID_STATUS);
 					SeedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
 				}
 			}
@@ -834,6 +843,48 @@ public class CrawlToolService {
 			jsonProvider.setTotal(seedsEffectiveStatusList.size());
 		}
 
+		return jsonProvider.toJSON();
+	}
+	
+	/**
+	 * 
+	 * 刷新单条抓取数据
+	 * */
+	@POST
+	@Path("/refreshSeedEffectiveStatus")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String refreshSeedEffectiveStatus(@DefaultValue("") @FormParam("templateId") String templateId) {
+		ResponseJSONProvider<SeedsEffectiveStatusModel> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusModel>();
+		jsonProvider.setSuccess(true);
+		CrawlToolResource serviceHelper = new CrawlToolResource();
+		// 先取之前的模板列表JSON字符串
+		String singleTemplateListModel = RedisOperator.getFromDefaultDB(templateId + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
+		TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(singleTemplateListModel);
+		TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateId);
+		PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
+		
+		Date currentDate = new Date();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String nowDateString = dateFormat.format(currentDate);
+
+		SeedsEffectiveStatusModel seedsEffectiveStatusModel = new SeedsEffectiveStatusModel();
+		seedsEffectiveStatusModel.setCheckTime(nowDateString);
+		// 检查列表页
+		ResponseJSONProvider<ParseResult> listJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyListContent(serviceHelper.getPageModeJSONString(pageModel)));
+		if (listJsonProvider.getSuccess() == false) {
+			seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);			
+			jsonProvider.setData(seedsEffectiveStatusModel);
+			return jsonProvider.toJSON();
+		}
+		// 检查内容页
+		ResponseJSONProvider<ParseResult> newsContentJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyNewContent(serviceHelper.getPageModeJSONString(pageModel)));			
+		if (newsContentJsonProvider.getSuccess() == false) {
+			seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
+			jsonProvider.setData(seedsEffectiveStatusModel);
+			return jsonProvider.toJSON();
+		}
+		seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_VALID_STATUS);
+		jsonProvider.setData(seedsEffectiveStatusModel);
 		return jsonProvider.toJSON();
 	}
 
