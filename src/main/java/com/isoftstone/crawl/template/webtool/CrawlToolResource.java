@@ -544,7 +544,7 @@ public class CrawlToolResource {
 
 		if (parseResult == null) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("请先保存常规模板！");
+			jsonProvider.setErrorMsg("解析列表页或内容页出错，请先检查相关配置，再重新保存常规模板，然后重试此操作！");
 			return jsonProvider;
 		}
 		String pageSort = pageModel.getTemplateIncreaseViewModel().getPageSort();
