@@ -68,6 +68,7 @@ import com.isoftstone.crawl.template.model.ResponseJSONProvider;
 import com.isoftstone.crawl.template.model.ScheduleDispatchViewModel;
 import com.isoftstone.crawl.template.model.SearchKeyWordDataModel;
 import com.isoftstone.crawl.template.model.SearchKeyWordModel;
+import com.isoftstone.crawl.template.model.SeedsEffectiveStatusModel;
 import com.isoftstone.crawl.template.model.TemplateIncreaseViewModel;
 import com.isoftstone.crawl.template.model.TemplateModel;
 import com.isoftstone.crawl.template.model.TemplateTagModel;
@@ -79,6 +80,7 @@ import com.isoftstone.crawl.template.utils.MD5Utils;
 import com.isoftstone.crawl.template.utils.RedisOperator;
 import com.isoftstone.crawl.template.utils.RedisUtils;
 import com.isoftstone.crawl.template.utils.ShellUtils;
+import com.isoftstone.crawl.template.utils.StatusMonitorCache;
 import com.isoftstone.crawl.template.vo.DispatchVo;
 import com.isoftstone.crawl.template.vo.Runmanager;
 import com.isoftstone.crawl.template.vo.Seed;
@@ -1233,20 +1235,23 @@ public class CrawlToolResource {
 
 		// 普通模板校验
 		if (pageModel.getBasicInfoViewModel().getTemplateType().equals(WebtoolConstants.NORMAL_TEMPLATE_NAME)) {
-//			if (pageModel.getNewsTitleViewModel().getSelector().equals("")) {
-//				responseJSONProvider.setErrorMsg("内容页中的标题选择器不能为空！");
-//				return responseJSONProvider;
-//			}
-//
-//			if (pageModel.getNewsPublishTimeViewModel().getSelector().equals("")) {
-//				responseJSONProvider.setErrorMsg("内容页中的发布时间选择器不能为空！");
-//				return responseJSONProvider;
-//			}
-//
-//			if (pageModel.getNewsSourceViewModel().getSelector().equals("")) {
-//				responseJSONProvider.setErrorMsg("内容页中的来源选择器不能为空！");
-//				return responseJSONProvider;
-//			}
+			// if (pageModel.getNewsTitleViewModel().getSelector().equals("")) {
+			// responseJSONProvider.setErrorMsg("内容页中的标题选择器不能为空！");
+			// return responseJSONProvider;
+			// }
+			//
+			// if
+			// (pageModel.getNewsPublishTimeViewModel().getSelector().equals(""))
+			// {
+			// responseJSONProvider.setErrorMsg("内容页中的发布时间选择器不能为空！");
+			// return responseJSONProvider;
+			// }
+			//
+			// if (pageModel.getNewsSourceViewModel().getSelector().equals(""))
+			// {
+			// responseJSONProvider.setErrorMsg("内容页中的来源选择器不能为空！");
+			// return responseJSONProvider;
+			// }
 		} else {// 搜索引擎模板
 			if (pageModel.getBasicInfoViewModel().getCurrentString().equals("")) {
 				responseJSONProvider.setErrorMsg("基本信息中的模板URL查询关键字不能为空！");
@@ -1616,6 +1621,23 @@ public class CrawlToolResource {
 		}
 	}
 
+	/**
+	 * 
+	 * 更新种子有效性状态
+	 * */
+	public void updateSeedsEffectiveStatusCache(String templateId, String nowDateString, String seedsEffectiveStatus) {
+		// 同时更新缓存中想对应的数据
+		List<SeedsEffectiveStatusModel> seedsEffectiveStatusList = StatusMonitorCache.getSeedsEffectiveStatusListCache().getSeedsEffectiveStatusList();
+
+		for (SeedsEffectiveStatusModel model : seedsEffectiveStatusList) {
+			if (model.getTemplateId().equals(templateId)) {
+				model.setCheckTime(nowDateString);
+				model.setEffectiveStatus(seedsEffectiveStatus);
+				break;
+			}
+		}
+	}
+
 	// I used 1000 bytes at first, but found that some documents have
 	// meta tag well past the first 1000 bytes.
 	// (e.g. http://cn.promo.yahoo.com/customcare/music.html)
@@ -1731,7 +1753,7 @@ public class CrawlToolResource {
 		int s = random.nextInt(max) % (max - min + 1) + min;
 		return s;
 	}
-	
+
 	/**
 	 * 
 	 * 获取domain
@@ -1746,7 +1768,7 @@ public class CrawlToolResource {
 		}
 		return null;
 	}
-	
+
 	/***
 	 * 
 	 * 产生Domain列表

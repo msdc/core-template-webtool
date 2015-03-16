@@ -845,7 +845,7 @@ public class CrawlToolService {
 
 		return jsonProvider.toJSON();
 	}
-	
+
 	/**
 	 * 
 	 * 刷新单条抓取数据
@@ -862,7 +862,7 @@ public class CrawlToolService {
 		TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(singleTemplateListModel);
 		TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateId);
 		PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
-		
+
 		Date currentDate = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String nowDateString = dateFormat.format(currentDate);
@@ -872,18 +872,23 @@ public class CrawlToolService {
 		// 检查列表页
 		ResponseJSONProvider<ParseResult> listJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyListContent(serviceHelper.getPageModeJSONString(pageModel)));
 		if (listJsonProvider.getSuccess() == false) {
-			seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);			
+			seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
 			jsonProvider.setData(seedsEffectiveStatusModel);
+			serviceHelper.updateSeedsEffectiveStatusCache(templateId, nowDateString, WebtoolConstants.TEMPLATE_INVALID_STATUS);
 			return jsonProvider.toJSON();
 		}
 		// 检查内容页
-		ResponseJSONProvider<ParseResult> newsContentJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyNewContent(serviceHelper.getPageModeJSONString(pageModel)));			
+		ResponseJSONProvider<ParseResult> newsContentJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyNewContent(serviceHelper.getPageModeJSONString(pageModel)));
 		if (newsContentJsonProvider.getSuccess() == false) {
 			seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
 			jsonProvider.setData(seedsEffectiveStatusModel);
+			serviceHelper.updateSeedsEffectiveStatusCache(templateId, nowDateString, WebtoolConstants.TEMPLATE_INVALID_STATUS);
 			return jsonProvider.toJSON();
 		}
+
 		seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_VALID_STATUS);
+		// 同时更新缓存中想对应的数据
+		serviceHelper.updateSeedsEffectiveStatusCache(templateId, nowDateString, WebtoolConstants.TEMPLATE_VALID_STATUS);
 		jsonProvider.setData(seedsEffectiveStatusModel);
 		return jsonProvider.toJSON();
 	}

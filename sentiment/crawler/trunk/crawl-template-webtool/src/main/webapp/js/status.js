@@ -24,6 +24,8 @@ var seedEffectiveVM = function (mainViewModel, urlData) {
     //检查单个种子有效性
     that.checkSingleSeedEffective = function () {
         var self = this;
+        self.effectiveStatusString('执行中..');
+        self.checkTimeString('执行中..');
         sendPostRequest('/webapi/crawlToolResource/refreshSeedEffectiveStatus', self, {templateId: self.templateId}, refreshSingleSeedHandler, refreshSingleSeedErrorHandler);
     };
 };
@@ -39,6 +41,9 @@ var crawlStatusVM = function (mainViewModel, urlData) {
     that.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
     //刷新爬取状态
     that.refreshCrawStatus = function () {
+        var self = this;
+        self.crawlStatusString('执行中..');
+        self.checkTimeString('执行中..');
         fillPageList('crawlStatusModelList', '/webapi/crawlToolResource/getCrawlStatusList', mainViewModel, initCrawlStatusList);
     };
 };
@@ -59,6 +64,8 @@ var crawlDataVM = function (mainViewModel, urlData) {
     //刷新数据
     that.refreshSingleData = function () {
         var self = this;
+        self.indexCountsString('执行中..');
+        self.checkTimeString('执行中..');
         sendPostRequest('/webapi/crawlToolResource/refreshCrawlData', self, {domain: self.url}, refreshSingleDataHandler, refreshSingleDataErrorHandler);
     };
 };
@@ -277,12 +284,36 @@ function initSeedsEffectiveList(mainViewModel, initData) {
 
 /**
  *
+ * 构造新的数据ko数据
+ * */
+function updateInitCrawlStatus(initData) {
+    var crawlStatusList = [];
+    if (initData) {
+        for (var i = 0; i < initData.length; i++) {
+            var model = initData[i];
+            if (model == null) {
+                continue;
+            }
+            //添加ko绑定 爬取状态
+            model.crawlStatusString = ko.observable(model.crawlStatus);
+            //添加ko 绑定 检查时间
+            model.checkTimeString = ko.observable(model.checkTime);
+            crawlStatusList.push(model);
+        }
+    }
+
+    return crawlStatusList;
+}
+
+/**
+ *
  * @summary 爬取状态列表
  * @param {Object} mainViewModel 整个页面的View-Model对象
  * @param {Object|Array} initData 初始化数据
  * */
 function initCrawlStatusList(mainViewModel, initData) {
-    mainViewModel.crawlStatusVM.urls(initData);
+    var updatedData = updateInitCrawlStatus(initData);
+    mainViewModel.crawlStatusVM.urls(updatedData);
     mainViewModel.crawlStatusVM.paginationUrls(mainViewModel.crawlStatusVM.urls().slice(0, paginationItemCounts));
     //加载爬取数据页面分页控件
     loadPaginationComponent('#crawl_status_pagination', mainViewModel.crawlStatusVM);
