@@ -206,7 +206,7 @@ public class CrawlToolService {
 		ParseResult parseResult = serviceHelper.saveParseResult(pageModel);
 		if (parseResult == null) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("调用TemplateFactory.process方法出错！无法解析出parseResult，请检查页面各项配置是否正确！确认选择器和过滤器表达式完全正确，重新保存模板后，重试！");
+			jsonProvider.setErrorMsg("无法完成页面解析，请检查选择器和过滤器正确性，确认后重新保存模板后，重试！");
 		} else {
 			jsonProvider.setSuccess(true);
 			jsonProvider.setData(parseResult);
