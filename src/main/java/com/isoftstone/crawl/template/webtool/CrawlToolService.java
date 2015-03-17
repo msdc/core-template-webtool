@@ -143,7 +143,7 @@ public class CrawlToolService {
 		ParseResult parseResult = serviceHelper.saveParseResult(pageModel);
 		if (parseResult == null) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("调用TemplateFactory.process方法出错！无法解析出parseResult，请检查页面各项配置是否正确！确认选择器和过滤器表达式完全正确，重新保存模板后，重试！");
+			jsonProvider.setErrorMsg("无法完成页面解析，请检查选择器和过滤器正确性，确认后重新保存模板后，重试！");
 			return jsonProvider.toJSON();
 		}
 		// 获取内容页链接
@@ -169,7 +169,16 @@ public class CrawlToolService {
 
 		int contentOutLinkIndex = serviceHelper.getRandomNumber(0, maxRandomNumber);
 		String contentOutLink = contentOutLinkArrayList.get(contentOutLinkIndex);
-		byte[] input = DownloadHtml.getHtml(contentOutLink);
+		byte[] input=null;
+		try{
+			input= DownloadHtml.getHtml(contentOutLink);
+		}catch(Exception e){
+			jsonProvider.setSuccess(false);
+			jsonProvider.setErrorMsg("访问内容页链接： ["+contentOutLink+"] 失败，网络访问异常！");
+			e.printStackTrace();
+			return jsonProvider.toJSON();
+		}
+		
 		String encoding = CrawlToolResource.sniffCharacterEncoding(input);
 		try {
 			parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, contentOutLink);
