@@ -116,7 +116,7 @@ public class CrawlToolResource {
 		List<Seed> seedList = dispatchVo.getSeed();
 		if (seedList == null) {
 			seedList = new ArrayList<Seed>();
-		} else {
+		} else if(beforeSeedList != null){
 			List<Seed> removeSeeds = new ArrayList<Seed>();
 			for (Iterator<String> it = beforeSeedList.iterator(); it.hasNext();) {
 				Seed seed = new Seed(it.next());
