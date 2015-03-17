@@ -7,6 +7,8 @@ var virtualWebPath = "/crawl-template-webtool";
 var paginationItemCounts = 10;
 
 $(function () {
+    //锁定页面元素
+    //pageLocker();
     $.ajax2({
         url: virtualWebPath + '/webapi/crawlToolResource/getTemplateList',
         type: 'GET',
@@ -460,3 +462,13 @@ $.ajax2 = function (options, aimDiv) {
     mask.show().css("opacity", "0.1");
     $.ajax(options);
 };
+
+/***
+ *
+ * 页面元素锁定
+ * */
+function pageLocker(){
+    $("button[type='button']").attr({disabled:"disabled"});
+    $("a[role='button']").attr({disabled:"disabled"});
+    $("body > nav").css("cssText","display:none!important");
+}
