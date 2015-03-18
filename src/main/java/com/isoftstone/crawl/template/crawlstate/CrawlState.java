@@ -84,7 +84,8 @@ public class CrawlState {
         String crawlDir = "/nutch_data/";
         String solrURL = "http://192.168.100.31:8080/solr/collection1/";
         String depth = "2";
-        String dispatchName = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
+        String dispatchName = folderName
+                + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
         DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName,
             WebtoolConstants.DISPATCH_REDIS_DBINDEX);
         boolean userProxy = dispatchVo.isUserProxy();
@@ -121,7 +122,8 @@ public class CrawlState {
         String crawlDir = "/nutch_data/";
         String solrURL = "http://192.168.100.31:8080/solr/collection1/";
         String depth = "3";
-        String dispatchName = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
+        String dispatchName = folderName
+                + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
         DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName,
             WebtoolConstants.DISPATCH_REDIS_DBINDEX);
         boolean userProxy = dispatchVo.isUserProxy();
@@ -151,11 +153,11 @@ public class CrawlState {
         String folderNameData = folderNameSeed.substring(0,
             folderNameSeed.lastIndexOf("_"));
         String data_folder = crawlDir + folderNameData + "_data";
-        if ("local".equals(model)) {
-            nutch_root = "/nutch/local_incremental/bin/crawl";
-        } else if ("deploy".equals(model)) {
-            nutch_root = "/nutch/deploy_normal/bin/crawl";
-        }
+        //        if ("local".equals(model)) {
+        //            nutch_root = "/nutch/local_incremental/bin/crawl";
+        //        } else if ("deploy".equals(model)) {
+        nutch_root = "/nutch/deploy_normal/bin/crawl";
+        //        }
         ReParseAndIndex.reParseAndIndex(nutch_root, data_folder, solr_index,
             false);
         return "success";
