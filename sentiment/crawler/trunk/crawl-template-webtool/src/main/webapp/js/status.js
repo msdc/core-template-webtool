@@ -43,7 +43,67 @@ var crawlStatusVM = function (mainViewModel, urlData) {
     that.refreshCrawStatus = function () {
         fillPageList('crawlStatusModelList', '/webapi/crawlToolResource/getCrawlStatusList', mainViewModel, initCrawlStatusList);
     };
+    //停止爬虫
+    that.stopCrawl = function () {
+        var self = this;
+        self.crawlStatusString('执行中..');
+        self.checkTimeString('执行中..');
+        sendPostRequest('/webapi/crawlToolResource/stopCrawl', self, {folderName: self.url}, function (data, dataModel) {
+            var json = JSON.parse(data);
+            if (json.success) {
+                var crawlStatusModel = json.data;
+                dataModel.crawlStatusString(crawlStatusModel.crawlStatus);
+                dataModel.checkTimeString(crawlStatusModel.checkTime);
+            }
+        }, function (error) {
+        });
+    };
+    //重新索引
+    that.reParse = function () {
+        var self = this;
+        sendAjax2PostRequest('/webapi/crawlToolResource/reParse', self, {folderName: self.url}, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
+    };
+    //爬虫增量.
+    that.crawlIncrement = function () {
+        var self = this;
+        sendAjax2PostRequest('/webapi/crawlToolResource/crawlIncrement', self, {folderName: self.url}, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
+    };
+    // 爬虫全量.
+    that.crawlFull = function () {
+        var self = this;
+        sendAjax2PostRequest('/webapi/crawlToolResource/crawlFull', self, {folderName: self.url}, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
+    };
 };
+
+/**
+ *
+ * 爬取状态api调用成功回调函数
+ * @param {Object} data
+ * @param {Object} dataModel
+ * */
+function crawlStatusSuccessHandler(data, dataModel) {
+    $('#modal_showOptionMessageTitle').text('操作结果');
+    var modalBody = $('#modal_body_showOptionMessage');
+    modalBody.text('');//清空
+    if (data.responseText) {
+        modalBody.text("错误信息:" + data.responseText);
+    } else {
+        var result = JSON.parse(data);
+        if (result.success) {
+            modalBody.text(result.data);
+        } else {
+            modalBody.text(result.errorMsg);
+        }
+    }
+    $('#modal-modal_showOptionMessage').modal('show');
+}
+
+/**
+ *
+ * 爬取状态api调用失败回调函数
+ * */
+function crawlStatusErrorHandler(error) {
+}
 
 /**
  *
@@ -54,7 +114,7 @@ var crawlDataVM = function (mainViewModel, urlData) {
     that.urls = ko.observableArray(urlData);
     //分页显示的url列表
     that.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
-    //刷新所有的抓取数据
+    //按照域统计
     that.refreshCrawlData = function () {
         fillPageList('crawlDataModelList', '/webapi/crawlToolResource/getCrawlDataList', mainViewModel, initCrawlDataList);
     };
@@ -145,6 +205,30 @@ function sendPostRequest(url, dataModel, data, successHandler, errorHandler) {
             errorHandler(error, dataModel);
         }
     });
+}
+
+/**
+ *
+ * 发送post请求
+ * @param {String} url
+ * @param {Object} dataModel
+ * @param {Object} data
+ * @param {String} targetElement
+ * @param {Function} successHandler
+ * @param {Function} errorHandler
+ * */
+function sendAjax2PostRequest(url, dataModel, data, targetElement, successHandler, errorHandler) {
+    $.ajax2({
+        url: virtualWebPath + url,
+        type: 'POST',
+        data: data,
+        success: function (data) {
+            successHandler(data, dataModel);
+        },
+        error: function (error) {
+            errorHandler(error, dataModel);
+        }
+    }, targetElement);
 }
 
 /**
