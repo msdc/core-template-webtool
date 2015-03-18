@@ -40,6 +40,11 @@ public class WebtoolConstants {
     public static final String KEY_HOST_USERNAME = "hostUserName";
     public static final String KEY_HOST_PASSWORD = "hostPassword";
     public static final String KEY_DES_FOLDER = "desFolderName";
+    public static final String KEY_NUTCH_HOST_IP = "nutchHostip";
+    public static final String KEY_NUTCH_HOST_USERNAME = "nutchHostUserName";
+    public static final String KEY_NUTCH_HOST_PASSWORD = "nutchHostPassword";
+
+    
     
     public static final String BAIDU_SEARCH_NAME="百度新闻搜索";
     public static final String BING_SEARCH_NAME="Bing新闻搜索";

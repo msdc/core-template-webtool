@@ -5,6 +5,7 @@
  */
 package com.isoftstone.crawl.template.crawlstate;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,9 +19,12 @@ import redis.clients.jedis.JedisPool;
 
 import com.isoftstone.crawl.template.consts.WebtoolConstants;
 import com.isoftstone.crawl.template.model.CrawlStateBean;
+import com.isoftstone.crawl.template.utils.Config;
 import com.isoftstone.crawl.template.utils.RedisOperator;
 import com.isoftstone.crawl.template.utils.RedisUtils;
+import com.isoftstone.crawl.template.utils.ShellUtils;
 import com.isoftstone.crawl.template.vo.DispatchVo;
+import com.isoftstone.crawl.template.vo.Runmanager;
 
 /**
  * CrawlStateUtil
@@ -62,16 +66,110 @@ public class CrawlState {
         return crawlStateList;
     }
 
+    /**
+     * 爬虫增量.
+     * @param dispatchName
+     */
     public void crawlIncrement(String dispatchName) {
-
+        String rootFolder = "/nutch_seeds";
+        String shDir = "/nutch/local_incremental/bin/crawl";
+        String proxyShDir = "/nutch/local_incremental_proxy/bin/crawl";
+        String crawlDir = "/nutch_data/";
+        String solrURL = "http://192.168.100.31:8080/solr/collection1/";
+        String depth = "2";
+        DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName,
+            WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+        boolean userProxy = dispatchVo.isUserProxy();
+        if (userProxy) {
+            shDir = proxyShDir;
+        }
+        String folderNameSeed = dispatchName.substring(0,
+            dispatchName.lastIndexOf("_"));
+        String folderNameData = folderNameSeed.substring(0,
+            folderNameSeed.lastIndexOf("_"));
+        String[] folderNameStrs = folderNameSeed.split("_");
+        folderNameSeed = folderNameStrs[0] + "_" + folderNameStrs[1] + "_"
+                + WebtoolConstants.INCREMENT_FILENAME_SIGN + "_"
+                + folderNameStrs[2];
+        folderNameData = folderNameData.substring(0,
+            folderNameData.lastIndexOf("_"))
+                + "_" + WebtoolConstants.INCREMENT_FILENAME_SIGN;
+        String seedFolder = rootFolder + File.separator + folderNameSeed;
+        String command = shDir + " " + seedFolder + " " + crawlDir
+                + folderNameData + "_data" + " " + solrURL + " " + depth;
+        Runmanager runmanager = getRunmanager(command);
+        ShellUtils.execCmd(runmanager);
     }
 
+    /**
+     * 爬虫全量.
+     * @param dispatchName
+     */
     public void crawlFull(String dispatchName) {
-
+        String rootFolder = "/nutch_seeds";
+        String shDir = "/nutch/deploy_normal/bin/crawl";
+        String proxyShDir = "/nutch/deploy_normal_proxy/bin/crawl";
+        String crawlDir = "/nutch_data/";
+        String solrURL = "http://192.168.100.31:8080/solr/collection1/";
+        String depth = "3";
+        DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName,
+            WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+        boolean userProxy = dispatchVo.isUserProxy();
+        if (userProxy) {
+            shDir = proxyShDir;
+        }
+        String folderNameSeed = dispatchName.substring(0,
+            dispatchName.lastIndexOf("_"));
+        String folderNameData = folderNameSeed.substring(0,
+            folderNameSeed.lastIndexOf("_"));
+        String seedFolder = rootFolder + File.separator + folderNameSeed;
+        String command = shDir + " " + seedFolder + " " + crawlDir
+                + folderNameData + "_data" + " " + solrURL + " " + depth;
+        Runmanager runmanager = getRunmanager(command);
+        ShellUtils.execCmd(runmanager);
     }
 
+    /**
+     * 重新索引.
+     * @param dispatchName
+     */
+    public void reParse(String dispatchName, String model) {
+        String nutch_root = "";
+        String solr_index = "http://192.168.100.31:8080/solr/collection1/";
+        String crawlDir = "/nutch_data/";
+        String folderNameSeed = dispatchName.substring(0,
+            dispatchName.lastIndexOf("_"));
+        String folderNameData = folderNameSeed.substring(0,
+            folderNameSeed.lastIndexOf("_"));
+        String data_folder = crawlDir + folderNameData + "_data";
+        if ("local".equals(model)) {
+            nutch_root = "/nutch/local_incremental/bin/crawl";
+        } else if ("deploy".equals(model)) {
+            nutch_root = "/nutch/deploy_normal/bin/crawl";
+        }
+        ReParseAndIndex.reParseAndIndex(nutch_root, data_folder, solr_index,
+            false);
+    }
+
+    /**
+     * 停止爬虫.
+     * @param dispatchName
+     */
     public void stopCrawl(String dispatchName) {
         
+    }
+
+    private Runmanager getRunmanager(String command) {
+        Runmanager runmanager = new Runmanager();
+        runmanager.setHostIp(Config
+                .getValue(WebtoolConstants.KEY_NUTCH_HOST_IP));
+        runmanager.setUsername(Config
+                .getValue(WebtoolConstants.KEY_NUTCH_HOST_USERNAME));
+        runmanager.setPassword(Config
+                .getValue(WebtoolConstants.KEY_NUTCH_HOST_PASSWORD));
+        runmanager.setPort(22);
+        runmanager.setCommand(command);
+        return runmanager;
     }
 
     /*
