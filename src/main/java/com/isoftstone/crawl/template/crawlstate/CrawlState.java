@@ -77,7 +77,7 @@ public class CrawlState {
      * 爬虫增量.
      * @param dispatchName
      */
-    public void crawlIncrement(String folderName) {
+    public String crawlIncrement(String folderName) {
         String rootFolder = "/nutch_seeds";
         String shDir = "/nutch/local_incremental/bin/crawl";
         String proxyShDir = "/nutch/local_incremental_proxy/bin/crawl";
@@ -107,13 +107,14 @@ public class CrawlState {
                 + folderNameData + "_data" + " " + solrURL + " " + depth;
         Runmanager runmanager = getRunmanager(command);
         ShellUtils.execCmd(runmanager);
+        return "success";
     }
 
     /**
      * 爬虫全量.
      * @param dispatchName
      */
-    public void crawlFull(String folderName) {
+    public String crawlFull(String folderName) {
         String rootFolder = "/nutch_seeds";
         String shDir = "/nutch/deploy_normal/bin/crawl";
         String proxyShDir = "/nutch/deploy_normal_proxy/bin/crawl";
@@ -136,13 +137,14 @@ public class CrawlState {
                 + folderNameData + "_data" + " " + solrURL + " " + depth;
         Runmanager runmanager = getRunmanager(command);
         ShellUtils.execCmd(runmanager);
+        return "success";
     }
 
     /**
      * 重新索引.
      * @param dispatchName
      */
-    public void reParse(String folderNameSeed, String model) {
+    public String reParse(String folderNameSeed, String model) {
         String nutch_root = "";
         String solr_index = "http://192.168.100.31:8080/solr/collection1/";
         String crawlDir = "/nutch_data/";
@@ -156,23 +158,24 @@ public class CrawlState {
         }
         ReParseAndIndex.reParseAndIndex(nutch_root, data_folder, solr_index,
             false);
+        return "success";
     }
 
     /**
      * 停止爬虫.
      * @param dispatchName
      */
-    public void stopCrawl(String folderName) {
+    public String stopCrawl(String folderName) {
         // 1.修改redis中种子状态
         String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
         DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey,
             WebtoolConstants.DISPATCH_REDIS_DBINDEX);
         if (dispatchVo == null) {
-            return;
+            return "error";
         }
         List<Seed> seedList = dispatchVo.getSeed();
         if (seedList == null) {
-            return;
+            return "error";
         }
         for (Iterator<Seed> it = seedList.iterator(); it.hasNext();) {
             Seed seed = it.next();
@@ -191,6 +194,7 @@ public class CrawlState {
         String incrementFolderName = domain + "_" + "1" + period + "_"
                 + WebtoolConstants.INCREMENT_FILENAME_SIGN + "_" + sequence;
         contextToFile(incrementFolderName);
+        return "success";
     }
 
     private Runmanager getRunmanager(String command) {
