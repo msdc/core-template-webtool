@@ -1353,11 +1353,11 @@ public class CrawlToolResource {
 
 		// 转换静态属性
 		HashMap<String, String> tags = templateResult.getTags();
-		if (tags != null) {
-			TemplateTagModel templateTagModel = new TemplateTagModel();
+		if (tags != null) {			
 			List<TemplateTagModel> tempalteTags = new ArrayList<TemplateTagModel>();
 			Iterator<Entry<String, String>> it = tags.entrySet().iterator();
 			while (it.hasNext()) {
+				TemplateTagModel templateTagModel = new TemplateTagModel();
 				Map.Entry<String, String> entry = (Map.Entry<String, String>) it.next();
 				templateTagModel.setTagKey(entry.getKey());
 				templateTagModel.setTagValue(entry.getValue());
