@@ -95,7 +95,7 @@ function crawlStatusSuccessHandler(data, dataModel) {
             modalBody.text(result.errorMsg);
         }
     }
-    $('#modal-modal_showOptionMessage').modal('show');
+    $('#modal_showOptionMessage').modal('show');
 }
 
 /**

@@ -1025,7 +1025,6 @@ public class CrawlToolService {
 		}else{
 			jsonProvider.setData("操作失败！");
 		}	
-		jsonProvider.setData(reParseResult);
 		return jsonProvider.toJSON();
 	}	
 	
