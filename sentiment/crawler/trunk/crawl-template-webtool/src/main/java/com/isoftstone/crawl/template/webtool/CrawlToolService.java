@@ -21,6 +21,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
+import org.mortbay.log.Log;
 
 import com.isoftstone.crawl.template.consts.WebtoolConstants;
 import com.isoftstone.crawl.template.crawlstate.CrawlState;
@@ -755,7 +756,9 @@ public class CrawlToolService {
 			TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateModel.getTemplateId());
 			PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
 			// 同时导出到文件
+			Log.info("开始批量导入文件.");
 			saveToLocalFile(pageModel.toJSON());
+			Log.info("批量导入文件完成.");
 			ResponseJSONProvider<String> saveResult = serviceHelper.saveIncreaseTemplateResult(templateModel, "");
 			if (saveResult.getErrorMsg() != null) {
 				failedTemplateCount++;
