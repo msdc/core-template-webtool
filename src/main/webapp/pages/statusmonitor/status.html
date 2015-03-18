@@ -13,6 +13,26 @@
     <title>爬取运行监控</title>
 </head>
 <body>
+
+<!--显示提示信息-->
+<div class="modal fade bs-example-modal-lg" id="modal_showOptionMessage" tabindex="-1" role="dialog" aria-labelledby="modal_showOptionMessageTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="modal_showOptionMessageTitle">提示信息</h4>
+            </div>
+            <div class="modal-body">
+                <div id="modal_body_showOptionMessage"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container">
 
     <div class="row">
@@ -111,7 +131,7 @@
                                                 <td>序号</td>
                                                 <td>调度名称</td>
                                                 <td>爬取状态</td>
-                                                <td>上次检查时间</td>
+                                                <td>状态检查时间</td>
                                                 <td>操作</td>
                                             </tr>
                                             </thead>
@@ -122,10 +142,10 @@
                                                 <td data-bind="text: crawlStatusString"></td>
                                                 <td data-bind="text: checkTimeString"></td>
                                                 <td>
-                                                    <a role="button" class="btn btn-primary">停止</a>
-                                                    <a role="button" class="btn btn-primary">增量重爬</a>
-                                                    <a role="button" class="btn btn-primary">全量重爬</a>
-                                                    <a role="button" class="btn btn-primary">重索引</a>
+                                                    <a role="button" class="btn btn-primary" data-bind="click: $parent.stopCrawl">停止</a>
+                                                    <a role="button" class="btn btn-primary" data-bind="click: $parent.crawlIncrement">增量重爬</a>
+                                                    <a role="button" class="btn btn-primary" data-bind="click: $parent.crawlFull">全量重爬</a>
+                                                    <a role="button" class="btn btn-primary" data-bind="click: $parent.reParse">重索引</a>
                                                 </td>
                                             </tr>
                                             </tbody>

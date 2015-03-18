@@ -968,6 +968,107 @@ public class CrawlToolService {
 		jsonProvider.setData(crawlStatusModelList);
 		return jsonProvider.toJSON();
 	}
+	
+	/**
+	 * 
+	 * 停止爬虫.
+	 * */
+	@POST
+	@Path("/stopCrawl")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String stopCrawl(@DefaultValue("") @FormParam("folderName") String folderName) {
+		ResponseJSONProvider<CrawlStatusModel> jsonProvider = new ResponseJSONProvider<CrawlStatusModel>();
+		CrawlState crawlState = new CrawlState();
+		String stopStatus=crawlState.stopCrawl(folderName);
+		
+		Date currentDate = new Date();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String nowDateString = dateFormat.format(currentDate);
+		
+		CrawlStatusModel crawlStatusModel = new CrawlStatusModel();
+		crawlStatusModel.setCheckTime(nowDateString);
+		if(stopStatus.equals("success")){
+			crawlStatusModel.setCrawlStatus("已停止");
+		}else{
+			crawlStatusModel.setCrawlStatus("停止失败");
+		}		
+		
+		// 同时更新缓存中想对应的数据
+		List<CrawlStatusModel> crawlStatusModelList = StatusMonitorCache.getCrawlStatusModelListCache().getCrawlStatusModelList();
+		for (CrawlStatusModel model : crawlStatusModelList) {
+			if (model.getUrl().equals(folderName)) {
+				model.setCheckTime(nowDateString);
+				model.setCrawlStatus(stopStatus);
+				break;
+			}
+		}
+		
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData(crawlStatusModel);
+		return jsonProvider.toJSON();
+	}
+	
+	/**
+	 * 
+	 * 重新索引
+	 * */
+	@POST
+	@Path("/reParse")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String reParse(@DefaultValue("") @FormParam("folderName") String folderName) {
+		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();	
+		CrawlState crawlState = new CrawlState();
+		String reParseResult=crawlState.reParse(folderName, null);		
+		jsonProvider.setSuccess(true);
+		if(reParseResult.equals("success")){
+			jsonProvider.setData("操作成功！");
+		}else{
+			jsonProvider.setData("操作失败！");
+		}	
+		jsonProvider.setData(reParseResult);
+		return jsonProvider.toJSON();
+	}	
+	
+	/**
+	 * 
+	 * 爬虫增量.
+	 * */
+	@POST
+	@Path("/crawlIncrement")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String crawlIncrement(@DefaultValue("") @FormParam("folderName") String folderName) {
+		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();	
+		CrawlState crawlState = new CrawlState();
+		String crawlIncrementResult=crawlState.crawlIncrement(folderName);	
+		jsonProvider.setSuccess(true);
+		if(crawlIncrementResult.equals("success")){
+			jsonProvider.setData("操作成功！");
+		}else{
+			jsonProvider.setData("操作失败！");
+		}	
+		return jsonProvider.toJSON();
+	}
+	
+	/**
+	 * 
+	 *  爬虫全量.
+	 * */
+	@POST
+	@Path("/crawlFull")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String crawlFull(@DefaultValue("") @FormParam("folderName") String folderName) {
+		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();	
+		CrawlState crawlState = new CrawlState();
+		String crawlFullResult=crawlState.crawlFull(folderName);	
+		jsonProvider.setSuccess(true);
+		if(crawlFullResult.equals("success")){
+			jsonProvider.setData("操作成功！");
+		}else{
+			jsonProvider.setData("操作失败！");
+		}	
+		return jsonProvider.toJSON();
+	}
+	
 
 	/**
 	 * 
