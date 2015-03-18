@@ -269,7 +269,7 @@ public class CrawlToolResource {
 		}
 	}
 
-	private static void putSeedsFolder(String folderName, String type) {
+	public static void putSeedsFolder(String folderName, String type) {
 		String hostIp = Config.getValue(WebtoolConstants.KEY_HOST_IP);
 		String userName = Config.getValue(WebtoolConstants.KEY_HOST_USERNAME);
 		String password = Config.getValue(WebtoolConstants.KEY_HOST_PASSWORD);
