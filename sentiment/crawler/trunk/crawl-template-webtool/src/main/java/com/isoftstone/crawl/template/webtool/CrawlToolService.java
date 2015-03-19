@@ -170,16 +170,16 @@ public class CrawlToolService {
 
 		int contentOutLinkIndex = serviceHelper.getRandomNumber(0, maxRandomNumber);
 		String contentOutLink = contentOutLinkArrayList.get(contentOutLinkIndex);
-		byte[] input=null;
-		try{
-			input= DownloadHtml.getHtml(contentOutLink);
-		}catch(Exception e){
+		byte[] input = null;
+		try {
+			input = DownloadHtml.getHtml(contentOutLink);
+		} catch (Exception e) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setErrorMsg("访问内容页链接： ["+contentOutLink+"] 失败，网络访问异常！");
+			jsonProvider.setErrorMsg("访问内容页链接： [" + contentOutLink + "] 失败，网络访问异常！");
 			e.printStackTrace();
 			return jsonProvider.toJSON();
 		}
-		
+
 		String encoding = CrawlToolResource.sniffCharacterEncoding(input);
 		try {
 			parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, contentOutLink);
@@ -852,10 +852,10 @@ public class CrawlToolService {
 		SeedsEffectiveStatusList seedsEffectiveStatusList = new SeedsEffectiveStatusList();
 		List<SeedsEffectiveStatusModel> seedsEffectiveStatusModelList = StatusMonitorCache.getSeedsEffectiveStatusListCache().getSeedsEffectiveStatusList();
 		seedsEffectiveStatusList.setSeedsEffectiveStatusList(seedsEffectiveStatusModelList);
-		if(seedsEffectiveStatusModelList!=null){
+		if (seedsEffectiveStatusModelList != null) {
 			// 列表按名称排序
 			Collections.sort(seedsEffectiveStatusModelList, new SeedsEffectiveModelComparator());
-		}		
+		}
 		jsonProvider.setData(seedsEffectiveStatusList);
 		if (seedsEffectiveStatusModelList != null) {
 			jsonProvider.setTotal(seedsEffectiveStatusModelList.size());
@@ -958,17 +958,17 @@ public class CrawlToolService {
 		CrawlStatusModelList crawlStatusModelList = new CrawlStatusModelList();
 		List<CrawlStatusModel> crawlStatusModelArrayList = StatusMonitorCache.getCrawlStatusModelListCache().getCrawlStatusModelList();
 
-		if(crawlStatusModelArrayList!=null){
+		if (crawlStatusModelArrayList != null) {
 			// 列表按名称排序
 			Collections.sort(crawlStatusModelArrayList, new CrawlStatusModelComparator());
-		}		
+		}
 		crawlStatusModelList.setCrawlStatusModelList(crawlStatusModelArrayList);
 
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData(crawlStatusModelList);
 		return jsonProvider.toJSON();
 	}
-	
+
 	/**
 	 * 
 	 * 停止爬虫.
@@ -979,20 +979,20 @@ public class CrawlToolService {
 	public String stopCrawl(@DefaultValue("") @FormParam("folderName") String folderName) {
 		ResponseJSONProvider<CrawlStatusModel> jsonProvider = new ResponseJSONProvider<CrawlStatusModel>();
 		CrawlState crawlState = new CrawlState();
-		String stopStatus=crawlState.stopCrawl(folderName);
-		
+		String stopStatus = crawlState.stopCrawl(folderName);
+
 		Date currentDate = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String nowDateString = dateFormat.format(currentDate);
-		
+
 		CrawlStatusModel crawlStatusModel = new CrawlStatusModel();
 		crawlStatusModel.setCheckTime(nowDateString);
-		if(stopStatus.equals("success")){
+		if (stopStatus.equals("success")) {
 			crawlStatusModel.setCrawlStatus("已停止");
-		}else{
+		} else {
 			crawlStatusModel.setCrawlStatus("停止失败");
-		}		
-		
+		}
+
 		// 同时更新缓存中想对应的数据
 		List<CrawlStatusModel> crawlStatusModelList = StatusMonitorCache.getCrawlStatusModelListCache().getCrawlStatusModelList();
 		for (CrawlStatusModel model : crawlStatusModelList) {
@@ -1002,12 +1002,12 @@ public class CrawlToolService {
 				break;
 			}
 		}
-		
+
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData(crawlStatusModel);
 		return jsonProvider.toJSON();
 	}
-	
+
 	/**
 	 * 
 	 * 重新索引
@@ -1016,18 +1016,18 @@ public class CrawlToolService {
 	@Path("/reParse")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String reParse(@DefaultValue("") @FormParam("folderName") String folderName) {
-		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();	
+		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		CrawlState crawlState = new CrawlState();
-		String reParseResult=crawlState.reParse(folderName, null);		
+		String reParseResult = crawlState.reParse(folderName, null);
 		jsonProvider.setSuccess(true);
-		if(reParseResult.equals("success")){
+		if (reParseResult.equals("success")) {
 			jsonProvider.setData("操作成功！");
-		}else{
+		} else {
 			jsonProvider.setData("操作失败！");
-		}	
+		}
 		return jsonProvider.toJSON();
-	}	
-	
+	}
+
 	/**
 	 * 
 	 * 爬虫增量.
@@ -1036,38 +1036,70 @@ public class CrawlToolService {
 	@Path("/crawlIncrement")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String crawlIncrement(@DefaultValue("") @FormParam("folderName") String folderName) {
-		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();	
+		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		CrawlState crawlState = new CrawlState();
-		String crawlIncrementResult=crawlState.crawlIncrement(folderName);	
+		String crawlIncrementResult = crawlState.crawlIncrement(folderName);
 		jsonProvider.setSuccess(true);
-		if(crawlIncrementResult.equals("success")){
+		if (crawlIncrementResult.equals("success")) {
 			jsonProvider.setData("操作成功！");
-		}else{
+		} else {
 			jsonProvider.setData("操作失败！");
-		}	
+		}
 		return jsonProvider.toJSON();
 	}
-	
+
 	/**
 	 * 
-	 *  爬虫全量.
+	 * 爬虫全量.
 	 * */
 	@POST
 	@Path("/crawlFull")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String crawlFull(@DefaultValue("") @FormParam("folderName") String folderName) {
-		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();	
+		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		CrawlState crawlState = new CrawlState();
-		String crawlFullResult=crawlState.crawlFull(folderName);	
+		String crawlFullResult = crawlState.crawlFull(folderName);
 		jsonProvider.setSuccess(true);
-		if(crawlFullResult.equals("success")){
+		if (crawlFullResult.equals("success")) {
 			jsonProvider.setData("操作成功！");
-		}else{
+		} else {
 			jsonProvider.setData("操作失败！");
-		}	
+		}
 		return jsonProvider.toJSON();
 	}
-	
+
+	/**
+	 * 
+	 * 获取种子爬取状态按分类查询 1、爬虫 2、搜索引擎
+	 * */
+	@GET
+	@Path("/getCrawlDataListByDataSource")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getCrawlDataListByDataSource() {
+		CrawlToolResource serviceHelper = new CrawlToolResource();
+		ResponseJSONProvider<CrawlDataModelList> jsonProvider = new ResponseJSONProvider<CrawlDataModelList>();
+
+		CrawlDataModelList crawlDataModelList = new CrawlDataModelList();
+		List<CrawlDataModel> crawlDataModelArrayList = new ArrayList<CrawlDataModel>();
+
+		CrawlDataModel searchEngineCrawlDataModel = new CrawlDataModel();
+		searchEngineCrawlDataModel.setDataSource("2");
+		// 搜索引擎
+		serviceHelper.fillCrawlDataModelArrayList(searchEngineCrawlDataModel, crawlDataModelArrayList, "tags", "datasource=2", "搜索引擎");
+		CrawlDataModel normalCrawlDataModel = new CrawlDataModel();
+		// 常规引擎
+		normalCrawlDataModel.setDataSource("1");
+		serviceHelper.fillCrawlDataModelArrayList(normalCrawlDataModel, crawlDataModelArrayList, "tags", "datasource=1", "定向站点");
+
+		// 列表按名称排序
+		Collections.sort(crawlDataModelArrayList, new CrawlDataModelComparator());
+		crawlDataModelList.setCrawlDataModelList(crawlDataModelArrayList);
+		// 添加到缓存
+		StatusMonitorCache.setCrawlDataModelListCache(crawlDataModelList);
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData(crawlDataModelList);
+		return jsonProvider.toJSON();
+	}
 
 	/**
 	 * 
@@ -1099,7 +1131,11 @@ public class CrawlToolService {
 					Date currentDate = new Date();
 					SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					String nowDateString = dateFormat.format(currentDate);
+					// 查询今日索引
+					long todayIndexCount = search.getQueryResultCount("host", entry.getKey(), WebtoolConstants.CRAWL_DATA_QUERY_FIELD, serviceHelper.getTimeOfZero(), new Date());
 					crawlDataModel.setUrl(entry.getKey());
+					// 今日索引
+					crawlDataModel.setTodayIndexCounts(todayIndexCount);
 					crawlDataModel.setIndexCounts(entry.getValue());
 					crawlDataModel.setCheckTime(nowDateString);
 					crawlDataModelArrayList.add(crawlDataModel);
@@ -1144,22 +1180,35 @@ public class CrawlToolService {
 
 	/**
 	 * 
-	 * 刷新单条抓取数据
+	 * 刷新单条抓取数据 typeName=2 搜索引擎，typeName=1 常規網站
 	 * */
 	@POST
 	@Path("/refreshCrawlData")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String refreshCrawlData(@DefaultValue("") @FormParam("domain") String domain) {
+	public String refreshCrawlData(@DefaultValue("") @FormParam("domain") String domain, @DefaultValue("") @FormParam("typeName") String typeName,
+			@DefaultValue("") @FormParam("dataSource") String dataSource) {
 		ResponseJSONProvider<CrawlDataModel> jsonProvider = new ResponseJSONProvider<CrawlDataModel>();
+		CrawlToolResource serviceHelper = new CrawlToolResource();
 		SolrSerach search = new SolrSerach();
-		long dataCount = search.getQueryResultCount(domain);
+		CrawlDataModel crawlDataModel = new CrawlDataModel();
+
 		Date currentDate = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String nowDateString = dateFormat.format(currentDate);
+		long dataCount = -1;
+		long todayDataCount = -1;
 
-		CrawlDataModel crawlDataModel = new CrawlDataModel();
+		if (typeName.equals("1")) {// 按域统计
+			dataCount = search.getQueryResultCount("host", domain);
+			todayDataCount = search.getQueryResultCount("host", domain, WebtoolConstants.CRAWL_DATA_QUERY_FIELD, serviceHelper.getTimeOfZero(), new Date());
+		} else if (typeName.equals("2")) {// 按分类统计
+			dataCount = search.getQueryResultCount("tags", "datasource=" + dataSource);
+			todayDataCount = search.getQueryResultCount("tags", "datasource=" + dataSource, WebtoolConstants.CRAWL_DATA_QUERY_FIELD, serviceHelper.getTimeOfZero(), new Date());
+		}
+
 		crawlDataModel.setCheckTime(nowDateString);
 		crawlDataModel.setIndexCounts(dataCount);
+		crawlDataModel.setTodayIndexCounts(todayDataCount);
 
 		// 同时更新缓存中想对应的数据
 		List<CrawlDataModel> crawlDataModelList = StatusMonitorCache.getCrawlDataModelListCache().getCrawlDataModelList();
@@ -1168,6 +1217,7 @@ public class CrawlToolService {
 			if (model.getUrl().equals(domain)) {
 				model.setCheckTime(nowDateString);
 				model.setIndexCounts(dataCount);
+				model.setTodayIndexCounts(todayDataCount);
 				break;
 			}
 		}
