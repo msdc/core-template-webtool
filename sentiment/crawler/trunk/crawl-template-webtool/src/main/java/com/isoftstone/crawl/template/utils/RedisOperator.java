@@ -239,7 +239,7 @@ public class RedisOperator {
                 return JSON.parseObject(json, DispatchVo.class);
         } catch (Exception e) {
             pool.returnBrokenResource(jedis);
-            LOG.error("", e);
+            LOG.error("get dispatch result from redis failed", e);
         } finally {
             RedisUtils.returnResource(pool, jedis);
         }
@@ -259,7 +259,7 @@ public class RedisOperator {
             jedis.set(guid, str.toString());
         } catch (Exception e) {
             pool.returnBrokenResource(jedis);
-            LOG.error("", e);
+            LOG.error("save dispatch result to redis failed", e);
         } finally {
             RedisUtils.returnResource(pool, jedis);
         }
