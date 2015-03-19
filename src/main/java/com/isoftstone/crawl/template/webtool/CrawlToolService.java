@@ -242,7 +242,22 @@ public class CrawlToolService {
 	public String saveTemplate(@DefaultValue("") @FormParam("data") String data) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		PageModel pageModel = serviceHelper.getPageModelByJsonString(data);
-		ResponseJSONProvider<String> jsonProvider = serviceHelper.saveTemplateResultToRedis(pageModel);
+		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
+		// 保存常规模板
+		jsonProvider = serviceHelper.saveTemplateResultToRedis(pageModel);
+		if (jsonProvider.getSuccess() == false) {
+			return jsonProvider.toJSON();
+		}
+		// 保存增量模板
+		jsonProvider = serviceHelper.saveIncreaseTemplateResult(pageModel);
+		if (jsonProvider.getSuccess() == false) {
+			return jsonProvider.toJSON();
+		}
+		// 保存到文件
+		saveToLocalFile(data);
+
+		jsonProvider.setSuccess(true);
+		jsonProvider.setData("模板保存成功！");
 		return jsonProvider.toJSON();
 	}
 
