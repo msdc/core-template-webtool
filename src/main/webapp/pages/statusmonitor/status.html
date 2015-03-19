@@ -24,10 +24,30 @@
                 <h4 class="modal-title" id="modal_showOptionMessageTitle">提示信息</h4>
             </div>
             <div class="modal-body">
-                <div id="modal_body_showOptionMessage"></div>
+                <div id="modal_body_showOptionMessage">操作成功</div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--种子有效性提示-->
+<div class="modal fade bs-example-modal-lg" id="modal_seedsEffectiveInfo" tabindex="-1" role="dialog" aria-labelledby="modal_seedsEffectiveInfoTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="modal_seedsEffectiveInfoTitle">提示</h4>
+            </div>
+            <div class="modal-body">
+                <div id="modal_body_seedsEffectiveInfo">当前操作可能需要较长时间，请耐心等待...</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-bind="click: checkSeedsEffective">确定</button>
             </div>
         </div>
     </div>
@@ -69,7 +89,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <button type="button" class="btn btn-primary"
-                                                data-bind="click: checkSeedsEffective">批量检查有效性
+                                                data-bind="click: showSeedEffectiveInfo">批量检查有效性
                                         </button>
                                     </div>
                                 </div>
@@ -171,7 +191,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <button type="button" class="btn btn-primary" data-bind="click: refreshCrawlData">按照域统计</button>
-                                        <button type="button" class="btn btn-primary">按照分类统计</button>
+                                        <button type="button" class="btn btn-primary" data-bind="click: queryByDataSource">按照分类统计</button>
                                     </div>
                                 </div>
                                 <div class="row addRowTopMargin">
@@ -180,7 +200,7 @@
                                             <thead>
                                             <tr>
                                                 <td>序号</td>
-                                                <td>域名</td>
+                                                <td data-bind="text: typeName"></td>
                                                 <td>已索引条数</td>
                                                 <td>今日索引条数</td>
                                                 <td>上次检查时间</td>
@@ -192,7 +212,7 @@
                                                 <td data-bind="text: ($index()+1)"></td>
                                                 <td data-bind="text: url" style="width: 400px;word-break: break-all"></td>
                                                 <td data-bind="text: indexCountsString"></td>
-                                                <td data-bind="text: todayIndexCounts"></td>
+                                                <td data-bind="text: todayIndexCountsString"></td>
                                                 <td data-bind="text: checkTimeString"></td>
                                                 <td>
                                                     <button type="button"  class="btn btn-primary" data-bind="click: $parent.refreshSingleData">刷新</button>

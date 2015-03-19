@@ -19,6 +19,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -61,6 +62,7 @@ import com.isoftstone.crawl.template.impl.TemplateFactory;
 import com.isoftstone.crawl.template.impl.TemplateResult;
 import com.isoftstone.crawl.template.model.BasicInfoViewModel;
 import com.isoftstone.crawl.template.model.CommonAttrViewModel;
+import com.isoftstone.crawl.template.model.CrawlDataModel;
 import com.isoftstone.crawl.template.model.CustomerAttrModel;
 import com.isoftstone.crawl.template.model.ListPaginationViewModel;
 import com.isoftstone.crawl.template.model.PageModel;
@@ -80,6 +82,7 @@ import com.isoftstone.crawl.template.utils.MD5Utils;
 import com.isoftstone.crawl.template.utils.RedisOperator;
 import com.isoftstone.crawl.template.utils.RedisUtils;
 import com.isoftstone.crawl.template.utils.ShellUtils;
+import com.isoftstone.crawl.template.utils.SolrSerach;
 import com.isoftstone.crawl.template.utils.StatusMonitorCache;
 import com.isoftstone.crawl.template.vo.DispatchVo;
 import com.isoftstone.crawl.template.vo.Runmanager;
@@ -116,7 +119,7 @@ public class CrawlToolResource {
 		List<Seed> seedList = dispatchVo.getSeed();
 		if (seedList == null) {
 			seedList = new ArrayList<Seed>();
-		} else if(beforeSeedList != null){
+		} else if (beforeSeedList != null) {
 			List<Seed> removeSeeds = new ArrayList<Seed>();
 			for (Iterator<String> it = beforeSeedList.iterator(); it.hasNext();) {
 				Seed seed = new Seed(it.next());
@@ -251,7 +254,7 @@ public class CrawlToolResource {
 			if ("true".equals(isCopy)) {
 				putSeedsFolder(folderName, "local");
 			}
-//			HdfsCommon.upFileToHdfs(filePath);
+			// HdfsCommon.upFileToHdfs(filePath);
 			putSeedsFolder(folderName, "deploy");
 		} catch (Exception e) {
 			LOG.error("生成文件错误.", e);
@@ -287,10 +290,10 @@ public class CrawlToolResource {
 			String desCopyRootFolder = Config.getValue(WebtoolConstants.KEY_DES_FOLDER);
 			command = "scp -r " + folderRoot + File.separator + folderName + " " + desCopyRootFolder;
 		} else {
-		    runmanager.setHostIp("192.168.100.26");
-	        runmanager.setUsername("root");
-	        runmanager.setPassword("123456");
-		    String desHdfsFolderName = Config.getValue("desHdfsFolderName");
+			runmanager.setHostIp("192.168.100.26");
+			runmanager.setUsername("root");
+			runmanager.setPassword("123456");
+			String desHdfsFolderName = Config.getValue("desHdfsFolderName");
 			command = "hadoop fs -put " + folderRoot + File.separator + folderName + " " + desHdfsFolderName;
 		}
 		LOG.info("命令：" + command);
@@ -1353,7 +1356,7 @@ public class CrawlToolResource {
 
 		// 转换静态属性
 		HashMap<String, String> tags = templateResult.getTags();
-		if (tags != null) {			
+		if (tags != null) {
 			List<TemplateTagModel> tempalteTags = new ArrayList<TemplateTagModel>();
 			Iterator<Entry<String, String>> it = tags.entrySet().iterator();
 			while (it.hasNext()) {
@@ -1636,6 +1639,40 @@ public class CrawlToolResource {
 				break;
 			}
 		}
+	}
+
+	/***
+	 * 获取当天零点
+	 * */
+	public Date getTimeOfZero() {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
+	}
+
+	/**
+	 * @param serviceHelper
+	 * @param crawlDataModelArrayList
+	 */
+	public void fillCrawlDataModelArrayList(CrawlDataModel crawlDataModel, List<CrawlDataModel> crawlDataModelArrayList, String filter, String value, String typeName) {
+		SolrSerach search = new SolrSerach();
+		Date currentDate = new Date();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String nowDateString = dateFormat.format(currentDate);
+
+		long searchEngineCount = search.getQueryResultCount(filter, value);
+		// 查询今日索引
+		long todayIndexCount = search.getQueryResultCount(filter, value, WebtoolConstants.CRAWL_DATA_QUERY_FIELD, getTimeOfZero(), new Date());
+		crawlDataModel.setUrl(typeName);
+		// 今日索引
+		crawlDataModel.setTodayIndexCounts(todayIndexCount);
+		crawlDataModel.setIndexCounts(searchEngineCount);
+		crawlDataModel.setCheckTime(nowDateString);
+		crawlDataModelArrayList.add(crawlDataModel);
 	}
 
 	// I used 1000 bytes at first, but found that some documents have

@@ -83,4 +83,7 @@ public class WebtoolConstants {
   	//种子有效性
 	public static final String TEMPLATE_VALID_STATUS = "有效";
 	public static final String TEMPLATE_INVALID_STATUS = "无效";
+	
+	//爬虫数据查询字段
+	public static final String CRAWL_DATA_QUERY_FIELD = "fetch_time";
 }
