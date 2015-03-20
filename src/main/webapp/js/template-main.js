@@ -544,12 +544,12 @@ function addNewTemplateDataInit(pageViewModel) {
     var dataSourceTagViewModel = new singleTemplateTagViewModel();
     dataSourceTagViewModel.tagKey('dataSource');
     pageViewModel.templateTagsViewModel.tags.push(dataSourceTagViewModel);
-    var projectTagViewModel = new singleTemplateTagViewModel();
-    projectTagViewModel.tagKey('项目');
-    pageViewModel.templateTagsViewModel.tags.push(projectTagViewModel);
-    var categoryTagViewModel = new singleTemplateTagViewModel();
-    categoryTagViewModel.tagKey('分类');
-    pageViewModel.templateTagsViewModel.tags.push(categoryTagViewModel);
+//    var projectTagViewModel = new singleTemplateTagViewModel();
+//    projectTagViewModel.tagKey('项目');
+//    pageViewModel.templateTagsViewModel.tags.push(projectTagViewModel);
+//    var categoryTagViewModel = new singleTemplateTagViewModel();
+//    categoryTagViewModel.tagKey('分类');
+//    pageViewModel.templateTagsViewModel.tags.push(categoryTagViewModel);
 }
 
 /**
@@ -827,8 +827,8 @@ function initUpdateTemplateTags(templateTags) {
     var isLanguage = false;
     var isOversea = false;
     var isDataSource = false;
-    var isProject = false;
-    var isCategory = false;
+    //var isProject = false;
+    //var isCategory = false;
     for (var tagKey in templateTags) {
         if (tagKey == 'mediaType') {
             isMediaType = true;
@@ -840,11 +840,13 @@ function initUpdateTemplateTags(templateTags) {
             isOversea = true;
         } else if (tagKey == 'dataSource') {
             isDataSource = true;
-        } else if (tagKey == '项目') {
-            isProject = true;
-        } else if (tagKey == '分类') {
-            isCategory = true;
         }
+
+//        else if (tagKey == '项目') {
+//            isProject = true;
+//        } else if (tagKey == '分类') {
+//            isCategory = true;
+//        }
     }
 
     if (!isMediaType) {
@@ -862,12 +864,12 @@ function initUpdateTemplateTags(templateTags) {
     if (!isDataSource) {
         templateTags.dataSource = '';
     }
-    if (!isProject) {
-        templateTags.项目 = '';
-    }
-    if (!isCategory) {
-        templateTags.分类 = '';
-    }
+//    if (!isProject) {
+//        templateTags.项目 = '';
+//    }
+//    if (!isCategory) {
+//        templateTags.分类 = '';
+//    }
 }
 
 /**
