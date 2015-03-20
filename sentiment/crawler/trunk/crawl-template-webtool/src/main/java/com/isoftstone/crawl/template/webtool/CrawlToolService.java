@@ -254,8 +254,10 @@ public class CrawlToolService {
 			return jsonProvider.toJSON();
 		}
 		// 保存到文件
-		saveToLocalFile(data);
-
+		jsonProvider = serviceHelper.getResponseJSONProvider(saveToLocalFile(data));
+		if (jsonProvider.getSuccess() == false) {
+			return jsonProvider.toJSON();
+		}
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("模板保存成功！");
 		return jsonProvider.toJSON();
@@ -768,12 +770,15 @@ public class CrawlToolService {
 		for (String listKey : templateListKeys) {
 			String templateModelJSONString = RedisOperator.getFromDefaultDB(listKey);
 			TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateModelJSONString);
-			TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateModel.getTemplateId());
-			PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
+			// TemplateResult templateResult =
+			// RedisOperator.getTemplateResultFromDefaultDB(templateModel.getTemplateId());
+			// PageModel pageModel =
+			// serviceHelper.convertTemplateResultToPageModel(templateModel,
+			// templateResult);
 			// 同时导出到文件
-			Log.info("开始批量导入文件.");
-			saveToLocalFile(pageModel.toJSON());
-			Log.info("批量导入文件完成.");
+			// Log.info("开始批量导入文件.");
+			// saveToLocalFile(pageModel.toJSON());
+			// Log.info("批量导入文件完成.");
 			ResponseJSONProvider<String> saveResult = serviceHelper.saveIncreaseTemplateResult(templateModel, "");
 			if (saveResult.getErrorMsg() != null) {
 				failedTemplateCount++;
@@ -831,6 +836,14 @@ public class CrawlToolService {
 					// 检查内容页
 					ResponseJSONProvider<ParseResult> newsContentJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyNewContent(serviceHelper.getPageModeJSONString(pageModel)));
 					if (newsContentJsonProvider.getSuccess() == false) {
+						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
+						seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
+						continue;
+					}
+					// 检查增量
+					ResponseJSONProvider<String> increaseJsonProvider = new ResponseJSONProvider<String>();
+					increaseJsonProvider = serviceHelper.saveIncreaseTemplateResult(pageModel);
+					if (increaseJsonProvider.getSuccess() == false) {
 						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
 						seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
 						continue;
