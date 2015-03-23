@@ -1306,8 +1306,8 @@ public class CrawlToolResource {
 		boolean isLanguage = false;
 		boolean isOversea = false;
 		boolean isDataSource = false;
-		// boolean isProject = false;
-		// boolean isCategory = false;
+		boolean isProject = false;
+		boolean isCategory = false;
 		List<TemplateTagModel> tempalteTags = pageModel.getTemplateTagsViewModel();
 		if (tempalteTags.size() == 0) {
 			responseJSONProvider.setErrorMsg("模板静态属性不能为空！");
@@ -1326,12 +1326,11 @@ public class CrawlToolResource {
 				isOversea = true;
 			} else if (tagKey.equals("dataSource")) {
 				isDataSource = true;
+			} else if (tagKey.equals("项目")) {
+				isProject = true;
+			} else if (tagKey.equals("分类")) {
+				isCategory = true;
 			}
-			// else if(tagKey.equals("项目")){
-			// isProject=true;
-			// }else if(tagKey.equals("分类")){
-			// isCategory=true;
-			// }
 		}
 
 		if (isMediaType == false) {
@@ -1359,15 +1358,15 @@ public class CrawlToolResource {
 			return responseJSONProvider;
 		}
 
-		// if (isProject == false) {
-		// responseJSONProvider.setErrorMsg("模板静态Tag属性，缺少'项目'属性！请配置！");
-		// return responseJSONProvider;
-		// }
-		//
-		// if (isCategory == false) {
-		// responseJSONProvider.setErrorMsg("模板静态Tag属性，缺少'分类'属性！请配置！");
-		// return responseJSONProvider;
-		// }
+		if (isProject == false) {
+			responseJSONProvider.setErrorMsg("模板静态Tag属性，缺少'项目'属性！请配置！");
+			return responseJSONProvider;
+		}
+
+		if (isCategory == false) {
+			responseJSONProvider.setErrorMsg("模板静态Tag属性，缺少'分类'属性！请配置！");
+			return responseJSONProvider;
+		}
 
 		for (TemplateTagModel model : tempalteTags) {
 			String tagKey = model.getTagKey();

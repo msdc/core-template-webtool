@@ -529,6 +529,12 @@ function addNewTemplateDataInit(pageViewModel) {
     pageViewModel.templateIncreaseViewModel.pageCounts('2');
 
     //模板静态属性预置
+    var projectTagViewModel = new singleTemplateTagViewModel();
+    projectTagViewModel.tagKey('项目');
+    pageViewModel.templateTagsViewModel.tags.push(projectTagViewModel);
+    var categoryTagViewModel = new singleTemplateTagViewModel();
+    categoryTagViewModel.tagKey('分类');
+    pageViewModel.templateTagsViewModel.tags.push(categoryTagViewModel);
     var mediaTypeTagViewModel = new singleTemplateTagViewModel();
     mediaTypeTagViewModel.tagKey('mediaType');
     pageViewModel.templateTagsViewModel.tags.push(mediaTypeTagViewModel);
@@ -544,12 +550,6 @@ function addNewTemplateDataInit(pageViewModel) {
     var dataSourceTagViewModel = new singleTemplateTagViewModel();
     dataSourceTagViewModel.tagKey('dataSource');
     pageViewModel.templateTagsViewModel.tags.push(dataSourceTagViewModel);
-//    var projectTagViewModel = new singleTemplateTagViewModel();
-//    projectTagViewModel.tagKey('项目');
-//    pageViewModel.templateTagsViewModel.tags.push(projectTagViewModel);
-//    var categoryTagViewModel = new singleTemplateTagViewModel();
-//    categoryTagViewModel.tagKey('分类');
-//    pageViewModel.templateTagsViewModel.tags.push(categoryTagViewModel);
 }
 
 /**
@@ -806,9 +806,27 @@ function updateTemplateDataInit(initData, pageViewModel, singleTemplateListJSON)
     if (templateTags != null) {
         //缺少相关属性时，则自动预置
         initUpdateTemplateTags(templateTags);
+        var projectTagField = new singleTemplateTagViewModel();
+        //优先项目和分类
+        if (templateTags['项目'] != null && templateTags['项目'] != undefined) {
+            projectTagField.tagKey('项目');
+            projectTagField.tagValue(templateTags['项目']);
+            pageViewModel.templateTagsViewModel.tags.push(projectTagField);
+        }
+
+        var categoryTagField = new singleTemplateTagViewModel();
+        if (templateTags['分类'] != null && templateTags['分类'] != undefined) {
+            categoryTagField.tagKey('分类');
+            categoryTagField.tagValue(templateTags['分类']);
+            pageViewModel.templateTagsViewModel.tags.push(categoryTagField);
+        }
+
         for (var tagKey in templateTags) {
             var tagValue = templateTags[tagKey];
             var templateTagModel = new singleTemplateTagViewModel();
+            if (tagKey == '项目' || tagKey == '分类') {
+                continue;
+            }
             templateTagModel.tagKey(tagKey);
             templateTagModel.tagValue(tagValue);
             pageViewModel.templateTagsViewModel.tags.push(templateTagModel);
@@ -827,8 +845,8 @@ function initUpdateTemplateTags(templateTags) {
     var isLanguage = false;
     var isOversea = false;
     var isDataSource = false;
-    //var isProject = false;
-    //var isCategory = false;
+    var isProject = false;
+    var isCategory = false;
     for (var tagKey in templateTags) {
         if (tagKey == 'mediaType') {
             isMediaType = true;
@@ -840,15 +858,19 @@ function initUpdateTemplateTags(templateTags) {
             isOversea = true;
         } else if (tagKey == 'dataSource') {
             isDataSource = true;
+        } else if (tagKey == '项目') {
+            isProject = true;
+        } else if (tagKey == '分类') {
+            isCategory = true;
         }
-
-//        else if (tagKey == '项目') {
-//            isProject = true;
-//        } else if (tagKey == '分类') {
-//            isCategory = true;
-//        }
     }
 
+    if (!isProject) {
+        templateTags.项目 = '';
+    }
+    if (!isCategory) {
+        templateTags.分类 = '';
+    }
     if (!isMediaType) {
         templateTags.mediaType = '';
     }
@@ -864,12 +886,6 @@ function initUpdateTemplateTags(templateTags) {
     if (!isDataSource) {
         templateTags.dataSource = '';
     }
-//    if (!isProject) {
-//        templateTags.项目 = '';
-//    }
-//    if (!isCategory) {
-//        templateTags.分类 = '';
-//    }
 }
 
 /**
