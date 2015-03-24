@@ -70,6 +70,7 @@ import com.isoftstone.crawl.template.model.ResponseJSONProvider;
 import com.isoftstone.crawl.template.model.ScheduleDispatchViewModel;
 import com.isoftstone.crawl.template.model.SearchKeyWordDataModel;
 import com.isoftstone.crawl.template.model.SearchKeyWordModel;
+import com.isoftstone.crawl.template.model.SeedsEffectiveStatusList;
 import com.isoftstone.crawl.template.model.SeedsEffectiveStatusModel;
 import com.isoftstone.crawl.template.model.TemplateIncreaseViewModel;
 import com.isoftstone.crawl.template.model.TemplateModel;
@@ -1666,8 +1667,14 @@ public class CrawlToolResource {
 	 * 更新种子有效性状态
 	 * */
 	public void updateSeedsEffectiveStatusCache(String templateId, String nowDateString, String seedsEffectiveStatus) {
+		String json = RedisOperator.getFromCacheDB(WebtoolConstants.SEEDS_EFFECTIVE_STATUS);
 		// 同时更新缓存中想对应的数据
-		List<SeedsEffectiveStatusModel> seedsEffectiveStatusList = StatusMonitorCache.getSeedsEffectiveStatusListCache().getSeedsEffectiveStatusList();
+		SeedsEffectiveStatusList list = getSeedsEffectiveStatusList(json);
+		List<SeedsEffectiveStatusModel> seedsEffectiveStatusList = list.getSeedsEffectiveStatusList();
+
+		if (seedsEffectiveStatusList == null) {
+			return;
+		}
 
 		for (SeedsEffectiveStatusModel model : seedsEffectiveStatusList) {
 			if (model.getTemplateId().equals(templateId)) {
@@ -1676,6 +1683,9 @@ public class CrawlToolResource {
 				break;
 			}
 		}
+		
+		//更新缓存
+		RedisOperator.setToCacheDB(WebtoolConstants.SEEDS_EFFECTIVE_STATUS, list.toJSON());
 	}
 
 	/***
@@ -1710,6 +1720,24 @@ public class CrawlToolResource {
 		crawlDataModel.setIndexCounts(searchEngineCount);
 		crawlDataModel.setCheckTime(nowDateString);
 		crawlDataModelArrayList.add(crawlDataModel);
+	}
+
+	/**
+	 * JSON 字符转换为对象
+	 * */
+	public SeedsEffectiveStatusList getSeedsEffectiveStatusList(String jsonString) {
+		SeedsEffectiveStatusList seedsEffectiveStatusList = null;
+		try {
+			ObjectMapper objectmapper = new ObjectMapper();
+			seedsEffectiveStatusList = objectmapper.readValue(jsonString, SeedsEffectiveStatusList.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return seedsEffectiveStatusList;
 	}
 
 	// I used 1000 bytes at first, but found that some documents have

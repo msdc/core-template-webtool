@@ -298,6 +298,7 @@ function templateViewModel(templateList) {
         var that = this;
         var templateUrl = that.basicInfoViewModel.url;
         var name = that.basicInfoViewModel.name;
+        that.statusText('执行中...');
         $.ajax({
             url: virtualWebPath + '/webapi/crawlToolResource/disableTemplate',
             type: 'POST',
@@ -312,6 +313,7 @@ function templateViewModel(templateList) {
             error: function (error) {
                 if (error) {
                     optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;停用模板操作失败！");
+                    that.statusText('失败');
                 }
             }
         });
@@ -320,6 +322,7 @@ function templateViewModel(templateList) {
         var that = this;
         var templateUrl = that.basicInfoViewModel.url;
         var name = that.basicInfoViewModel.name;
+        that.statusText('执行中...');
         $.ajax({
             url: virtualWebPath + '/webapi/crawlToolResource/enableTemplate',
             type: 'POST',
@@ -334,6 +337,7 @@ function templateViewModel(templateList) {
             error: function (error) {
                 if (error) {
                     optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;启用模板操作失败！");
+                    that.statusText('失败');
                 }
             }
         });

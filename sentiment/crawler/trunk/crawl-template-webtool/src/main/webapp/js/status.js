@@ -340,9 +340,11 @@ $(function () {
     //初始化种子有效性列表测试数据
     fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolResource/getSeedsEffectiveStatusCache', mainViewModel, true, initSeedsEffectiveList);
     //初始化爬取状态列表
-    fillPageList('crawlStatusModelList', '/webapi/crawlToolResource/getCrawlStatusCache', mainViewModel, true, initCrawlStatusList);
+    //fillPageList('crawlStatusModelList', '/webapi/crawlToolResource/getCrawlStatusCache', mainViewModel, true, initCrawlStatusList);
+    fillPageList('crawlStatusModelList', '/webapi/crawlToolResource/getCrawlStatusList', mainViewModel, true, initCrawlStatusList);
     //初始化爬取数据列表
-    fillPageList('crawlDataModelList', '/webapi/crawlToolResource/getCrawlDataCache', mainViewModel, true, initCrawlDataList);
+    //fillPageList('crawlDataModelList', '/webapi/crawlToolResource/getCrawlDataCache', mainViewModel, true, initCrawlDataList);
+    fillPageList('crawlDataModelList', '/webapi/crawlToolResource/getCrawlDataList', mainViewModel, true, initCrawlDataList);
 
     //注册Tab显示事件
     registerTabShownEvent(mainViewModel);
@@ -356,18 +358,15 @@ function registerTabShownEvent(mainViewModel) {
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         var target = e.target.hash; // newly activated tab
         if (target == "#seeds_effective") {
-            //var sampleData = seedEffectiveSampleData();//测试数据
-            //初始化种子有效性列表
-            //initSeedsEffectiveList(mainViewModel, null);
+            //初始化种子有效性列表测试数据
+            fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolResource/getSeedsEffectiveStatusCache', mainViewModel, true, initSeedsEffectiveList);
         }
         else if (target == '#crawl_status') {
-            //var sampleData = crawlStatusSampleData();//测试数据
             //初始化爬取状态列表
-            //initCrawlStatusList(mainViewModel, []);
+            fillPageList('crawlStatusModelList', '/webapi/crawlToolResource/getCrawlStatusList', mainViewModel, true, initCrawlStatusList);
         } else if (target == '#crawl_data') {
-            //var sampleData = crawlDataSampleData();//测试数据
             //初始化爬取数据列表
-            //initCrawlDataList(mainViewModel, []);
+            fillPageList('crawlDataModelList', '/webapi/crawlToolResource/getCrawlDataList', mainViewModel, true, initCrawlDataList);
         }
     });
 }
@@ -385,10 +384,10 @@ function initSeedsEffectiveList(isPageLoad, mainViewModel, initData) {
     mainViewModel.seedEffectiveVM.paginationUrls(mainViewModel.seedEffectiveVM.urls().slice(0, paginationItemCounts));
     //加载种子有效性页面分页控件
     loadPaginationComponent('#seeds_effective_pagination', mainViewModel.seedEffectiveVM);
-    if (!isPageLoad) {
-        //提示
-        showOptionModalMessage('操作结果', '检查种子有效性操作已执行完毕！');
-    }
+//    if (!isPageLoad) {
+//        //提示
+//        showOptionModalMessage('操作结果', '检查种子有效性操作已执行完毕！');
+//    }
 }
 
 /**

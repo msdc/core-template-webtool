@@ -469,7 +469,16 @@ public class CrawlToolService {
 	public String disableTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl, @DefaultValue("") @FormParam("name") String name) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
+
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		String templateString = RedisOperator.getFromDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
+		TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateString);
+		TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateGuid);
+		PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
+		// 保存到文件
+		saveToLocalFile(pageModel.toJSON());
 		serviceHelper.setTemplateStatus(templateUrl, name, "false");
+
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("操作成功！");
 		return jsonProvider.toJSON();
@@ -485,6 +494,15 @@ public class CrawlToolService {
 	public String enableTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl, @DefaultValue("") @FormParam("name") String name) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
+
+		String templateGuid = MD5Utils.MD5(templateUrl);
+		String templateString = RedisOperator.getFromDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
+		TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateString);
+		TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateGuid);
+		PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
+		// 保存到文件
+		saveToLocalFile(pageModel.toJSON());
+
 		serviceHelper.setTemplateStatus(templateUrl, name, "true");
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("操作成功！");
@@ -860,8 +878,10 @@ public class CrawlToolService {
 		// 列表按名称排序
 		Collections.sort(seedsEffectiveStatusModelList, new SeedsEffectiveModelComparator());
 		seedsEffectiveStatusList.setSeedsEffectiveStatusList(seedsEffectiveStatusModelList);
+		// 添加到Redis存储
+		RedisOperator.setToCacheDB(WebtoolConstants.SEEDS_EFFECTIVE_STATUS, seedsEffectiveStatusList.toJSON());
 		// 添加到缓存
-		StatusMonitorCache.setSeedsEffectiveStatusListCache(seedsEffectiveStatusList);
+		// StatusMonitorCache.setSeedsEffectiveStatusListCache(seedsEffectiveStatusList);
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData(seedsEffectiveStatusList);
 		return jsonProvider.toJSON();
@@ -876,9 +896,20 @@ public class CrawlToolService {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getSeedsEffectiveStatusCache() {
 		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();
+		CrawlToolResource serviceHelper = new CrawlToolResource();
 		jsonProvider.setSuccess(true);
 		SeedsEffectiveStatusList seedsEffectiveStatusList = new SeedsEffectiveStatusList();
-		List<SeedsEffectiveStatusModel> seedsEffectiveStatusModelList = StatusMonitorCache.getSeedsEffectiveStatusListCache().getSeedsEffectiveStatusList();
+		String json = RedisOperator.getFromCacheDB(WebtoolConstants.SEEDS_EFFECTIVE_STATUS);
+		if(json==null){
+			jsonProvider.setData(seedsEffectiveStatusList);
+			return jsonProvider.toJSON();
+		}
+		seedsEffectiveStatusList = serviceHelper.getSeedsEffectiveStatusList(json);
+
+		// 获取缓存
+		// List<SeedsEffectiveStatusModel> seedsEffectiveStatusModelList =
+		// StatusMonitorCache.getSeedsEffectiveStatusListCache().getSeedsEffectiveStatusList();
+		List<SeedsEffectiveStatusModel> seedsEffectiveStatusModelList = seedsEffectiveStatusList.getSeedsEffectiveStatusList();
 		seedsEffectiveStatusList.setSeedsEffectiveStatusList(seedsEffectiveStatusModelList);
 		if (seedsEffectiveStatusModelList != null) {
 			// 列表按名称排序
