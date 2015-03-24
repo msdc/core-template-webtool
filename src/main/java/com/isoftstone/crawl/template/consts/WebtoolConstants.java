@@ -64,6 +64,8 @@ public class WebtoolConstants {
     public static final String TEMPLATE_LIST_KEY_PARTERN = "_templatelist";
     //模板导出文件后缀
     public static final String TEMPLATE_FILE_EXTENTIONS_NAME =  ".txt";
+    //种子有效性文件 缓存Key
+    public static final String SEEDS_EFFECTIVE_STATUS =  "seeds_effective_status";  
     
     //-- 增量文件夹命名标识.
   	public static final String INCREMENT_FILENAME_SIGN = "increment";

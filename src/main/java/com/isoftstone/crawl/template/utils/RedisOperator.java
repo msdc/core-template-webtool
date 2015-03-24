@@ -23,6 +23,9 @@ public class RedisOperator {
 
     // 常规模板库
     public static final int DEFAULT_DBINDEX = 0;
+    
+    //种子有效性缓存库
+    public static final int CACHE_DBINDEX = 4;
 
     /**
      * 
@@ -35,6 +38,26 @@ public class RedisOperator {
             pool = RedisUtils.getPool();
             jedis = pool.getResource();
             jedis.select(DEFAULT_DBINDEX);
+            jedis.set(key, value);
+        } catch (Exception e) {
+            pool.returnBrokenResource(jedis);
+            e.printStackTrace();
+        } finally {
+            RedisUtils.returnResource(pool, jedis);
+        }
+    }
+    
+    /**
+     * 
+     * 添加到缓存库
+     * */
+    public static void setToCacheDB(String key, String value) {
+        JedisPool pool = null;
+        Jedis jedis = null;
+        try {
+            pool = RedisUtils.getPool();
+            jedis = pool.getResource();
+            jedis.select(CACHE_DBINDEX);
             jedis.set(key, value);
         } catch (Exception e) {
             pool.returnBrokenResource(jedis);
@@ -75,6 +98,28 @@ public class RedisOperator {
             pool = RedisUtils.getPool();
             jedis = pool.getResource();
             jedis.select(DEFAULT_DBINDEX);
+            String value = jedis.get(key);
+            return value;
+        } catch (Exception e) {
+            pool.returnBrokenResource(jedis);
+            e.printStackTrace();
+        } finally {
+            RedisUtils.returnResource(pool, jedis);
+        }
+        return "";
+    }
+    
+    /**
+     * 
+     * 从缓存库库中取值
+     * */
+    public static String getFromCacheDB(String key) {
+        JedisPool pool = null;
+        Jedis jedis = null;
+        try {
+            pool = RedisUtils.getPool();
+            jedis = pool.getResource();
+            jedis.select(CACHE_DBINDEX);
             String value = jedis.get(key);
             return value;
         } catch (Exception e) {
