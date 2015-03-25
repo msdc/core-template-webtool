@@ -43,8 +43,15 @@ public class WebtoolConstants {
     public static final String KEY_NUTCH_HOST_IP = "nutchHostip";
     public static final String KEY_NUTCH_HOST_USERNAME = "nutchHostUserName";
     public static final String KEY_NUTCH_HOST_PASSWORD = "nutchHostPassword";
-
     
+    
+    public static final String KEY_NUTCH_CRAWLDIR = "crawlDir";
+    public static final String KEY_NUTCH_SOLR_URL = "solrURL";
+    public static final String KEY_NUTCH_LOCAL_INCREMENT_SHDIR = "localIncrementShDir";
+    public static final String KEY_NUTCH_LOCAL_INCREMENT_PROXY_SHDIR = "localIncrementProxyShDir";
+    public static final String KEY_NUTCH_DEPLOY_NORMAL_SHDIR = "deployNormalShDir";
+    public static final String KEY_NUTCH_DEPLOY_NORMAL_PROXY_SHDIR = "deployNormalProxyShDir";
+    public static final String KEY_HDFS_ROOT_PREFIX = "hdfsRootPrefix";
     
     public static final String BAIDU_SEARCH_NAME="百度新闻搜索";
     public static final String BING_SEARCH_NAME="Bing新闻搜索";
