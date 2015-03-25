@@ -78,11 +78,13 @@ public class CrawlState {
      * @param dispatchName
      */
     public String crawlIncrement(String folderName) {
-        String rootFolder = "/nutch_seeds";
-        String shDir = "/nutch/local_incremental/bin/crawl";
-        String proxyShDir = "/nutch/local_incremental_proxy/bin/crawl";
-        String crawlDir = "/nutch_data/";
-        String solrURL = "http://192.168.100.31:8080/solr/collection1/";
+        String rootFolder = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
+        String shDir = Config
+                .getValue(WebtoolConstants.KEY_NUTCH_LOCAL_INCREMENT_SHDIR);
+        String proxyShDir = Config
+                .getValue(WebtoolConstants.KEY_NUTCH_LOCAL_INCREMENT_PROXY_SHDIR);
+        String crawlDir = Config.getValue(WebtoolConstants.KEY_NUTCH_CRAWLDIR);
+        String solrURL = Config.getValue(WebtoolConstants.KEY_NUTCH_SOLR_URL);
         String depth = "2";
         String dispatchName = folderName
                 + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
@@ -116,11 +118,13 @@ public class CrawlState {
      * @param dispatchName
      */
     public String crawlFull(String folderName) {
-        String rootFolder = "/nutch_seeds";
-        String shDir = "/nutch/deploy_normal/bin/crawl";
-        String proxyShDir = "/nutch/deploy_normal_proxy/bin/crawl";
-        String crawlDir = "/nutch_data/";
-        String solrURL = "http://192.168.100.31:8080/solr/collection1/";
+        String rootFolder = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
+        String shDir = Config
+                .getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_SHDIR);
+        String proxyShDir = Config
+                .getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_PROXY_SHDIR);
+        String crawlDir = Config.getValue(WebtoolConstants.KEY_NUTCH_CRAWLDIR);
+        String solrURL = Config.getValue(WebtoolConstants.KEY_NUTCH_SOLR_URL);
         String depth = "3";
         String dispatchName = folderName
                 + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
@@ -135,6 +139,10 @@ public class CrawlState {
         String folderNameData = folderNameSeed.substring(0,
             folderNameSeed.lastIndexOf("_"));
         String seedFolder = rootFolder + File.separator + folderNameSeed;
+        // -- 如果是集群模式.
+        //TODO:现在默认是集群模式.
+        seedFolder = Config.getValue(WebtoolConstants.KEY_HDFS_ROOT_PREFIX)
+                + folderNameSeed;
         String command = shDir + " " + seedFolder + " " + crawlDir
                 + folderNameData + "_data" + " " + solrURL + " " + depth;
         Runmanager runmanager = getRunmanager(command);
@@ -143,23 +151,24 @@ public class CrawlState {
     }
 
     /**
-     * 重新索引.
-     * @param dispatchName
+     * 重新索引. 目前只对集群模式起作用.
+     * @param folderNameSeed
      */
     public String reParse(String folderNameSeed, String model) {
-        String nutch_root = "";
-        String solr_index = "http://192.168.100.31:8080/solr/collection1/";
-        String crawlDir = "/nutch_data/";
+        String nutch_root = Config
+                .getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_SHDIR);
+        String solrURL = Config.getValue(WebtoolConstants.KEY_NUTCH_SOLR_URL);
+        String crawlDir = Config.getValue(WebtoolConstants.KEY_NUTCH_CRAWLDIR);
         String folderNameData = folderNameSeed.substring(0,
             folderNameSeed.lastIndexOf("_"));
         String data_folder = crawlDir + folderNameData + "_data";
         //        if ("local".equals(model)) {
         //            nutch_root = "/nutch/local_incremental/bin/crawl";
         //        } else if ("deploy".equals(model)) {
-        nutch_root = "/nutch/deploy_normal/bin/crawl";
+        //        nutch_root = "/nutch/deploy_normal/bin/crawl";
         //        }
-        ReParseAndIndex.reParseAndIndex(nutch_root, data_folder, solr_index,
-            false);
+        ReParseAndIndex
+                .reParseAndIndex(nutch_root, data_folder, solrURL, false);
         return "success";
     }
 
