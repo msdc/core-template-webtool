@@ -53,7 +53,9 @@ var crawlStatusVM = function (mainViewModel, urlData) {
         var self = this;
         self.crawlStatusString('执行中..');
         self.checkTimeString('执行中..');
-        sendPostRequest('/webapi/crawlToolResource/stopCrawl', self, {folderName: self.url}, function (data, dataModel) {
+        var isDeploy = $('#btn_toggle_schema').prop('checked');
+        var isNormal = $('#btn_toggle_index').prop('checked');
+        sendPostRequest('/webapi/crawlToolResource/stopCrawl', self, {folderName: self.url, isDeploy: isDeploy, isNormal: isNormal}, function (data, dataModel) {
             var json = JSON.parse(data);
             if (json.success) {
                 var crawlStatusModel = json.data;
@@ -66,17 +68,16 @@ var crawlStatusVM = function (mainViewModel, urlData) {
     //重新索引
     that.reParse = function () {
         var self = this;
-        sendAjax2PostRequest('/webapi/crawlToolResource/reParse', self, {folderName: self.url}, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
+        var isDeploy = $('#btn_toggle_schema').prop('checked');
+        var isNormal = $('#btn_toggle_index').prop('checked');
+        sendAjax2PostRequest('/webapi/crawlToolResource/reParse', self, {folderName: self.url, isDeploy: isDeploy, isNormal: isNormal}, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
     };
-    //爬虫增量.
-    that.crawlIncrement = function () {
+    //重爬
+    that.crawl = function () {
         var self = this;
-        sendAjax2PostRequest('/webapi/crawlToolResource/crawlIncrement', self, {folderName: self.url}, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
-    };
-    // 爬虫全量.
-    that.crawlFull = function () {
-        var self = this;
-        sendAjax2PostRequest('/webapi/crawlToolResource/crawlFull', self, {folderName: self.url}, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
+        var isDeploy = $('#btn_toggle_schema').prop('checked');
+        var isNormal = $('#btn_toggle_index').prop('checked');
+        sendAjax2PostRequest('/webapi/crawlToolResource/crawl', self, {folderName: self.url, isDeploy: isDeploy, isNormal: isNormal}, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
     };
 };
 

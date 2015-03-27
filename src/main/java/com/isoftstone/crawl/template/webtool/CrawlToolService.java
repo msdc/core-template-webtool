@@ -900,7 +900,7 @@ public class CrawlToolService {
 		jsonProvider.setSuccess(true);
 		SeedsEffectiveStatusList seedsEffectiveStatusList = new SeedsEffectiveStatusList();
 		String json = RedisOperator.getFromCacheDB(WebtoolConstants.SEEDS_EFFECTIVE_STATUS);
-		if(json==null){
+		if (json == null) {
 			jsonProvider.setData(seedsEffectiveStatusList);
 			return jsonProvider.toJSON();
 		}
@@ -1035,10 +1035,10 @@ public class CrawlToolService {
 	@POST
 	@Path("/stopCrawl")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String stopCrawl(@DefaultValue("") @FormParam("folderName") String folderName) {
+	public String stopCrawl(@DefaultValue("") @FormParam("folderName") String folderName, @FormParam("isDeploy") boolean isDeploy, @FormParam("isNormal") boolean isNormal) {
 		ResponseJSONProvider<CrawlStatusModel> jsonProvider = new ResponseJSONProvider<CrawlStatusModel>();
 		CrawlState crawlState = new CrawlState();
-		String stopStatus = crawlState.stopCrawl(folderName);
+		String stopStatus = crawlState.stopCrawl(folderName, isDeploy, isNormal);
 
 		Date currentDate = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -1074,10 +1074,10 @@ public class CrawlToolService {
 	@POST
 	@Path("/reParse")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String reParse(@DefaultValue("") @FormParam("folderName") String folderName) {
+	public String reParse(@DefaultValue("") @FormParam("folderName") String folderName, @FormParam("isDeploy") boolean isDeploy, @FormParam("isNormal") boolean isNormal) {
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		CrawlState crawlState = new CrawlState();
-		String reParseResult = crawlState.reParse(folderName, null);
+		String reParseResult = crawlState.reParse(folderName, isDeploy, isNormal);
 		jsonProvider.setSuccess(true);
 		if (reParseResult.equals("success")) {
 			jsonProvider.setData("操作成功！");
@@ -1089,35 +1089,15 @@ public class CrawlToolService {
 
 	/**
 	 * 
-	 * 爬虫增量.
+	 * 重爬
 	 * */
 	@POST
-	@Path("/crawlIncrement")
+	@Path("/crawl")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String crawlIncrement(@DefaultValue("") @FormParam("folderName") String folderName) {
+	public String crawl(@DefaultValue("") @FormParam("folderName") String folderName, @FormParam("isDeploy") boolean isDeploy, @FormParam("isNormal") boolean isNormal) {
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		CrawlState crawlState = new CrawlState();
-		String crawlIncrementResult = crawlState.crawlIncrement(folderName);
-		jsonProvider.setSuccess(true);
-		if (crawlIncrementResult.equals("success")) {
-			jsonProvider.setData("操作成功！");
-		} else {
-			jsonProvider.setData("操作失败！");
-		}
-		return jsonProvider.toJSON();
-	}
-
-	/**
-	 * 
-	 * 爬虫全量.
-	 * */
-	@POST
-	@Path("/crawlFull")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String crawlFull(@DefaultValue("") @FormParam("folderName") String folderName) {
-		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
-		CrawlState crawlState = new CrawlState();
-		String crawlFullResult = crawlState.crawlFull(folderName);
+		String crawlFullResult = crawlState.crawl(folderName, isDeploy, isNormal);
 		jsonProvider.setSuccess(true);
 		if (crawlFullResult.equals("success")) {
 			jsonProvider.setData("操作成功！");
