@@ -255,8 +255,8 @@ public class CrawlToolResource {
 			if ("true".equals(isCopy)) {
 				putSeedsFolder(folderName, "local");
 			}
-			// HdfsCommon.upFileToHdfs(filePath);
-			putSeedsFolder(folderName, "deploy");
+			HdfsCommon.upFileToHdfs(filePath);
+			//putSeedsFolder(folderName, "deploy");
 		} catch (Exception e) {
 			LOG.error("生成文件错误.", e);
 		} finally {
