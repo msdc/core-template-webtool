@@ -72,6 +72,17 @@ public class CrawlState {
         }
         return crawlStateList;
     }
+    
+    /**
+     * 重爬.
+     * @param folderName 文件夹名称.
+     * @param isDeploy 是否是集群.
+     * @param isNomal 是否是全量.
+     * @return 结果标识.
+     */
+    public String crawl(String folderName, boolean isDeploy, boolean isNomal) {
+        return "success";
+    }
 
     /**
      * 爬虫增量.
@@ -154,7 +165,7 @@ public class CrawlState {
      * 重新索引. 目前只对集群模式起作用.
      * @param folderNameSeed
      */
-    public String reParse(String folderNameSeed, String model) {
+    public String reParse(String folderNameSeed, boolean isDeploy, boolean isNomal) {
         String nutch_root = Config
                 .getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_SHDIR);
         String solrURL = Config.getValue(WebtoolConstants.KEY_NUTCH_SOLR_URL);
@@ -176,7 +187,7 @@ public class CrawlState {
      * 停止爬虫.
      * @param dispatchName
      */
-    public String stopCrawl(String folderName) {
+    public String stopCrawl(String folderName, boolean isDeploy, boolean isNomal) {
         // 1.修改redis中种子状态
         String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
         DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey,
