@@ -133,11 +133,7 @@ public class CrawlState {
         ShellUtils.execCmd(runmanager);
         return "success";
     }
-    
-    public static void main(String[] args) {
-        new CrawlState().crawl("world.huanqiu.com_1hour_1", false, true);
-    }
-
+ 
     /**
      * 爬虫全量.
      * @param dispatchName
