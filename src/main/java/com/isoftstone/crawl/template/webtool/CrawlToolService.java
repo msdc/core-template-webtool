@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -21,7 +21,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
-import org.mortbay.log.Log;
 
 import com.isoftstone.crawl.template.consts.WebtoolConstants;
 import com.isoftstone.crawl.template.crawlstate.CrawlState;

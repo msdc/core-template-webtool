@@ -47,10 +47,18 @@ public class WebtoolConstants {
     
     public static final String KEY_NUTCH_CRAWLDIR = "crawlDir";
     public static final String KEY_NUTCH_SOLR_URL = "solrURL";
+    
+    // -- increment
     public static final String KEY_NUTCH_LOCAL_INCREMENT_SHDIR = "localIncrementShDir";
+    public static final String KEY_NUTCH_DEPLOY_INCREMENT_SHDIR = "deployIncrementShDir";
     public static final String KEY_NUTCH_LOCAL_INCREMENT_PROXY_SHDIR = "localIncrementProxyShDir";
+    public static final String KEY_NUTCH_DEPLOY_INCREMENT_PROXY_SHDIR = "deployIncrementProxyShDir";
+    
+    // -- normal
     public static final String KEY_NUTCH_DEPLOY_NORMAL_SHDIR = "deployNormalShDir";
     public static final String KEY_NUTCH_DEPLOY_NORMAL_PROXY_SHDIR = "deployNormalProxyShDir";
+    public static final String KEY_NUTCH_LOCAL_NORMAL_SHDIR = "localNormalShDir";
+    public static final String KEY_NUTCH_LOCAL_NORMAL_PROXY_SHDIR = "localNormalProxyShDir";
     public static final String KEY_HDFS_ROOT_PREFIX = "hdfsRootPrefix";
     
     public static final String BAIDU_SEARCH_NAME="百度新闻搜索";

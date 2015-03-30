@@ -25,6 +25,7 @@ import redis.clients.jedis.JedisPool;
 import com.isoftstone.crawl.template.consts.WebtoolConstants;
 import com.isoftstone.crawl.template.model.CrawlStateBean;
 import com.isoftstone.crawl.template.utils.Config;
+import com.isoftstone.crawl.template.utils.HdfsCommon;
 import com.isoftstone.crawl.template.utils.RedisOperator;
 import com.isoftstone.crawl.template.utils.RedisUtils;
 import com.isoftstone.crawl.template.utils.ShellUtils;
@@ -294,8 +295,8 @@ public class CrawlState {
             if ("true".equals(isCopy)) {
                 CrawlToolResource.putSeedsFolder(folderName, "local");
             }
-            //HdfsCommon.upFileToHdfs(filePath);
-            CrawlToolResource.putSeedsFolder(folderName, "deploy");
+            HdfsCommon.upFileToHdfs(filePath);
+//            CrawlToolResource.putSeedsFolder(folderName, "deploy");
         } catch (Exception e) {
             LOG.error("生成文件错误.", e);
         } finally {
