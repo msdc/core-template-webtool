@@ -475,9 +475,9 @@ public class CrawlToolService {
 		TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateString);
 		TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateGuid);
 		PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
-		// 保存到文件
-		saveToLocalFile(pageModel.toJSON());
 		serviceHelper.setTemplateStatus(templateUrl, name, "false");
+		// 保存到文件
+		saveToLocalFile(pageModel.toJSON());	
 
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("操作成功！");
@@ -500,10 +500,10 @@ public class CrawlToolService {
 		TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateString);
 		TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateGuid);
 		PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
+		serviceHelper.setTemplateStatus(templateUrl, name, "true");
 		// 保存到文件
 		saveToLocalFile(pageModel.toJSON());
-
-		serviceHelper.setTemplateStatus(templateUrl, name, "true");
+		
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("操作成功！");
 		return jsonProvider.toJSON();
