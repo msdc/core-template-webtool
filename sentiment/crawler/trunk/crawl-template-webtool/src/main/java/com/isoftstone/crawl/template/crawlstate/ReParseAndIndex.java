@@ -1,12 +1,12 @@
 package com.isoftstone.crawl.template.crawlstate;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.isoftstone.crawl.template.consts.WebtoolConstants;
 import com.isoftstone.crawl.template.utils.Config;
@@ -18,25 +18,8 @@ import com.isoftstone.crawl.template.vo.Runmanager;
  */
 
 public class ReParseAndIndex {
-    public static void main(String[] args) {
-        if (args.length < 4) {
-            System.err
-                    .println("Usage: ParseAndIndex <nutch_root> <data_folder> <solr_index> <parse_filter>");
-            return;
-        }
-        String nutch_root = args[0];
-        String data_folder = args[1];
-        String solr_index = args[2];
-        String filter = args[3];
-        if (nutch_root != null && data_folder != null) {
-            System.out.println("ParseAndIndex: nutch_root: " + nutch_root);
-            System.out.println("ParseAndIndex: data_folder: " + data_folder);
-            System.out.println("ParseAndIndex: solr_index: " + solr_index);
-            System.out.println("ParseAndIndex: parse_filter: " + filter);
-        }
-        reParseAndIndex(nutch_root, data_folder, solr_index,
-            Boolean.parseBoolean(filter));
-    }
+    
+    private static final Log LOG = LogFactory.getLog(ReParseAndIndex.class);
 
     public static void reParseAndIndex(String nutch_root, String data_folder,
             String solr_index, boolean filter) {
@@ -45,7 +28,7 @@ public class ReParseAndIndex {
 
         File[] fis = new File(data_folder).listFiles();
         for (File tpFile : fis) {
-            System.out.println("tpFile:" + tpFile);
+            LOG.info("tpFile:" + tpFile);
             if (tpFile.isDirectory()) {
                 File[] secfis = tpFile.listFiles();
                 for (File sectpFile : secfis) {
@@ -143,8 +126,8 @@ public class ReParseAndIndex {
             if (file.isDirectory()) {
                 removeDir(file);
             } else
-                System.out.println(file + ":" + file.delete());
+                LOG.info(file + ":" + file.delete());
         }
-        System.out.println(dir + "----" + dir.delete());
+        LOG.info(dir + "----" + dir.delete());
     }
 }

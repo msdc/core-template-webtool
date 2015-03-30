@@ -43,6 +43,16 @@ import com.isoftstone.crawl.template.webtool.CrawlToolResource;
  */
 public class CrawlState {
 
+    /**
+     * 
+     */
+    private static final String ERROR = "error";
+
+    /**
+     * 
+     */
+    private static final String SUCCESS = "success";
+
     private static final Log LOG = LogFactory.getLog(CrawlState.class);
 
     /**
@@ -82,7 +92,7 @@ public class CrawlState {
      * @return 结果标识.
      */
     public String crawl(String folderName, boolean isDeploy, boolean isNomal) {
-        String result = "error";
+        String result = ERROR;
         if (isNomal) {
             result = crawlFull(folderName, isDeploy);
         } else {
@@ -101,14 +111,16 @@ public class CrawlState {
         String crawlDir = Config.getValue(WebtoolConstants.KEY_NUTCH_CRAWLDIR);
         String solrURL = Config.getValue(WebtoolConstants.KEY_NUTCH_SOLR_URL);
         String depth = "2";
-        String dispatchName = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
-        DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName, WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+        String dispatchName = folderName
+                + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
+        DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName,
+            WebtoolConstants.DISPATCH_REDIS_DBINDEX);
         boolean userProxy = dispatchVo.isUserProxy();
-        
+
         //--确定shDir.
-        if(isDeploy) {
+        if (isDeploy) {
             shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_INCREMENT_SHDIR);
-            if(userProxy) {
+            if (userProxy) {
                 shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_INCREMENT_PROXY_SHDIR);
             }
         } else {
@@ -117,9 +129,11 @@ public class CrawlState {
                 shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_LOCAL_INCREMENT_PROXY_SHDIR);
             }
         }
-        
-        String folderNameSeed = dispatchName.substring(0, dispatchName.lastIndexOf("_"));
-        String folderNameData = folderNameSeed.substring(0, folderNameSeed.lastIndexOf("_"));
+
+        String folderNameSeed = dispatchName.substring(0,
+            dispatchName.lastIndexOf("_"));
+        String folderNameData = folderNameSeed.substring(0,
+            folderNameSeed.lastIndexOf("_"));
         String[] folderNameStrs = folderNameSeed.split("_");
         folderNameSeed = folderNameStrs[0] + "_" + folderNameStrs[1] + "_"
                 + WebtoolConstants.INCREMENT_FILENAME_SIGN + "_"
@@ -131,10 +145,11 @@ public class CrawlState {
         String command = shDir + " " + seedFolder + " " + crawlDir
                 + folderNameData + "_data" + " " + solrURL + " " + depth;
         Runmanager runmanager = getRunmanager(command);
+        LOG.info("增量重爬:" + command);
         ShellUtils.execCmd(runmanager);
-        return "success";
+        return SUCCESS;
     }
- 
+
     /**
      * 爬虫全量.
      * @param dispatchName
@@ -150,30 +165,38 @@ public class CrawlState {
         DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName,
             WebtoolConstants.DISPATCH_REDIS_DBINDEX);
         boolean userProxy = dispatchVo.isUserProxy();
-        
-        if(isDeploy) {
-            shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_LOCAL_NORMAL_SHDIR);
-            if(userProxy) {
-                shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_LOCAL_NORMAL_PROXY_SHDIR);
+
+        if (isDeploy) {
+            shDir = Config
+                    .getValue(WebtoolConstants.KEY_NUTCH_LOCAL_NORMAL_SHDIR);
+            if (userProxy) {
+                shDir = Config
+                        .getValue(WebtoolConstants.KEY_NUTCH_LOCAL_NORMAL_PROXY_SHDIR);
             }
         } else {
-            shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_SHDIR);
+            shDir = Config
+                    .getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_SHDIR);
             if (userProxy) {
-                shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_PROXY_SHDIR);
+                shDir = Config
+                        .getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_PROXY_SHDIR);
             }
         }
-        
-        String folderNameSeed = dispatchName.substring(0, dispatchName.lastIndexOf("_"));
-        String folderNameData = folderNameSeed.substring(0, folderNameSeed.lastIndexOf("_"));
+
+        String folderNameSeed = dispatchName.substring(0,
+            dispatchName.lastIndexOf("_"));
+        String folderNameData = folderNameSeed.substring(0,
+            folderNameSeed.lastIndexOf("_"));
         String seedFolder = rootFolder + File.separator + folderNameSeed;
-        if(isDeploy) {
-            seedFolder = Config.getValue(WebtoolConstants.KEY_HDFS_ROOT_PREFIX) + folderNameSeed;
+        if (isDeploy) {
+            seedFolder = Config.getValue(WebtoolConstants.KEY_HDFS_ROOT_PREFIX)
+                    + folderNameSeed;
         }
         String command = shDir + " " + seedFolder + " " + crawlDir
                 + folderNameData + "_data" + " " + solrURL + " " + depth;
+        LOG.info("全量重爬:" + command);
         Runmanager runmanager = getRunmanager(command);
         ShellUtils.execCmd(runmanager);
-        return "success";
+        return SUCCESS;
     }
 
     /**
@@ -185,15 +208,16 @@ public class CrawlState {
         String nutch_root;
         String solrURL = Config.getValue(WebtoolConstants.KEY_NUTCH_SOLR_URL);
         String crawlDir = Config.getValue(WebtoolConstants.KEY_NUTCH_CRAWLDIR);
-        String folderNameData = folderNameSeed.substring(0, folderNameSeed.lastIndexOf("_"));
-        
+        String folderNameData = folderNameSeed.substring(0,
+            folderNameSeed.lastIndexOf("_"));
+
         //-- 判断是否是集群还是单机模式.
         if (isDeploy) {
             nutch_root = Config.getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_SHDIR);
         } else {
             nutch_root = Config.getValue(WebtoolConstants.KEY_NUTCH_LOCAL_NORMAL_SHDIR);
         }
-        
+
         //-- 设置data目录.
         if (!isNomal) {
             folderNameData = folderNameData.substring(0,
@@ -203,8 +227,11 @@ public class CrawlState {
 
         String data_folder = crawlDir + folderNameData + "_data";
         
+        LOG.info("ParseAndIndex: nutch_root: " + nutch_root);
+        LOG.info("ParseAndIndex: data_folder: " + data_folder);
+        
         ReParseAndIndex.reParseAndIndex(nutch_root, data_folder, solrURL, false);
-        return "success";
+        return SUCCESS;
     }
 
     /**
@@ -217,11 +244,11 @@ public class CrawlState {
         DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey,
             WebtoolConstants.DISPATCH_REDIS_DBINDEX);
         if (dispatchVo == null) {
-            return "error";
+            return ERROR;
         }
         List<Seed> seedList = dispatchVo.getSeed();
         if (seedList == null) {
-            return "error";
+            return ERROR;
         }
         for (Iterator<Seed> it = seedList.iterator(); it.hasNext();) {
             Seed seed = it.next();
@@ -240,7 +267,11 @@ public class CrawlState {
         String incrementFolderName = domain + "_" + "1" + period + "_"
                 + WebtoolConstants.INCREMENT_FILENAME_SIGN + "_" + sequence;
         contextToFile(incrementFolderName);
-        return "success";
+        return SUCCESS;
+    }
+
+    public String deleteCrawlerSeed(String pageModelData) {
+        return SUCCESS;
     }
 
     private Runmanager getRunmanager(String command) {
@@ -296,7 +327,7 @@ public class CrawlState {
                 CrawlToolResource.putSeedsFolder(folderName, "local");
             }
             HdfsCommon.upFileToHdfs(filePath);
-//            CrawlToolResource.putSeedsFolder(folderName, "deploy");
+            //            CrawlToolResource.putSeedsFolder(folderName, "deploy");
         } catch (Exception e) {
             LOG.error("生成文件错误.", e);
         } finally {
