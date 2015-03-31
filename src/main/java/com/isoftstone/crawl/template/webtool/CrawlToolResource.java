@@ -96,7 +96,7 @@ public class CrawlToolResource {
 	 */
 	public void saveSeedsValueToFile(String folderName, String incrementFolderName, String templateUrl, List<String> seeds, String status, boolean userProxy, String paginationUrl,
 			String currentString, String start) {
-		List<String> beforeSeedList = getSeedListResult(templateUrl, WebtoolConstants.SEEDLIST_REDIS_DEBINDEX);
+		List<String> beforeSeedList = getSeedListResult(templateUrl, Constants.SEEDLIST_REDIS_DEBINDEX);
 
 		// --1.1 保存模板url到本地文件.
 		List<String> templateList = new ArrayList<String>();
@@ -106,11 +106,11 @@ public class CrawlToolResource {
 		contentToTxt(incrementFolderName, seeds, status, paginationUrl, currentString, start, beforeSeedList);
 
 		// --1.3将增量种子列表，保存到redis中，key为模板url.
-		setSeedListResult(seeds, templateUrl, WebtoolConstants.SEEDLIST_REDIS_DEBINDEX);
+		setSeedListResult(seeds, templateUrl, Constants.SEEDLIST_REDIS_DEBINDEX);
 		// --2.保存到redis中.
 		String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
 
-		DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey, WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+		DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey, Constants.DISPATCH_REDIS_DBINDEX);
 		if (dispatchVo == null) {
 			dispatchVo = new DispatchVo();
 		}
@@ -133,7 +133,7 @@ public class CrawlToolResource {
 			seedList.add(seed);
 		}
 		dispatchVo.setSeed(seedList);
-		RedisOperator.setDispatchResult(dispatchVo, redisKey, WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+		RedisOperator.setDispatchResult(dispatchVo, redisKey, Constants.DISPATCH_REDIS_DBINDEX);
 	}
 
 	public void setSeedListResult(List<String> seedList, String guid, int dbindex) {
