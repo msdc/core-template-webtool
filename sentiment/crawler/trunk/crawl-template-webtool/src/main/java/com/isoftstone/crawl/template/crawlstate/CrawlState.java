@@ -23,6 +23,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import com.isoftstone.crawl.template.consts.WebtoolConstants;
+import com.isoftstone.crawl.template.global.Constants;
 import com.isoftstone.crawl.template.model.CrawlStateBean;
 import com.isoftstone.crawl.template.utils.Config;
 import com.isoftstone.crawl.template.utils.HdfsCommon;
@@ -61,12 +62,12 @@ public class CrawlState {
      */
     public List<CrawlStateBean> getCrawlState() {
         List<String> folderNameList = getResultList("*_dispatch",
-            WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+            Constants.DISPATCH_REDIS_DBINDEX);
         List<CrawlStateBean> crawlStateList = new ArrayList<CrawlStateBean>();
         for (Iterator<String> it = folderNameList.iterator(); it.hasNext();) {
             String redisKey = it.next();
             DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey,
-                WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+                Constants.DISPATCH_REDIS_DBINDEX);
             CrawlStateBean bean = new CrawlStateBean();
             bean.setDispatchName(redisKey.substring(0,
                 redisKey.lastIndexOf("_")));
@@ -114,7 +115,7 @@ public class CrawlState {
         String dispatchName = folderName
                 + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
         DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName,
-            WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+            Constants.DISPATCH_REDIS_DBINDEX);
         boolean userProxy = dispatchVo.isUserProxy();
 
         //--确定shDir.
@@ -163,7 +164,7 @@ public class CrawlState {
         String dispatchName = folderName
                 + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
         DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName,
-            WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+            Constants.DISPATCH_REDIS_DBINDEX);
         boolean userProxy = dispatchVo.isUserProxy();
 
         if (isDeploy) {
@@ -242,7 +243,7 @@ public class CrawlState {
         // 1.修改redis中种子状态
         String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
         DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey,
-            WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+            Constants.DISPATCH_REDIS_DBINDEX);
         if (dispatchVo == null) {
             return ERROR;
         }
@@ -255,7 +256,7 @@ public class CrawlState {
             seed.setIsEnabled("false");
         }
         RedisOperator.setDispatchResult(dispatchVo, redisKey,
-            WebtoolConstants.DISPATCH_REDIS_DBINDEX);
+            Constants.DISPATCH_REDIS_DBINDEX);
         // 2.修改文件中 种子状态.
         String[] folderNameArr = folderName.split("_");
         String domain = folderNameArr[0];
