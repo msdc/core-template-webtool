@@ -476,7 +476,7 @@ public class CrawlToolService {
 		PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
 		serviceHelper.setTemplateStatus(templateUrl, name, "false");
 		// 保存到文件
-		saveToLocalFile(pageModel.toJSON());	
+		saveToLocalFile(pageModel.toJSON());
 
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("操作成功！");
@@ -502,7 +502,7 @@ public class CrawlToolService {
 		serviceHelper.setTemplateStatus(templateUrl, name, "true");
 		// 保存到文件
 		saveToLocalFile(pageModel.toJSON());
-		
+
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("操作成功！");
 		return jsonProvider.toJSON();
@@ -787,15 +787,10 @@ public class CrawlToolService {
 		for (String listKey : templateListKeys) {
 			String templateModelJSONString = RedisOperator.getFromDefaultDB(listKey);
 			TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateModelJSONString);
-			// TemplateResult templateResult =
-			// RedisOperator.getTemplateResultFromDefaultDB(templateModel.getTemplateId());
-			// PageModel pageModel =
-			// serviceHelper.convertTemplateResultToPageModel(templateModel,
-			// templateResult);
+			TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateModel.getTemplateId());
+			PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
 			// 同时导出到文件
-			// Log.info("开始批量导入文件.");
-			// saveToLocalFile(pageModel.toJSON());
-			// Log.info("批量导入文件完成.");
+			saveToLocalFile(pageModel.toJSON());
 			ResponseJSONProvider<String> saveResult = serviceHelper.saveIncreaseTemplateResult(templateModel, "");
 			if (saveResult.getErrorMsg() != null) {
 				failedTemplateCount++;
