@@ -14,18 +14,11 @@ import com.isoftstone.crawl.template.impl.TemplateFactory;
 import com.isoftstone.crawl.template.impl.TemplateResult;
 import com.isoftstone.crawl.template.vo.DispatchVo;
 
+import com.isoftstone.crawl.template.global.Constants;
+
 public class RedisOperator {
 
     private static final Log LOG = LogFactory.getLog(RedisOperator.class);
-
-    // 增量模板库
-    public static final int INCREASE_DBINDEX = 1;
-
-    // 常规模板库
-    public static final int DEFAULT_DBINDEX = 0;
-    
-    //种子有效性缓存库
-    public static final int CACHE_DBINDEX = 4;
 
     /**
      * 
@@ -37,7 +30,7 @@ public class RedisOperator {
         try {
             pool = RedisUtils.getPool();
             jedis = pool.getResource();
-            jedis.select(DEFAULT_DBINDEX);
+            jedis.select(Constants.DEFAULT_REDIS_DBINDEX);
             jedis.set(key, value);
         } catch (Exception e) {
             pool.returnBrokenResource(jedis);
@@ -57,7 +50,7 @@ public class RedisOperator {
         try {
             pool = RedisUtils.getPool();
             jedis = pool.getResource();
-            jedis.select(CACHE_DBINDEX);
+            jedis.select(Constants.CACHE_REDIS_DBINDEX);
             jedis.set(key, value);
         } catch (Exception e) {
             pool.returnBrokenResource(jedis);
@@ -77,7 +70,7 @@ public class RedisOperator {
         try {
             pool = RedisUtils.getPool();
             jedis = pool.getResource();
-            jedis.select(INCREASE_DBINDEX);
+            jedis.select(Constants.INCREASE_REDIS_DBINDEX);
             jedis.set(key, value);
         } catch (Exception e) {
             pool.returnBrokenResource(jedis);
@@ -97,7 +90,7 @@ public class RedisOperator {
         try {
             pool = RedisUtils.getPool();
             jedis = pool.getResource();
-            jedis.select(DEFAULT_DBINDEX);
+            jedis.select(Constants.DEFAULT_REDIS_DBINDEX);
             String value = jedis.get(key);
             return value;
         } catch (Exception e) {
@@ -119,7 +112,7 @@ public class RedisOperator {
         try {
             pool = RedisUtils.getPool();
             jedis = pool.getResource();
-            jedis.select(CACHE_DBINDEX);
+            jedis.select(Constants.CACHE_REDIS_DBINDEX);
             String value = jedis.get(key);
             return value;
         } catch (Exception e) {
@@ -141,7 +134,7 @@ public class RedisOperator {
         try {
             pool = RedisUtils.getPool();
             jedis = pool.getResource();
-            jedis.select(INCREASE_DBINDEX);
+            jedis.select(Constants.INCREASE_REDIS_DBINDEX);
             String value = jedis.get(key);
             return value;
         } catch (Exception e) {
@@ -163,7 +156,7 @@ public class RedisOperator {
         try {
             pool = RedisUtils.getPool();
             jedis = pool.getResource();
-            jedis.select(DEFAULT_DBINDEX);
+            jedis.select(Constants.DEFAULT_REDIS_DBINDEX);
             return jedis.del(keys);
         } catch (Exception e) {
             pool.returnBrokenResource(jedis);
@@ -184,7 +177,7 @@ public class RedisOperator {
         try {
             pool = RedisUtils.getPool();
             jedis = pool.getResource();
-            jedis.select(INCREASE_DBINDEX);
+            jedis.select(Constants.INCREASE_REDIS_DBINDEX);
             return jedis.del(keys);
         } catch (Exception e) {
             pool.returnBrokenResource(jedis);
@@ -206,7 +199,7 @@ public class RedisOperator {
         try {
             pool = RedisUtils.getPool();
             jedis = pool.getResource();
-            jedis.select(DEFAULT_DBINDEX);
+            jedis.select(Constants.DEFAULT_REDIS_DBINDEX);
             listKeys = jedis.keys(pattern);
             return listKeys;
         } catch (Exception e) {
@@ -226,7 +219,7 @@ public class RedisOperator {
     public static void saveTemplateToDefaultDB(TemplateResult templateResult,
             String templateGuid) {
         RedisUtils.setTemplateResult(templateResult, templateGuid,
-            DEFAULT_DBINDEX);
+        		Constants.DEFAULT_REDIS_DBINDEX);
     }
 
     /**
@@ -236,7 +229,7 @@ public class RedisOperator {
     public static void saveTemplateToIncreaseDB(TemplateResult templateResult,
             String templateGuid) {
         RedisUtils.setTemplateResult(templateResult, templateGuid,
-            INCREASE_DBINDEX);
+        		Constants.INCREASE_REDIS_DBINDEX);
     }
 
     /**
@@ -246,7 +239,7 @@ public class RedisOperator {
     public static ParseResult getParseResultFromDefaultDB(byte[] input,
             String encoding, String url) {
         ParseResult parseResult = TemplateFactory.process(input, encoding, url,
-            DEFAULT_DBINDEX);
+        		Constants.DEFAULT_REDIS_DBINDEX);
         return parseResult;
     }
 
@@ -257,7 +250,7 @@ public class RedisOperator {
     public static ParseResult getParseResultFromIncreaseDB(byte[] input,
             String encoding, String url) {
         ParseResult parseResult = TemplateFactory.process(input, encoding, url,
-            INCREASE_DBINDEX);
+        		Constants.INCREASE_REDIS_DBINDEX);
         return parseResult;
     }
 
@@ -268,7 +261,7 @@ public class RedisOperator {
     public static TemplateResult getTemplateResultFromDefaultDB(
             String templateGuid) {
         TemplateResult templateResult = RedisUtils.getTemplateResult(
-            templateGuid, DEFAULT_DBINDEX);
+            templateGuid, Constants.DEFAULT_REDIS_DBINDEX);
         return templateResult;
     }
 

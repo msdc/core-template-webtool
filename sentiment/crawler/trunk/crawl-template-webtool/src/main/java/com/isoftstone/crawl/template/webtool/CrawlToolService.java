@@ -772,7 +772,7 @@ public class CrawlToolService {
 
 	/**
 	 * 
-	 * 根据关键字，自动批量生成增量模板
+	 *  批量生成增量模板
 	 * */
 	@GET
 	@Path("/generateAllIncreaseTemplates")
@@ -788,10 +788,14 @@ public class CrawlToolService {
 			String templateModelJSONString = RedisOperator.getFromDefaultDB(listKey);
 			TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateModelJSONString);
 			TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateModel.getTemplateId());
-			PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
-			// 同时导出到文件
-			saveToLocalFile(pageModel.toJSON());
-			ResponseJSONProvider<String> saveResult = serviceHelper.saveIncreaseTemplateResult(templateModel, "");
+			PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);			
+			// 注释原因：经过和东辉讨论后，移除此处的【保存增量模板】的操作。
+			// 具体原因：因为现在【保存增量模板】按钮的功能，已经合并到【保存模板】按钮上去了,也就是说，在保存模板的时候，增量模板已经都保存了，根本不会出现之前只点【保存模板】而忘了点【保存增量模板】的场景存在！
+			// 所以就不需要在这又执行一次增量模板的保存操作了。
+			//ResponseJSONProvider<String> saveResult = serviceHelper.saveIncreaseTemplateResult(templateModel, "");
+			
+			//导出到文件
+			ResponseJSONProvider<String> saveResult=serviceHelper.getResponseJSONProvider(saveToLocalFile(pageModel.toJSON()));
 			if (saveResult.getErrorMsg() != null) {
 				failedTemplateCount++;
 				sbString.append("<div class=\"alert alert-danger\" role=\"alert\"><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span><span class=\"sr-only\">Error:</span>"
@@ -799,9 +803,11 @@ public class CrawlToolService {
 			}
 		}
 		if (failedTemplateCount > 0) {
-			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板，其中" + failedTemplateCount + "个未成功生成增量模板，请根据上述模板名称，检查相应的模板配置！</div>");
+			//sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板，其中" + failedTemplateCount + "个未成功生成增量模板，请根据上述模板名称，检查相应的模板配置！</div>");
+			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板，其中" + failedTemplateCount + "个未成功生成种子到文件，请根据上述模板名称，检查相应的模板配置！</div>");
 		} else {
-			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板,全部成功生成增量模板!</div>");
+			//sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板,全部成功生成增量模板!</div>");
+			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板，全部种子生成到文件成功!</div>");
 		}
 
 		jsonProvider.setData(sbString.toString());
