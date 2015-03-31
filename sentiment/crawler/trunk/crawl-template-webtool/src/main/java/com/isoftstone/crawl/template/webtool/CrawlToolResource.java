@@ -283,22 +283,32 @@ public class CrawlToolResource {
 		runmanager.setPort(22);
 		String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
 		LOG.info("文件根目录" + folderRoot);
+		
+		String desCopyRootFolders = Config.getValue("desFolderNameIPs");
+		String[] desCopyRootFolderStr = desCopyRootFolders.split(";");
+		
 		String command = "";
 		if ("local".equals(type)) {
 			// String folderPath = folderRoot + "/" + folderName;
 			// new SFTPUtils().copyFile(runmanager, folderPath, folderPath);
-			String desCopyRootFolder = Config.getValue(WebtoolConstants.KEY_DES_FOLDER);
-			command = "scp -r " + folderRoot + File.separator + folderName + " " + desCopyRootFolder;
+//			String desCopyRootFolder = Config.getValue(WebtoolConstants.KEY_DES_FOLDER);
+		    for(int i = 0; i < desCopyRootFolderStr.length; i ++) {
+		        String desCopyRootFolder = desCopyRootFolderStr[i];
+		        command = "scp -r " + folderRoot + File.separator + folderName + " " + desCopyRootFolder;
+		        LOG.info("命令：" + command);
+		        runmanager.setCommand(command);
+		        ShellUtils.execCmd(runmanager);
+		    }
 		} else {
 			runmanager.setHostIp("192.168.100.26");
 			runmanager.setUsername("root");
 			runmanager.setPassword("123456");
 			String desHdfsFolderName = Config.getValue("desHdfsFolderName");
 			command = "hadoop fs -put " + folderRoot + File.separator + folderName + " " + desHdfsFolderName;
+			LOG.info("命令：" + command);
+			runmanager.setCommand(command);
+			ShellUtils.execCmd(runmanager);
 		}
-		LOG.info("命令：" + command);
-		runmanager.setCommand(command);
-		ShellUtils.execCmd(runmanager);
 	}
 
 	public List<SearchKeyWordDataModel> getKeyWordModelList(List<SearchKeyWordDataModel> originalKeyWordModelList, String searchEngineType) {
