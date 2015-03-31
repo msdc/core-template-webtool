@@ -299,16 +299,17 @@ public class CrawlToolResource {
 		        runmanager.setCommand(command);
 		        ShellUtils.execCmd(runmanager);
 		    }
-		} else {
-			runmanager.setHostIp("192.168.100.26");
-			runmanager.setUsername("root");
-			runmanager.setPassword("123456");
-			String desHdfsFolderName = Config.getValue("desHdfsFolderName");
-			command = "hadoop fs -put " + folderRoot + File.separator + folderName + " " + desHdfsFolderName;
-			LOG.info("命令：" + command);
-			runmanager.setCommand(command);
-			ShellUtils.execCmd(runmanager);
-		}
+		} 
+//		else {
+//			runmanager.setHostIp("192.168.100.26");
+//			runmanager.setUsername("root");
+//			runmanager.setPassword("123456");
+//			String desHdfsFolderName = Config.getValue("desHdfsFolderName");
+//			command = "hadoop fs -put " + folderRoot + File.separator + folderName + " " + desHdfsFolderName;
+//			LOG.info("命令：" + command);
+//			runmanager.setCommand(command);
+//			ShellUtils.execCmd(runmanager);
+//		}
 	}
 
 	public List<SearchKeyWordDataModel> getKeyWordModelList(List<SearchKeyWordDataModel> originalKeyWordModelList, String searchEngineType) {
