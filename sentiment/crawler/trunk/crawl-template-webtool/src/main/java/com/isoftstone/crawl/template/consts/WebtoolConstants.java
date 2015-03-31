@@ -26,10 +26,6 @@ public class WebtoolConstants {
     
     public static final String SEED_FILE_NAME = "seed.txt";
     
-    public static final Integer DISPATCH_REDIS_DBINDEX = 2;
-    
-    public static final Integer SEEDLIST_REDIS_DEBINDEX = 3;
-    
     public static final String INCREASE_TEMPLATE_PARTERN =  "_increasetemplate";  
     
     public static final String KEY_HDFS_ROOT_FOLDER = "hdfsRootFolder";
@@ -60,6 +56,11 @@ public class WebtoolConstants {
     public static final String KEY_NUTCH_LOCAL_NORMAL_SHDIR = "localNormalShDir";
     public static final String KEY_NUTCH_LOCAL_NORMAL_PROXY_SHDIR = "localNormalProxyShDir";
     public static final String KEY_HDFS_ROOT_PREFIX = "hdfsRootPrefix";
+
+    //--TODO:
+    public static final String KEY_NUTCH_HOST_IP_TEST = "nutchHostIp";
+    
+    
     
     public static final String BAIDU_SEARCH_NAME="百度新闻搜索";
     public static final String BING_SEARCH_NAME="Bing新闻搜索";
