@@ -772,7 +772,7 @@ public class CrawlToolService {
 
 	/**
 	 * 
-	 *  批量生成增量模板
+	 * 批量生成种子文件
 	 * */
 	@GET
 	@Path("/generateAllIncreaseTemplates")
@@ -788,25 +788,29 @@ public class CrawlToolService {
 			String templateModelJSONString = RedisOperator.getFromDefaultDB(listKey);
 			TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateModelJSONString);
 			TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateModel.getTemplateId());
-			PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);			
+			PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
 			// 注释原因：经过和东辉讨论后，移除此处的【保存增量模板】的操作。
 			// 具体原因：因为现在【保存增量模板】按钮的功能，已经合并到【保存模板】按钮上去了,也就是说，在保存模板的时候，增量模板已经都保存了，根本不会出现之前只点【保存模板】而忘了点【保存增量模板】的场景存在！
 			// 所以就不需要在这又执行一次增量模板的保存操作了。
-			//ResponseJSONProvider<String> saveResult = serviceHelper.saveIncreaseTemplateResult(templateModel, "");
-			
-			//导出到文件
-			ResponseJSONProvider<String> saveResult=serviceHelper.getResponseJSONProvider(saveToLocalFile(pageModel.toJSON()));
+			// ResponseJSONProvider<String> saveResult =
+			// serviceHelper.saveIncreaseTemplateResult(templateModel, "");
+
+			// 导出到文件
+			ResponseJSONProvider<String> saveResult = serviceHelper.getResponseJSONProvider(saveToLocalFile(pageModel.toJSON()));
 			if (saveResult.getErrorMsg() != null) {
 				failedTemplateCount++;
-//				sbString.append("<div class=\"alert alert-danger\" role=\"alert\"><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span><span class=\"sr-only\">Error:</span>"
-//						+ saveResult.getErrorMsg() + "</div>");
+				// sbString.append("<div class=\"alert alert-danger\" role=\"alert\"><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span><span class=\"sr-only\">Error:</span>"
+				// + saveResult.getErrorMsg() + "</div>");
 			}
 		}
 		if (failedTemplateCount > 0) {
-			//sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板，其中" + failedTemplateCount + "个未成功生成增量模板，请根据上述模板名称，检查相应的模板配置！</div>");
+			// sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共"
+			// + templateListKeys.size() + "个模板，其中" + failedTemplateCount +
+			// "个未成功生成增量模板，请根据上述模板名称，检查相应的模板配置！</div>");
 			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板，其中" + failedTemplateCount + "个未成功生成种子到文件，请检查相应的模板配置！</div>");
 		} else {
-			//sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板,全部成功生成增量模板!</div>");
+			// sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共"
+			// + templateListKeys.size() + "个模板,全部成功生成增量模板!</div>");
 			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板，全部种子生成到文件成功!</div>");
 		}
 
@@ -849,7 +853,7 @@ public class CrawlToolService {
 					if (listJsonProvider.getSuccess() == false) {
 						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
 						seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
-						//同时停用该模板
+						// 同时停用该模板
 						disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
 						continue;
 					}
@@ -858,7 +862,7 @@ public class CrawlToolService {
 					if (newsContentJsonProvider.getSuccess() == false) {
 						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
 						seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
-						//同时停用该模板
+						// 同时停用该模板
 						disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
 						continue;
 					}
@@ -868,7 +872,7 @@ public class CrawlToolService {
 					if (increaseJsonProvider.getSuccess() == false) {
 						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
 						seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
-						//同时停用该模板
+						// 同时停用该模板
 						disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
 						continue;
 					}
@@ -1044,18 +1048,30 @@ public class CrawlToolService {
 	public String stopCrawl(@DefaultValue("") @FormParam("folderName") String folderName, @FormParam("isDeploy") boolean isDeploy, @FormParam("isNormal") boolean isNormal) {
 		ResponseJSONProvider<CrawlStatusModel> jsonProvider = new ResponseJSONProvider<CrawlStatusModel>();
 		CrawlState crawlState = new CrawlState();
-		String stopStatus = crawlState.stopCrawl(folderName, isDeploy, isNormal);
 
 		Date currentDate = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String nowDateString = dateFormat.format(currentDate);
 
 		CrawlStatusModel crawlStatusModel = new CrawlStatusModel();
-		crawlStatusModel.setCheckTime(nowDateString);
+		String stopStatus = "";
+
 		if (stopStatus.equals("success")) {
 			crawlStatusModel.setCrawlStatus("已停止");
+		} else if (stopStatus.equals("")) {
+			crawlStatusModel.setCrawlStatus("失败");
 		} else {
 			crawlStatusModel.setCrawlStatus("停止失败");
+		}
+		crawlStatusModel.setCheckTime(nowDateString);
+
+		try {
+			stopStatus = crawlState.stopCrawl(folderName, isDeploy, isNormal);
+		} catch (Exception e) {
+			e.printStackTrace();
+			jsonProvider.setSuccess(false);
+			jsonProvider.setData(crawlStatusModel);
+			return jsonProvider.toJSON();
 		}
 
 		// 同时更新缓存中想对应的数据
@@ -1083,7 +1099,19 @@ public class CrawlToolService {
 	public String reParse(@DefaultValue("") @FormParam("folderName") String folderName, @FormParam("isDeploy") boolean isDeploy, @FormParam("isNormal") boolean isNormal) {
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		CrawlState crawlState = new CrawlState();
-		String reParseResult = crawlState.reParse(folderName, isDeploy, isNormal);
+		String reParseResult = null;
+		try {
+			reParseResult = crawlState.reParse(folderName, isDeploy, isNormal);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		if (reParseResult == null) {
+			jsonProvider.setSuccess(false);
+			jsonProvider.setData("调用reParse方法异常!");
+			return jsonProvider.toJSON();
+		}
+
 		jsonProvider.setSuccess(true);
 		if (reParseResult.equals("success")) {
 			jsonProvider.setData("操作成功！");
@@ -1103,7 +1131,19 @@ public class CrawlToolService {
 	public String crawl(@DefaultValue("") @FormParam("folderName") String folderName, @FormParam("isDeploy") boolean isDeploy, @FormParam("isNormal") boolean isNormal) {
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		CrawlState crawlState = new CrawlState();
-		String crawlFullResult = crawlState.crawl(folderName, isDeploy, isNormal);
+		String crawlFullResult = null;
+		try {
+			crawlFullResult = crawlState.crawl(folderName, isDeploy, isNormal);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		if (crawlFullResult == null) {
+			jsonProvider.setSuccess(false);
+			jsonProvider.setData("调用crawl方法异常");
+			return jsonProvider.toJSON();
+		}
+
 		jsonProvider.setSuccess(true);
 		if (crawlFullResult.equals("success")) {
 			jsonProvider.setData("操作成功！");
