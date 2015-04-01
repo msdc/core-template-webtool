@@ -798,13 +798,13 @@ public class CrawlToolService {
 			ResponseJSONProvider<String> saveResult=serviceHelper.getResponseJSONProvider(saveToLocalFile(pageModel.toJSON()));
 			if (saveResult.getErrorMsg() != null) {
 				failedTemplateCount++;
-				sbString.append("<div class=\"alert alert-danger\" role=\"alert\"><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span><span class=\"sr-only\">Error:</span>"
-						+ saveResult.getErrorMsg() + "</div>");
+//				sbString.append("<div class=\"alert alert-danger\" role=\"alert\"><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span><span class=\"sr-only\">Error:</span>"
+//						+ saveResult.getErrorMsg() + "</div>");
 			}
 		}
 		if (failedTemplateCount > 0) {
 			//sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板，其中" + failedTemplateCount + "个未成功生成增量模板，请根据上述模板名称，检查相应的模板配置！</div>");
-			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板，其中" + failedTemplateCount + "个未成功生成种子到文件，请根据上述模板名称，检查相应的模板配置！</div>");
+			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板，其中" + failedTemplateCount + "个未成功生成种子到文件，请检查相应的模板配置！</div>");
 		} else {
 			//sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板,全部成功生成增量模板!</div>");
 			sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共" + templateListKeys.size() + "个模板，全部种子生成到文件成功!</div>");
