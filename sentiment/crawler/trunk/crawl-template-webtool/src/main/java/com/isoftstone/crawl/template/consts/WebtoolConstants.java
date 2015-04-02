@@ -56,6 +56,10 @@ public class WebtoolConstants {
     public static final String KEY_NUTCH_LOCAL_NORMAL_SHDIR = "localNormalShDir";
     public static final String KEY_NUTCH_LOCAL_NORMAL_PROXY_SHDIR = "localNormalProxyShDir";
     public static final String KEY_HDFS_ROOT_PREFIX = "hdfsRootPrefix";
+    
+    
+    public static final String KEY_NUTCH_REPARSE_LOCAL = "localReParse";
+    public static final String KEY_NUTCH_REPARSE_DEPLOY = "deployReParse";
 
     //--TODO:
     public static final String KEY_NUTCH_HOST_IP_TEST = "nutchHostIp";
