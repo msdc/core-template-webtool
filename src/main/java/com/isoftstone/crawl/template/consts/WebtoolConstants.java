@@ -108,4 +108,7 @@ public class WebtoolConstants {
 	
 	//爬虫数据查询字段
 	public static final String CRAWL_DATA_QUERY_FIELD = "fetch_time";
+	
+	//自定义选择器属性
+	public static final String CUSTOMER_SELECTOR_ATTRIBUTE = "其他";
 }
