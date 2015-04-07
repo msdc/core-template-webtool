@@ -76,6 +76,7 @@ function singleCustomerViewModel() {
         if (this.attrSelected() == '其他') {
             return true;
         } else {
+            this.otherSelector('');
             return false;
         }
     }, this);
@@ -201,7 +202,7 @@ function paginationViewModel() {
     this.parseEngine = ko.observableArray(['jsoup', 'xpath']);
     this.selector = ko.observable();
     this.otherSelector = ko.observable();
-    this.selectorAttr = ko.observableArray(['href', 'text', 'src', 'html','其他']);
+    this.selectorAttr = ko.observableArray(['href', 'text', 'src', 'html', '其他']);
     this.selectorAttrSelected = ko.observable('href');
     this.filter = ko.observable();
     this.filterCategory = ko.observableArray(['匹配', '替换', '移除']);
@@ -289,6 +290,7 @@ function paginationViewModel() {
     }, this);
     this.showOtherSelectorInput = ko.computed(function () {
         if (this.selectorAttrSelected() == '其他') {
+            this.otherSelector('');
             return true;
         } else {
             return false;
@@ -304,7 +306,7 @@ function commonAttrViewMode() {
     this.parseEngine = ko.observableArray(['jsoup', 'xpath']);
     this.selector = ko.observable();
     this.otherSelector = ko.observable();
-    this.selectorAttr = ko.observable(['href', 'text', 'src', 'html','其他']);
+    this.selectorAttr = ko.observable(['href', 'text', 'src', 'html', '其他']);
     this.selectorAttrSelected = ko.observable('text');
     this.filter = ko.observable();
     this.filterCategory = ko.observable([ '匹配', '替换', '移除']);
@@ -338,6 +340,7 @@ function commonAttrViewMode() {
         if (this.selectorAttrSelected() == '其他') {
             return true;
         } else {
+            this.otherSelector('');
             return false;
         }
     }, this);
@@ -428,7 +431,7 @@ function loadPageContext(initData) {
                             for (var i = 0; i < modelArray.length; i++) {
                                 var model = modelArray[i];
                                 var temp = new customerAttrModel(
-                                    model.target(), model.selector(), model.attrSelected(), model.filter(), model.filterCategorySelected(), model.formatCategorySelected(), model.formatter(), model.filterReplaceTo()
+                                    model.target(), model.selector(), model.attrSelected(), model.otherSelector(), model.filter(), model.filterCategorySelected(), model.formatCategorySelected(), model.formatter(), model.filterReplaceTo()
                                 );
                                 attrModels.push(temp);
                             }
@@ -442,7 +445,7 @@ function loadPageContext(initData) {
                             for (var i = 0; i < modelArray.length; i++) {
                                 var model = modelArray[i];
                                 var temp = new customerAttrModel(
-                                    model.target(), model.selector(), model.attrSelected(), model.filter(), model.filterCategorySelected(), model.formatCategorySelected(), model.formatter(), model.filterReplaceTo()
+                                    model.target(), model.selector(), model.attrSelected(), model.otherSelector(), model.filter(), model.filterCategorySelected(), model.formatCategorySelected(), model.formatter(), model.filterReplaceTo()
                                 );
                                 attrModels.push(temp);
                             }
@@ -1107,6 +1110,7 @@ function getJSONString(obj) {
         newsTitleViewModel: {
             selector: obj.newsTitleViewModel.selector(),
             selectorAttr: obj.newsTitleViewModel.selectorAttrSelected(),
+            otherSelector:obj.newsTitleViewModel.otherSelector(),
             filterCategory: obj.newsTitleViewModel.filterCategorySelected(),
             filter: obj.newsTitleViewModel.filter(),
             filterReplaceTo: obj.newsTitleViewModel.filterReplaceTo()
@@ -1114,6 +1118,7 @@ function getJSONString(obj) {
         newsPublishTimeViewModel: {
             selector: obj.newsPublishTimeViewModel.selector(),
             selectorAttr: obj.newsPublishTimeViewModel.selectorAttrSelected(),
+            otherSelector:obj.newsPublishTimeViewModel.otherSelector(),
             filterCategory: obj.newsPublishTimeViewModel.filterCategorySelected(),
             filter: obj.newsPublishTimeViewModel.filter(),
             filterReplaceTo: obj.newsPublishTimeViewModel.filterReplaceTo(),
@@ -1123,6 +1128,7 @@ function getJSONString(obj) {
         newsSourceViewModel: {
             selector: obj.newsSourceViewModel.selector(),
             selectorAttr: obj.newsSourceViewModel.selectorAttrSelected(),
+            otherSelector:obj.newsSourceViewModel.otherSelector(),
             filterCategory: obj.newsSourceViewModel.filterCategorySelected(),
             filter: obj.newsSourceViewModel.filter(),
             filterReplaceTo: obj.newsSourceViewModel.filterReplaceTo()
@@ -1130,6 +1136,7 @@ function getJSONString(obj) {
         newsContentViewModel: {
             selector: obj.newsContentViewModel.selector(),
             selectorAttr: obj.newsContentViewModel.selectorAttrSelected(),
+            otherSelector:obj.newsContentViewModel.otherSelector(),
             filterCategory: obj.newsContentViewModel.filterCategorySelected(),
             filter: obj.newsContentViewModel.filter(),
             filterReplaceTo: obj.newsContentViewModel.filterReplaceTo()
@@ -1137,11 +1144,13 @@ function getJSONString(obj) {
         listCustomerAttrViewModel: obj.listAttrModels(),
         listOutLinkViewModel: {
             selector: obj.listOutLinkViewModel.selector(),
-            selectorAttr: obj.listOutLinkViewModel.selectorAttrSelected()
+            selectorAttr: obj.listOutLinkViewModel.selectorAttrSelected(),
+            otherSelector:obj.listOutLinkViewModel.otherSelector()
         },
         listPaginationViewModel: {
             selector: obj.listPaginationViewModel.selector(),
             selectorAttr: obj.listPaginationViewModel.selectorAttrSelected(),
+            otherSelector:obj.listPaginationViewModel.otherSelector(),
             filterCategory: obj.listPaginationViewModel.filterCategorySelected(),
             filter: obj.listPaginationViewModel.filter(),
             paginationType: obj.listPaginationViewModel.paginationTypeSelected(),
