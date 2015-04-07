@@ -108,9 +108,29 @@ public class CrawlToolResource {
 		// --1.3将增量种子列表，保存到redis中，key为模板url.
 		setSeedListResult(seeds, templateUrl, Constants.SEEDLIST_REDIS_DEBINDEX);
 		// --2.保存到redis中.
-		String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
+        // --2.1 保存全量调度数据到redis中.
+		String normalRedisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX_NORMAL;
+		DispatchVo normalDispatchVo = RedisOperator.getDispatchResult(normalRedisKey, Constants.DISPATCH_REDIS_DBINDEX);
+        if (normalDispatchVo == null) {
+            normalDispatchVo = new DispatchVo();
+        }
+        List<Seed> normalSeedList = normalDispatchVo.getSeed();
+        if (normalSeedList == null) {
+            normalSeedList = new ArrayList<Seed>();
+        }
+        Seed normalSeed = new Seed(templateUrl, status, WebtoolConstants.DISPATCH_STATIS_START);
+        //--删除之前旧状态的全量种子.
+        normalSeedList.remove(normalSeed);
+        //--添加当前新状态的全量种子.
+        normalSeedList.add(normalSeed);
+		normalDispatchVo.setSeed(normalSeedList);
+		normalDispatchVo.setUserProxy(userProxy);
+		RedisOperator.setDispatchResult(normalDispatchVo, normalRedisKey, Constants.DISPATCH_REDIS_DBINDEX);
+		
+        //-- 2.2 保存增量调度数据到redis中.
+		String incrementRedisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX_INCREMENT;
 
-		DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey, Constants.DISPATCH_REDIS_DBINDEX);
+		DispatchVo dispatchVo = RedisOperator.getDispatchResult(incrementRedisKey, Constants.DISPATCH_REDIS_DBINDEX);
 		if (dispatchVo == null) {
 			dispatchVo = new DispatchVo();
 		}
@@ -133,7 +153,7 @@ public class CrawlToolResource {
 			seedList.add(seed);
 		}
 		dispatchVo.setSeed(seedList);
-		RedisOperator.setDispatchResult(dispatchVo, redisKey, Constants.DISPATCH_REDIS_DBINDEX);
+		RedisOperator.setDispatchResult(dispatchVo, incrementRedisKey, Constants.DISPATCH_REDIS_DBINDEX);
 	}
 
 	public void setSeedListResult(List<String> seedList, String guid, int dbindex) {

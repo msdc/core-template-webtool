@@ -20,7 +20,9 @@ public class WebtoolConstants {
 
     public static final String URL_STATUS_FALSE = "false";
     
-    public static final String DISPATCH_REIDIS_POSTFIX = "_dispatch";
+    public static final String DISPATCH_REIDIS_POSTFIX_NORMAL = "_dispatch";
+    
+    public static final String DISPATCH_REIDIS_POSTFIX_INCREMENT = "increment_dispatch";
     
     public static final String DISPATCH_STATIS_START = "start";
     
