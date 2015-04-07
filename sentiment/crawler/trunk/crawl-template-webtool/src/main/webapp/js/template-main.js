@@ -41,7 +41,8 @@ function singleCustomerViewModel() {
     this.id = ko.observable();
     this.target = ko.observable();
     this.selector = ko.observable();
-    this.attr = ko.observableArray(['href', 'text', 'src', 'html']);
+    this.otherSelector = ko.observable();
+    this.attr = ko.observableArray(['href', 'text', 'src', 'html', '其他']);
     this.attrSelected = ko.observable('text');
     this.filterCategory = ko.observableArray([ '匹配', '替换', '移除']);
     this.filterCategorySelected = ko.observable('匹配');
@@ -71,6 +72,13 @@ function singleCustomerViewModel() {
         }
     }, this);
     this.filterReplaceTo = ko.observable();
+    this.showOtherSelectorInput = ko.computed(function () {
+        if (this.attrSelected() == '其他') {
+            return true;
+        } else {
+            return false;
+        }
+    }, this);
 }
 
 /**
@@ -192,7 +200,8 @@ function customerAttrViewModel() {
 function paginationViewModel() {
     this.parseEngine = ko.observableArray(['jsoup', 'xpath']);
     this.selector = ko.observable();
-    this.selectorAttr = ko.observableArray(['href', 'text', 'src', 'html']);
+    this.otherSelector = ko.observable();
+    this.selectorAttr = ko.observableArray(['href', 'text', 'src', 'html','其他']);
     this.selectorAttrSelected = ko.observable('href');
     this.filter = ko.observable();
     this.filterCategory = ko.observableArray(['匹配', '替换', '移除']);
@@ -278,6 +287,13 @@ function paginationViewModel() {
             return false;
         }
     }, this);
+    this.showOtherSelectorInput = ko.computed(function () {
+        if (this.selectorAttrSelected() == '其他') {
+            return true;
+        } else {
+            return false;
+        }
+    }, this);
 }
 
 /**
@@ -287,7 +303,8 @@ function paginationViewModel() {
 function commonAttrViewMode() {
     this.parseEngine = ko.observableArray(['jsoup', 'xpath']);
     this.selector = ko.observable();
-    this.selectorAttr = ko.observable(['href', 'text', 'src', 'html']);
+    this.otherSelector = ko.observable();
+    this.selectorAttr = ko.observable(['href', 'text', 'src', 'html','其他']);
     this.selectorAttrSelected = ko.observable('text');
     this.filter = ko.observable();
     this.filterCategory = ko.observable([ '匹配', '替换', '移除']);
@@ -317,6 +334,13 @@ function commonAttrViewMode() {
         }
     }, this);
     this.filterReplaceTo = ko.observable();
+    this.showOtherSelectorInput = ko.computed(function () {
+        if (this.selectorAttrSelected() == '其他') {
+            return true;
+        } else {
+            return false;
+        }
+    }, this);
 }
 /**************View-Models****************/
 
