@@ -854,7 +854,7 @@ public class CrawlToolService {
 						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
 						seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
 						// 同时停用该模板
-						disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
+						//disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
 						continue;
 					}
 					// 检查内容页
@@ -863,7 +863,7 @@ public class CrawlToolService {
 						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
 						seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
 						// 同时停用该模板
-						disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
+						//disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
 						continue;
 					}
 					// 检查增量
@@ -873,7 +873,7 @@ public class CrawlToolService {
 						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
 						seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
 						// 同时停用该模板
-						disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
+						//disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
 						continue;
 					}
 					seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_VALID_STATUS);
