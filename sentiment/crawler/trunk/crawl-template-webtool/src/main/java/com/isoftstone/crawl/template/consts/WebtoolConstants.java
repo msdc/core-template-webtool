@@ -22,7 +22,7 @@ public class WebtoolConstants {
     
     public static final String DISPATCH_REIDIS_POSTFIX_NORMAL = "_dispatch";
     
-    public static final String DISPATCH_REIDIS_POSTFIX_INCREMENT = "increment_dispatch";
+    public static final String DISPATCH_REIDIS_POSTFIX_INCREMENT = "_increment_dispatch";
     
     public static final String DISPATCH_STATIS_START = "start";
     
