@@ -25,6 +25,19 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!--自定义选择器属性-->
+                        <div class="row">
+                            <div class="col-md-6"  data-bind="visible: showOtherSelectorInput">
+                                <div class="form-group" data-bind="if: showOtherSelectorInput">
+                                    <label>自定义选择器属性</label>
+                                    <input type="text" class="form-control"
+                                           data-bind="value: otherSelector"
+                                           placeholder="自定义选择器属性">
+                                </div>
+                            </div>
+                            <div class="col-md-6"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -70,6 +83,19 @@
                                     <select class="form-control" data-bind="options: selectorAttr, value:selectorAttrSelected"></select>
                                 </div>
                             </div>
+                        </div>
+
+                        <!--自定义选择器属性-->
+                        <div class="row">
+                            <div class="col-md-6"  data-bind="visible: showOtherSelectorInput">
+                                <div class="form-group" data-bind="if: showOtherSelectorInput">
+                                    <label>自定义选择器属性</label>
+                                    <input type="text" class="form-control"
+                                           data-bind="value: otherSelector"
+                                           placeholder="自定义选择器属性">
+                                </div>
+                            </div>
+                            <div class="col-md-6"></div>
                         </div>
 
                         <!--过滤器内容 格式化器内容-->
@@ -212,6 +238,19 @@
                                                     <select class="form-control" data-bind="options: attr,value: attrSelected"></select>
                                                 </div>
                                             </div>
+                                        </div>
+
+                                        <!--自定义选择器属性-->
+                                        <div class="row">
+                                            <div class="col-md-6"  data-bind="visible: showOtherSelectorInput">
+                                                <div class="form-group" data-bind="if: showOtherSelectorInput">
+                                                    <label>自定义选择器属性</label>
+                                                    <input type="text" class="form-control"
+                                                           data-bind="value: otherSelector"
+                                                           placeholder="自定义选择器属性">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6"></div>
                                         </div>
 
                                         <!--过滤器内容-->
