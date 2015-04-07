@@ -185,32 +185,7 @@ function templateViewModel(templateList) {
     };
     //搜索
     self.search = function () {
-        $.ajax2({
-            url: virtualWebPath + '/webapi/crawlToolResource/searchTemplateList',
-            type: 'POST',
-            data: {
-                searchString: self.searchString()
-            },
-            success: function (data) {
-                var json = JSON.parse(data);
-                if (json.success) {
-                    if (json.data.templateList != null) {
-                        var templateLists = json.data.templateList;
-                        var searchData = updateTemplateListInitData(templateLists);
-                        self.urls(searchData);
-                        self.paginationUrls(searchData.slice(0, paginationItemCounts));
-                        //重新加载分页组件
-                        loadPaginationComponent(self);
-                    }
-                }
-            },
-            error: function (error) {
-                self.urls([]);
-                if (error) {
-                    optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;搜索操作执行失败！");
-                }
-            }
-        }, '#template_list_table');
+        searchKeyWords(self.searchString(), self);
     };
     //批量生成增量模板
     self.generateAllIncreaseTemplates = function () {
@@ -342,8 +317,49 @@ function templateViewModel(templateList) {
             }
         });
     };
+    self.showSearchTemplate = function () {
+        searchKeyWords('show_search_engine', self);
+    };
+    self.showNormalTemplate = function () {
+        searchKeyWords('show_normal_template', self);
+    };
 }
 /*****************View-Model***********************/
+
+/**
+ *
+ * 搜索
+ * @param {String} searchString
+ * @param {Object} self
+ * */
+function searchKeyWords(searchString, self) {
+    $.ajax2({
+        url: virtualWebPath + '/webapi/crawlToolResource/searchTemplateList',
+        type: 'POST',
+        data: {
+            searchString: searchString
+        },
+        success: function (data) {
+            var json = JSON.parse(data);
+            if (json.success) {
+                if (json.data.templateList != null) {
+                    var templateLists = json.data.templateList;
+                    var searchData = updateTemplateListInitData(templateLists);
+                    self.urls(searchData);
+                    self.paginationUrls(searchData.slice(0, paginationItemCounts));
+                    //重新加载分页组件
+                    loadPaginationComponent(self);
+                }
+            }
+        },
+        error: function (error) {
+            self.urls([]);
+            if (error) {
+                optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;搜索操作执行失败！");
+            }
+        }
+    }, '#template_list_table');
+}
 
 /**
  *
@@ -471,8 +487,8 @@ $.ajax2 = function (options, aimDiv) {
  *
  * 页面元素锁定
  * */
-function pageLocker(){
-    $("button[type='button']").attr({disabled:"disabled"});
-    $("a[role='button']").attr({disabled:"disabled"});
-    $("body > nav").css("cssText","display:none!important");
+function pageLocker() {
+    $("button[type='button']").attr({disabled: "disabled"});
+    $("a[role='button']").attr({disabled: "disabled"});
+    $("body > nav").css("cssText", "display:none!important");
 }
