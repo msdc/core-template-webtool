@@ -112,10 +112,8 @@ public class CrawlState {
         String crawlDir = Config.getValue(WebtoolConstants.KEY_NUTCH_CRAWLDIR);
         String solrURL = Config.getValue(WebtoolConstants.KEY_NUTCH_SOLR_URL);
         String depth = "2";
-        String dispatchName = folderName
-                + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
-        DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName,
-            Constants.DISPATCH_REDIS_DBINDEX);
+        String dispatchName = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX_INCREMENT;
+        DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName, Constants.DISPATCH_REDIS_DBINDEX);
         boolean userProxy = dispatchVo.isUserProxy();
 
         //--确定shDir.
@@ -131,10 +129,8 @@ public class CrawlState {
             }
         }
 
-        String folderNameSeed = dispatchName.substring(0,
-            dispatchName.lastIndexOf("_"));
-        String folderNameData = folderNameSeed.substring(0,
-            folderNameSeed.lastIndexOf("_"));
+        String folderNameSeed = dispatchName.substring(0, dispatchName.lastIndexOf("_"));
+        String folderNameData = folderNameSeed.substring(0, folderNameSeed.lastIndexOf("_"));
         String[] folderNameStrs = folderNameSeed.split("_");
         folderNameSeed = folderNameStrs[0] + "_" + folderNameStrs[1] + "_"
                 + WebtoolConstants.INCREMENT_FILENAME_SIGN + "_"
@@ -161,36 +157,27 @@ public class CrawlState {
         String crawlDir = Config.getValue(WebtoolConstants.KEY_NUTCH_CRAWLDIR);
         String solrURL = Config.getValue(WebtoolConstants.KEY_NUTCH_SOLR_URL);
         String depth = "3";
-        String dispatchName = folderName
-                + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
-        DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName,
-            Constants.DISPATCH_REDIS_DBINDEX);
+        String dispatchName = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX_NORMAL;
+        DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName, Constants.DISPATCH_REDIS_DBINDEX);
         boolean userProxy = dispatchVo.isUserProxy();
 
         if (isDeploy) {
-            shDir = Config
-                    .getValue(WebtoolConstants.KEY_NUTCH_LOCAL_NORMAL_SHDIR);
+            shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_LOCAL_NORMAL_SHDIR);
             if (userProxy) {
-                shDir = Config
-                        .getValue(WebtoolConstants.KEY_NUTCH_LOCAL_NORMAL_PROXY_SHDIR);
+                shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_LOCAL_NORMAL_PROXY_SHDIR);
             }
         } else {
-            shDir = Config
-                    .getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_SHDIR);
+            shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_SHDIR);
             if (userProxy) {
-                shDir = Config
-                        .getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_PROXY_SHDIR);
+                shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_PROXY_SHDIR);
             }
         }
 
-        String folderNameSeed = dispatchName.substring(0,
-            dispatchName.lastIndexOf("_"));
-        String folderNameData = folderNameSeed.substring(0,
-            folderNameSeed.lastIndexOf("_"));
+        String folderNameSeed = dispatchName.substring(0, dispatchName.lastIndexOf("_"));
+        String folderNameData = folderNameSeed.substring(0, folderNameSeed.lastIndexOf("_"));
         String seedFolder = rootFolder + File.separator + folderNameSeed;
         if (isDeploy) {
-            seedFolder = Config.getValue(WebtoolConstants.KEY_HDFS_ROOT_PREFIX)
-                    + folderNameSeed;
+            seedFolder = Config.getValue(WebtoolConstants.KEY_HDFS_ROOT_PREFIX) + folderNameSeed;
         }
         String command = shDir + " " + seedFolder + " " + crawlDir
                 + folderNameData + "_data" + " " + solrURL + " " + depth;
@@ -232,6 +219,7 @@ public class CrawlState {
         LOG.info("ParseAndIndex: data_folder: " + data_folder);
         
         String command = "java -jar /reparseAndIndex.jar " + nutch_reparse + " " +  data_folder + " " + solrURL + " false";
+        LOG.info("ParseAndIndex: command:" + command);
         Runmanager runmanager = getRunmanager(command);
         ShellUtils.execCmd(runmanager);
         
@@ -239,12 +227,12 @@ public class CrawlState {
     }
 
     /**
-     * 停止爬虫.
+     * 停止爬虫.(目前只停止增量.)
      * @param dispatchName
      */
     public String stopCrawl(String folderName, boolean isDeploy, boolean isNomal) {
         // 1.修改redis中种子状态
-        String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX;
+        String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX_INCREMENT;
         DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey,
             Constants.DISPATCH_REDIS_DBINDEX);
         if (dispatchVo == null) {

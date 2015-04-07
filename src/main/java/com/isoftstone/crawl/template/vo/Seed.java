@@ -4,6 +4,8 @@ public class Seed {
     private String url;
 
     private String isEnabled;
+    
+    private String status;
 
     public Seed() {
         super();
@@ -22,6 +24,18 @@ public class Seed {
         this.url = url;
         this.isEnabled = isEnabled;
     }
+    
+    /**
+     * @param url
+     * @param isEnabled
+     * @param status
+     */
+    public Seed(String url, String isEnabled, String status) {
+        super();
+        this.url = url;
+        this.isEnabled = isEnabled;
+        this.status = status;
+    }
 
     public String getUrl() {
         return url;
@@ -37,6 +51,20 @@ public class Seed {
 
     public void setIsEnabled(String isEnabled) {
         this.isEnabled = isEnabled;
+    }
+
+    /**
+     * @return the status
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     /*
