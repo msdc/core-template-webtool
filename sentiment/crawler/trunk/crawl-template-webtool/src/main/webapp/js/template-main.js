@@ -9,10 +9,11 @@ var virtualWebPath = "/crawl-template-webtool";
  *
  * 自定义属性初始化model对象
  * */
-function customerAttrModel(target, selector, attr, filter, filterCategory, formatCategory, formatter, filterReplaceTo) {
+function customerAttrModel(target, selector, attr, otherAttr, filter, filterCategory, formatCategory, formatter, filterReplaceTo) {
     this.target = target;
     this.selector = selector;
     this.attr = attr;
+    this.otherSelector = otherAttr;
     this.filter = filter;
     this.filterCategory = filterCategory;
     this.formatCategory = formatCategory;
@@ -674,7 +675,12 @@ function updateTemplateDataInit(initData, pageViewModel, singleTemplateListJSON)
             var listOutLinkSelector = listOutLinkIndexer.value;
             var listOutLinkSelectorAttr = listOutLinkIndexer.attribute;
             pageViewModel.listOutLinkViewModel.selector(listOutLinkSelector);
-            pageViewModel.listOutLinkViewModel.selectorAttrSelected(listOutLinkSelectorAttr);
+            if (listOutLinkSelectorAttr != 'href' && listOutLinkSelectorAttr != 'text' && listOutLinkSelectorAttr != 'src' && listOutLinkSelectorAttr != 'html') {
+                pageViewModel.listOutLinkViewModel.selectorAttrSelected('其他');
+                pageViewModel.listOutLinkViewModel.otherSelector(listOutLinkSelectorAttr);
+            } else {
+                pageViewModel.listOutLinkViewModel.selectorAttrSelected(listOutLinkSelectorAttr);
+            }
         }
 
         //列表页的自定义属性
@@ -688,7 +694,12 @@ function updateTemplateDataInit(initData, pageViewModel, singleTemplateListJSON)
                     var customerViewModelIndexer = listCustomerAttrObj.indexers[0];
                     customerViewModel.target(listCustomerAttrObj.name);
                     customerViewModel.selector(customerViewModelIndexer.value);
-                    customerViewModel.attrSelected(customerViewModelIndexer.attribute);
+                    if (customerViewModelIndexer.attribute != 'href' && customerViewModelIndexer.attribute != 'text' && customerViewModelIndexer.attribute != 'src' && customerViewModelIndexer.attribute != 'html') {
+                        customerViewModel.otherSelector(customerViewModelIndexer.attribute);
+                        customerViewModel.attrSelected('其他');
+                    } else {
+                        customerViewModel.attrSelected(customerViewModelIndexer.attribute);
+                    }
                 }
 
                 //列表自定义属性过滤器
@@ -718,7 +729,12 @@ function updateTemplateDataInit(initData, pageViewModel, singleTemplateListJSON)
             var listPaginationSelector = listPaginationIndexer.value;
             var listPaginationSelectorAttr = listPaginationIndexer.attribute;
             pageViewModel.listPaginationViewModel.selector(listPaginationSelector);
-            pageViewModel.listPaginationViewModel.selectorAttrSelected(listPaginationSelectorAttr);
+            if (listPaginationSelectorAttr != 'href' && listPaginationSelectorAttr != 'text' && listPaginationSelectorAttr != 'src' && listPaginationSelectorAttr != 'html') {
+                pageViewModel.listPaginationViewModel.selectorAttrSelected('其他');
+                pageViewModel.listPaginationViewModel.otherSelector(listPaginationSelectorAttr);
+            } else {
+                pageViewModel.listPaginationViewModel.selectorAttrSelected(listPaginationSelectorAttr);
+            }
         }
         //过滤器
         if (listPagination.filters != null) {
@@ -773,21 +789,39 @@ function updateTemplateDataInit(initData, pageViewModel, singleTemplateListJSON)
             var newsFieldIndexer = newsField.indexers[0];
             if (newsFieldName == "title") {
                 pageViewModel.newsTitleViewModel.selector(newsFieldIndexer.value);
-                pageViewModel.newsTitleViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
+                var newsSelectorAttr = newsFieldIndexer.attribute;
+                if (newsSelectorAttr != 'href' && newsSelectorAttr != 'text' && newsSelectorAttr != 'src' && newsSelectorAttr != 'html') {
+                    pageViewModel.newsTitleViewModel.selectorAttrSelected('其他');
+                    pageViewModel.newsTitleViewModel.otherSelector(newsSelectorAttr);
+                } else {
+                    pageViewModel.newsTitleViewModel.selectorAttrSelected(newsSelectorAttr);
+                }
                 if (newsField.filters != null) {
                     var newsTitleViewModelFilter = newsField.filters[0];
                     setViewModelFilter(pageViewModel.newsTitleViewModel, newsTitleViewModelFilter);
                 }
             } else if (newsFieldName == "content") {
                 pageViewModel.newsContentViewModel.selector(newsFieldIndexer.value);
-                pageViewModel.newsContentViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
+                var newsSelectorAttr = newsFieldIndexer.attribute;
+                if (newsSelectorAttr != 'href' && newsSelectorAttr != 'text' && newsSelectorAttr != 'src' && newsSelectorAttr != 'html') {
+                    pageViewModel.newsContentViewModel.selectorAttrSelected('其他');
+                    pageViewModel.newsContentViewModel.otherSelector(newsSelectorAttr);
+                } else {
+                    pageViewModel.newsContentViewModel.selectorAttrSelected(newsSelectorAttr);
+                }
                 if (newsField.filters != null) {
                     var newsContentViewModelFilter = newsField.filters[0];
                     setViewModelFilter(pageViewModel.newsContentViewModel, newsContentViewModelFilter);
                 }
             } else if (newsFieldName == "tstamp") {
                 pageViewModel.newsPublishTimeViewModel.selector(newsFieldIndexer.value);
-                pageViewModel.newsPublishTimeViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
+                var newsSelectorAttr = newsFieldIndexer.attribute;
+                if (newsSelectorAttr != 'href' && newsSelectorAttr != 'text' && newsSelectorAttr != 'src' && newsSelectorAttr != 'html') {
+                    pageViewModel.newsPublishTimeViewModel.selectorAttrSelected('其他');
+                    pageViewModel.newsPublishTimeViewModel.otherSelector(newsSelectorAttr);
+                } else {
+                    pageViewModel.newsPublishTimeViewModel.selectorAttrSelected(newsSelectorAttr);
+                }
                 if (newsField.filters != null) {
                     var newsPublishTimeViewModelFilter = newsField.filters[0];
                     setViewModelFilter(pageViewModel.newsPublishTimeViewModel, newsPublishTimeViewModelFilter);
@@ -798,7 +832,13 @@ function updateTemplateDataInit(initData, pageViewModel, singleTemplateListJSON)
                 }
             } else if (newsFieldName == "source") {
                 pageViewModel.newsSourceViewModel.selector(newsFieldIndexer.value);
-                pageViewModel.newsSourceViewModel.selectorAttrSelected(newsFieldIndexer.attribute);
+                var newsSelectorAttr = newsFieldIndexer.attribute;
+                if (newsSelectorAttr != 'href' && newsSelectorAttr != 'text' && newsSelectorAttr != 'src' && newsSelectorAttr != 'html') {
+                    pageViewModel.newsSourceViewModel.selectorAttrSelected('其他');
+                    pageViewModel.newsSourceViewModel.otherSelector(newsSelectorAttr);
+                } else {
+                    pageViewModel.newsSourceViewModel.selectorAttrSelected(newsSelectorAttr);
+                }
                 if (newsField.filters != null) {
                     var newsSourceViewModelFilter = newsField.filters[0];
                     setViewModelFilter(pageViewModel.newsSourceViewModel, newsSourceViewModelFilter);
@@ -809,7 +849,12 @@ function updateTemplateDataInit(initData, pageViewModel, singleTemplateListJSON)
                 //自定义属性索引器
                 customerViewModel.target(newsField.name);
                 customerViewModel.selector(newsFieldIndexer.value);
-                customerViewModel.attrSelected(newsFieldIndexer.attribute);
+                if (newsFieldIndexer.attribute != 'href' && newsFieldIndexer.attribute != 'text' && newsFieldIndexer.attribute != 'src' && newsFieldIndexer.attribute != 'html') {
+                    customerViewModel.attrSelected('其他');
+                    customerViewModel.otherSelector(newsFieldIndexer.attribute);
+                } else {
+                    customerViewModel.attrSelected(newsFieldIndexer.attribute);
+                }
 
                 //内容页自定义属性过滤器
                 if (newsField.filters != null) {
@@ -1110,7 +1155,7 @@ function getJSONString(obj) {
         newsTitleViewModel: {
             selector: obj.newsTitleViewModel.selector(),
             selectorAttr: obj.newsTitleViewModel.selectorAttrSelected(),
-            otherSelector:obj.newsTitleViewModel.otherSelector(),
+            otherSelector: obj.newsTitleViewModel.otherSelector(),
             filterCategory: obj.newsTitleViewModel.filterCategorySelected(),
             filter: obj.newsTitleViewModel.filter(),
             filterReplaceTo: obj.newsTitleViewModel.filterReplaceTo()
@@ -1118,7 +1163,7 @@ function getJSONString(obj) {
         newsPublishTimeViewModel: {
             selector: obj.newsPublishTimeViewModel.selector(),
             selectorAttr: obj.newsPublishTimeViewModel.selectorAttrSelected(),
-            otherSelector:obj.newsPublishTimeViewModel.otherSelector(),
+            otherSelector: obj.newsPublishTimeViewModel.otherSelector(),
             filterCategory: obj.newsPublishTimeViewModel.filterCategorySelected(),
             filter: obj.newsPublishTimeViewModel.filter(),
             filterReplaceTo: obj.newsPublishTimeViewModel.filterReplaceTo(),
@@ -1128,7 +1173,7 @@ function getJSONString(obj) {
         newsSourceViewModel: {
             selector: obj.newsSourceViewModel.selector(),
             selectorAttr: obj.newsSourceViewModel.selectorAttrSelected(),
-            otherSelector:obj.newsSourceViewModel.otherSelector(),
+            otherSelector: obj.newsSourceViewModel.otherSelector(),
             filterCategory: obj.newsSourceViewModel.filterCategorySelected(),
             filter: obj.newsSourceViewModel.filter(),
             filterReplaceTo: obj.newsSourceViewModel.filterReplaceTo()
@@ -1136,7 +1181,7 @@ function getJSONString(obj) {
         newsContentViewModel: {
             selector: obj.newsContentViewModel.selector(),
             selectorAttr: obj.newsContentViewModel.selectorAttrSelected(),
-            otherSelector:obj.newsContentViewModel.otherSelector(),
+            otherSelector: obj.newsContentViewModel.otherSelector(),
             filterCategory: obj.newsContentViewModel.filterCategorySelected(),
             filter: obj.newsContentViewModel.filter(),
             filterReplaceTo: obj.newsContentViewModel.filterReplaceTo()
@@ -1145,12 +1190,12 @@ function getJSONString(obj) {
         listOutLinkViewModel: {
             selector: obj.listOutLinkViewModel.selector(),
             selectorAttr: obj.listOutLinkViewModel.selectorAttrSelected(),
-            otherSelector:obj.listOutLinkViewModel.otherSelector()
+            otherSelector: obj.listOutLinkViewModel.otherSelector()
         },
         listPaginationViewModel: {
             selector: obj.listPaginationViewModel.selector(),
             selectorAttr: obj.listPaginationViewModel.selectorAttrSelected(),
-            otherSelector:obj.listPaginationViewModel.otherSelector(),
+            otherSelector: obj.listPaginationViewModel.otherSelector(),
             filterCategory: obj.listPaginationViewModel.filterCategorySelected(),
             filter: obj.listPaginationViewModel.filter(),
             paginationType: obj.listPaginationViewModel.paginationTypeSelected(),
