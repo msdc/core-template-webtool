@@ -128,16 +128,22 @@
     <div class="row addRowTopMargin">
         <div class="col-md-8">
             <button type="button" class="btn btn-primary" data-bind="click: addNew">添加</button>
-            <button type="button" class="btn btn-primary" data-optiontype="file_export" data-toggle="modal"
-                    data-target="#model_export">批量导出模板
-            </button>
-            <button type="button" class="btn btn-primary" data-optiontype="file_import" data-toggle="modal"
-                    data-target="#model_export">批量导入模板
-            </button>
-            <button type="button" class="btn btn-primary" data-bind="click: generateAllIncreaseTemplates">批量生成种子文件
-            </button>
-            <button type="button" class="btn btn-primary" data-bind="click: showSearchTemplate">只显示搜索引擎</button>
-            <button type="button" class="btn btn-primary" data-bind="click: showNormalTemplate">只显示普通模板</button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">批量操作<span class="caret"></span></button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="#" data-optiontype="file_export" data-toggle="modal" data-target="#model_export">批量导出模板</a></li>
+                    <li><a href="#" data-optiontype="file_import" data-toggle="modal" data-target="#model_export">批量导入模板</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#" data-bind="click: generateAllIncreaseTemplates">批量生成种子文件</a></li>
+                </ul>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">视图<span class="caret"></span></button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="#" data-bind="click: showSearchTemplate">只显示搜索引擎</a></li>
+                    <li><a href="#" data-bind="click: showNormalTemplate">只显示普通模板</a></li>
+                </ul>
+            </div>
         </div>
         <div class="col-md-4 text-right">
             <div class="input-group">
