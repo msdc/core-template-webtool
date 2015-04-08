@@ -26,6 +26,10 @@ public class WebtoolConstants {
     
     public static final String DISPATCH_STATIS_START = "start";
     
+    public static final String DISPATCH_STATIS_RUNNING = "running";
+
+    public static final String DISPATCH_STATIS_COMPLETE = "complete";
+    
     public static final String SEED_FILE_NAME = "seed.txt";
     
     public static final String INCREASE_TEMPLATE_PARTERN =  "_increasetemplate";  

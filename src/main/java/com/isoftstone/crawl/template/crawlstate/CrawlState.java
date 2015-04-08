@@ -61,16 +61,15 @@ public class CrawlState {
      * @return 爬虫状态设置.
      */
     public List<CrawlStateBean> getCrawlState() {
-        List<String> folderNameList = getResultList("*_dispatch",
-            Constants.DISPATCH_REDIS_DBINDEX);
+        List<String> folderNameList = getResultList("*(increment)", Constants.DISPATCH_REDIS_DBINDEX);
+        List<String> normalFolderNameList = getResultList("*_dispatch", Constants.DISPATCH_REDIS_DBINDEX);
+        folderNameList.addAll(normalFolderNameList);
         List<CrawlStateBean> crawlStateList = new ArrayList<CrawlStateBean>();
         for (Iterator<String> it = folderNameList.iterator(); it.hasNext();) {
             String redisKey = it.next();
-            DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey,
-                Constants.DISPATCH_REDIS_DBINDEX);
+            DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey, Constants.DISPATCH_REDIS_DBINDEX);
             CrawlStateBean bean = new CrawlStateBean();
-            bean.setDispatchName(redisKey.substring(0,
-                redisKey.lastIndexOf("_")));
+            bean.setDispatchName(redisKey.substring(0, redisKey.lastIndexOf("_")));
             String crawlState = "";
             if ("running".equals(dispatchVo.getStatus())) {
                 crawlState = "爬取中";
@@ -132,15 +131,10 @@ public class CrawlState {
         String folderNameSeed = dispatchName.substring(0, dispatchName.lastIndexOf("_"));
         String folderNameData = folderNameSeed.substring(0, folderNameSeed.lastIndexOf("_"));
         String[] folderNameStrs = folderNameSeed.split("_");
-        folderNameSeed = folderNameStrs[0] + "_" + folderNameStrs[1] + "_"
-                + WebtoolConstants.INCREMENT_FILENAME_SIGN + "_"
-                + folderNameStrs[2];
-        folderNameData = folderNameData.substring(0,
-            folderNameData.lastIndexOf("_"))
-                + "_" + WebtoolConstants.INCREMENT_FILENAME_SIGN;
+        folderNameSeed = folderNameStrs[0] + "_" + folderNameStrs[1] + "_" + WebtoolConstants.INCREMENT_FILENAME_SIGN + "_" + folderNameStrs[2];
+        folderNameData = folderNameData.substring(0, folderNameData.lastIndexOf("_")) + "_" + WebtoolConstants.INCREMENT_FILENAME_SIGN;
         String seedFolder = rootFolder + File.separator + folderNameSeed;
-        String command = shDir + " " + seedFolder + " " + crawlDir
-                + folderNameData + "_data" + " " + solrURL + " " + depth;
+        String command = shDir + " " + seedFolder + " " + crawlDir + folderNameData + "_data" + " " + solrURL + " " + depth;
         Runmanager runmanager = getRunmanager(command);
         LOG.info("增量重爬:" + command);
         ShellUtils.execCmd(runmanager);
@@ -179,11 +173,29 @@ public class CrawlState {
         if (isDeploy) {
             seedFolder = Config.getValue(WebtoolConstants.KEY_HDFS_ROOT_PREFIX) + folderNameSeed;
         }
-        String command = shDir + " " + seedFolder + " " + crawlDir
-                + folderNameData + "_data" + " " + solrURL + " " + depth;
+        
+        List<Seed> seedList = dispatchVo.getSeed();
+        List<String> seedStrs = new ArrayList<String>();
+        for(Iterator<Seed> it = seedList.iterator(); it.hasNext();) {
+            Seed seed = it.next();
+            if("true".equals(seed.getIsEnabled())) {
+                seedStrs.add(seed.getUrl());
+            }
+        }
+        contentToTxt4CrawlerAgain(folderName, seedStrs, "true");
+        
+        dispatchVo.setStatus(WebtoolConstants.DISPATCH_STATIS_RUNNING);
+        RedisOperator.setDispatchResult(dispatchVo, dispatchName, Constants.DISPATCH_REDIS_DBINDEX);
+        
+        String command = shDir + " " + seedFolder + " " + crawlDir + folderNameData + "_data" + " " + solrURL + " " + depth;
         LOG.info("全量重爬:" + command);
         Runmanager runmanager = getRunmanager(command);
         ShellUtils.execCmd(runmanager);
+        
+        dispatchVo.setStatus(WebtoolConstants.DISPATCH_STATIS_COMPLETE);
+        RedisOperator.setDispatchResult(dispatchVo, dispatchName, Constants.DISPATCH_REDIS_DBINDEX);
+        contentToTxt4CrawlerAgain(folderName, seedStrs, "false");
+        
         return SUCCESS;
     }
 
@@ -303,11 +315,9 @@ public class CrawlState {
                 }
                 input.close();
 
-                // --写入未包含到本次种子中的历史数据.
                 for (int i = 0; i < fileSeedList.size(); i++) {
                     String tempStr = fileSeedList.get(i);
-                    strBuf.append("#" + tempStr
-                            + System.getProperty("line.separator"));
+                    strBuf.append("#" + tempStr + System.getProperty("line.separator"));
                 }
 
             }
@@ -319,7 +329,6 @@ public class CrawlState {
                 CrawlToolResource.putSeedsFolder(folderName, "local");
             }
             HdfsCommon.upFileToHdfs(filePath);
-            //            CrawlToolResource.putSeedsFolder(folderName, "deploy");
         } catch (Exception e) {
             LOG.error("生成文件错误.", e);
         } finally {
@@ -357,5 +366,72 @@ public class CrawlState {
             RedisUtils.returnResource(pool, jedis);
         }
         return null;
+    }
+    
+    /**
+     * 
+     * 保存内容到文件
+     * */
+    private void contentToTxt4CrawlerAgain(String folderName, List<String> seeds, String status) {
+        String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
+        String filePath = folderRoot + File.separator + folderName + File.separator + WebtoolConstants.SEED_FILE_NAME;
+        String str = null; // 原有txt内容
+        StringBuffer strBuf = new StringBuffer();// 内容更新
+        BufferedReader input = null;
+        BufferedWriter output = null;
+        try {
+            File f = new File(filePath);
+            if (!f.exists()) {
+                return;
+            } else {
+                input = new BufferedReader(new FileReader(f));
+                List<String> fileSeedList = new ArrayList<String>();
+                while ((str = input.readLine()) != null) {
+                    fileSeedList.add(str);
+                }
+                input.close();
+
+                // --写入未包含到本次种子中的历史数据.
+                for (int i = 0; i < fileSeedList.size(); i++) {
+                    String tempStr = fileSeedList.get(i);
+                    String temp = tempStr;
+                    if (tempStr.startsWith("#")) {
+                        temp = tempStr.substring(1, tempStr.length());
+                    }
+                    if (!seeds.contains(temp)) {
+                        strBuf.append(tempStr + System.getProperty("line.separator"));
+                    }
+                }
+
+            }
+            for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
+                String seedStr = it.next();
+                if ("false".equals(status)) {
+                    strBuf.append("#");
+                }
+                strBuf.append(seedStr + System.getProperty("line.separator"));
+            }
+            output = new BufferedWriter(new FileWriter(f));
+            output.write(strBuf.toString());
+            output.close();
+            String isCopy = Config.getValue(WebtoolConstants.KEY_IS_COPYFOLDER);
+            if ("true".equals(isCopy)) {
+                CrawlToolResource.putSeedsFolder(folderName, "local");
+            }
+            HdfsCommon.upFileToHdfs(filePath);
+        } catch (Exception e) {
+            LOG.error("生成文件错误.", e);
+        } finally {
+            try {
+                if (input != null) {
+                    input.close();
+                }
+                if (output != null) {
+                    output.close();
+                }
+            } catch (IOException e) {
+                LOG.error("关闭流异常.", e);
+            }
+        }
     }
 }
