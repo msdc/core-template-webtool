@@ -206,6 +206,7 @@
                                                 <td data-bind="text: typeName"></td>
                                                 <td>已索引条数</td>
                                                 <td>今日索引条数</td>
+                                                <td>今日发布条数</td>
                                                 <td>上次查询时间</td>
                                                 <td>操作</td>
                                             </tr>
@@ -216,6 +217,7 @@
                                                 <td data-bind="text: url" style="width: 400px;word-break: break-all"></td>
                                                 <td data-bind="text: indexCountsString"></td>
                                                 <td data-bind="text: todayIndexCountsString"></td>
+                                                <td data-bind="text: todayPublishTimeCounts"></td>
                                                 <td data-bind="text: checkTimeString"></td>
                                                 <td>
                                                     <button type="button"  class="btn btn-primary" data-bind="click: $parent.refreshSingleData">刷新</button>
