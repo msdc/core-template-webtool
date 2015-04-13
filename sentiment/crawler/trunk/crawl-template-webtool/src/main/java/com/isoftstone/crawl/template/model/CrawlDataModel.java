@@ -11,6 +11,9 @@ public class CrawlDataModel {
 	private String url = "";
 	private Long indexCounts;
 	private Long todayIndexCounts;
+	
+	private Long todayPublishTimeCounts;
+	
 	private String checkTime = "";
 	private String dataSource = "";
 
@@ -83,5 +86,13 @@ public class CrawlDataModel {
 
 	public void setDataSource(String dataSource) {
 		this.dataSource = dataSource;
+	}	
+	
+	public Long getTodayPublishTimeCounts() {
+		return todayPublishTimeCounts;
+	}
+
+	public void setTodayPublishTimeCounts(Long todayPublishTimeCounts) {
+		this.todayPublishTimeCounts = todayPublishTimeCounts;
 	}
 }

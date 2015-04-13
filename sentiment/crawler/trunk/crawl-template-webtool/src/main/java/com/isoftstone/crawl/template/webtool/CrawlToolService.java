@@ -1229,9 +1229,17 @@ public class CrawlToolService {
 					String nowDateString = dateFormat.format(currentDate);
 					// 查询今日索引
 					long todayIndexCount = search.getQueryResultCount("host", entry.getKey(), WebtoolConstants.CRAWL_DATA_QUERY_FIELD, serviceHelper.getTimeOfZero(), new Date());
+					
+					//new add by DonegalChen
+					long todayPublishTimeCount=search.getQueryResultCount("host", entry.getKey(), WebtoolConstants.CRAWL_DATA_PUBSHI_TIME_QUERY_FIELD, serviceHelper.getTimeOfZero(), new Date());
+					
 					crawlDataModel.setUrl(entry.getKey());
 					// 今日索引
 					crawlDataModel.setTodayIndexCounts(todayIndexCount);
+					
+					//new add by DonegalChen
+					crawlDataModel.setTodayPublishTimeCounts(todayPublishTimeCount);
+					
 					crawlDataModel.setIndexCounts(entry.getValue());
 					crawlDataModel.setCheckTime(nowDateString);
 					crawlDataModelArrayList.add(crawlDataModel);
