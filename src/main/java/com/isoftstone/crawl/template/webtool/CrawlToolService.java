@@ -59,7 +59,7 @@ import com.isoftstone.crawl.template.utils.TemplateModelComparator;
  * 
  * 爬虫工具restful-services服务类
  * */
-@Path("crawlToolResource")
+@Path("crawlToolService")
 public class CrawlToolService {
 
 	/**
@@ -67,7 +67,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/saveToLocalFile")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String saveToLocalFile(@DefaultValue("") @FormParam("data") String data) {
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		CrawlToolResource serviceHelper = new CrawlToolResource();
@@ -135,7 +135,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/verifyNewContent")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String verifyNewContent(@DefaultValue("") @FormParam("data") String data) {
 		ResponseJSONProvider<ParseResult> jsonProvider = new ResponseJSONProvider<ParseResult>();
 		CrawlToolResource serviceHelper = new CrawlToolResource();
@@ -198,7 +198,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/verifyListContent")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String verifyListContent(@DefaultValue("") @FormParam("data") String data) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		PageModel pageModel = serviceHelper.getPageModelByJsonString(data);
@@ -220,7 +220,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/getJSONString")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getJSONString(@DefaultValue("") @FormParam("data") String data) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		PageModel pageModel = serviceHelper.getPageModelByJsonString(data);
@@ -237,7 +237,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/saveTemplate")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String saveTemplate(@DefaultValue("") @FormParam("data") String data) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		PageModel pageModel = serviceHelper.getPageModelByJsonString(data);
@@ -268,7 +268,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/saveIncreaseTemplate")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String saveIncreaseTemplate(@DefaultValue("") @FormParam("data") String data) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		PageModel pageModel = serviceHelper.getPageModelByJsonString(data);
@@ -282,7 +282,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/viewHtmlContent")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String viewHtmlContent(@DefaultValue("") @FormParam("webUrl") String webUrl) {
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		String htmlContent = "";
@@ -307,7 +307,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/deleteTemplate")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String deleteTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		String templateGuid = MD5Utils.MD5(templateUrl);
@@ -348,7 +348,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/updateTemplate")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String updateTemplate(@DefaultValue("") @FormParam("templateGuid") String templateGuid) {
 		ResponseJSONProvider<TemplateResult> jsonProvider = new ResponseJSONProvider<TemplateResult>();
 		TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateGuid);
@@ -363,7 +363,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/getTemplateGuid")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getTemplateGuid(@DefaultValue("") @FormParam("templateUrl") String templateUrl) {
 		String templateGuid = MD5Utils.MD5(templateUrl);
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
@@ -378,7 +378,7 @@ public class CrawlToolService {
 	 * */
 	@GET
 	@Path("/getTemplateList")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getTemplateList() {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<TemplateList> jsonProvider = new ResponseJSONProvider<TemplateList>();
@@ -413,7 +413,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/searchTemplateList")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String searchTemplateList(@DefaultValue("") @FormParam("searchString") String searchString) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<TemplateList> jsonProvider = new ResponseJSONProvider<TemplateList>();
@@ -472,7 +472,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/disableTemplate")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String disableTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl, @DefaultValue("") @FormParam("name") String name) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
@@ -497,7 +497,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/enableTemplate")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String enableTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl, @DefaultValue("") @FormParam("name") String name) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
@@ -522,7 +522,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/getSingleTemplateModel")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getSingleTemplateModel(@DefaultValue("") @FormParam("templateGuid") String templateGuid) {
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		String json = RedisOperator.getFromDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
@@ -537,7 +537,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/exportAllTemplates")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String exportAllTemplates(@DefaultValue("") @FormParam("filePath") String filePath) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
@@ -597,7 +597,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/importAllTemplates")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String importAllTemplates(@DefaultValue("") @FormParam("filePath") String dirPath) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
@@ -646,7 +646,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/bulkSearchTemplates")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String bulkSearchTemplates(@DefaultValue("") @FormParam("data") String data) {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
@@ -784,7 +784,7 @@ public class CrawlToolService {
 	 * */
 	@GET
 	@Path("/generateAllIncreaseTemplates")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String generateAllIncreaseTemplates() {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
@@ -832,7 +832,7 @@ public class CrawlToolService {
 	 * */
 	@GET
 	@Path("/getSeedsEffectiveStatusList")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getSeedsEffectiveStatusList() {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();
@@ -914,7 +914,7 @@ public class CrawlToolService {
 	 * */
 	@GET
 	@Path("/getSeedsEffectiveStatusCache")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getSeedsEffectiveStatusCache() {
 		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();
 		CrawlToolResource serviceHelper = new CrawlToolResource();
@@ -950,7 +950,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/refreshSeedEffectiveStatus")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String refreshSeedEffectiveStatus(@DefaultValue("") @FormParam("templateId") String templateId) {
 		ResponseJSONProvider<SeedsEffectiveStatusModel> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusModel>();
 		jsonProvider.setSuccess(true);
@@ -997,7 +997,7 @@ public class CrawlToolService {
 	 * */
 	@GET
 	@Path("/getCrawlStatusList")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getCrawlStatusList() {
 		ResponseJSONProvider<CrawlStatusModelList> jsonProvider = new ResponseJSONProvider<CrawlStatusModelList>();
 
@@ -1032,7 +1032,7 @@ public class CrawlToolService {
 	 * */
 	@GET
 	@Path("/getCrawlStatusCache")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getCrawlStatusCache() {
 		ResponseJSONProvider<CrawlStatusModelList> jsonProvider = new ResponseJSONProvider<CrawlStatusModelList>();
 		CrawlStatusModelList crawlStatusModelList = new CrawlStatusModelList();
@@ -1055,7 +1055,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/stopCrawl")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String stopCrawl(@DefaultValue("") @FormParam("folderName") String folderName, @FormParam("isDeploy") boolean isDeploy, @FormParam("isNormal") boolean isNormal) {
 		ResponseJSONProvider<CrawlStatusModel> jsonProvider = new ResponseJSONProvider<CrawlStatusModel>();
 		CrawlState crawlState = new CrawlState();
@@ -1106,7 +1106,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/reParse")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String reParse(@DefaultValue("") @FormParam("folderName") String folderName, @FormParam("isDeploy") boolean isDeploy, @FormParam("isNormal") boolean isNormal) {
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		CrawlState crawlState = new CrawlState();
@@ -1138,7 +1138,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/crawl")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String crawl(@DefaultValue("") @FormParam("folderName") String folderName, @FormParam("isDeploy") boolean isDeploy, @FormParam("isNormal") boolean isNormal) {
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		CrawlState crawlState = new CrawlState();
@@ -1170,7 +1170,7 @@ public class CrawlToolService {
 	 * */
 	@GET
 	@Path("/getCrawlDataListByDataSource")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON )
 	public String getCrawlDataListByDataSource() {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<CrawlDataModelList> jsonProvider = new ResponseJSONProvider<CrawlDataModelList>();
@@ -1203,7 +1203,7 @@ public class CrawlToolService {
 	 * */
 	@GET
 	@Path("/getCrawlDataList")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getCrawlDataList() {
 		CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<CrawlDataModelList> jsonProvider = new ResponseJSONProvider<CrawlDataModelList>();
@@ -1231,7 +1231,7 @@ public class CrawlToolService {
 					long todayIndexCount = search.getQueryResultCount("host", entry.getKey(), WebtoolConstants.CRAWL_DATA_QUERY_FIELD, serviceHelper.getTimeOfZero(), new Date());
 					
 					//new add by DonegalChen
-					long todayPublishTimeCount=search.getQueryResultCount("host", entry.getKey(), WebtoolConstants.CRAWL_DATA_PUBSHI_TIME_QUERY_FIELD, serviceHelper.getTimeOfZero(), new Date());
+					long todayPublishTimeCount=search.getQueryResultCount("host", entry.getKey(), WebtoolConstants.CRAWL_DATA_PUBLISH_TIME_QUERY_FIELD, serviceHelper.getTimeOfZero(), new Date());
 					
 					crawlDataModel.setUrl(entry.getKey());
 					// 今日索引
@@ -1266,7 +1266,7 @@ public class CrawlToolService {
 	 * */
 	@GET
 	@Path("/getCrawlDataCache")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getCrawlDataCache() {
 		ResponseJSONProvider<CrawlDataModelList> jsonProvider = new ResponseJSONProvider<CrawlDataModelList>();
 		CrawlDataModelList crawlDataModelList = new CrawlDataModelList();
@@ -1288,7 +1288,7 @@ public class CrawlToolService {
 	 * */
 	@POST
 	@Path("/refreshCrawlData")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String refreshCrawlData(@DefaultValue("") @FormParam("domain") String domain, @DefaultValue("") @FormParam("typeName") String typeName,
 			@DefaultValue("") @FormParam("dataSource") String dataSource) {
 		ResponseJSONProvider<CrawlDataModel> jsonProvider = new ResponseJSONProvider<CrawlDataModel>();

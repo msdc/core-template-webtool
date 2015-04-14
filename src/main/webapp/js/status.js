@@ -20,14 +20,14 @@ var seedEffectiveVM = function (mainViewModel, urlData) {
     //注册modal中确定按钮事件 检查种子有效性
     mainViewModel.checkSeedsEffective = function () {
         $('#modal_seedsEffectiveInfo').modal('hide');
-        fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolResource/getSeedsEffectiveStatusList', mainViewModel, false, initSeedsEffectiveList);
+        fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolService/getSeedsEffectiveStatusList', mainViewModel, false, initSeedsEffectiveList);
     };
     //检查单个种子有效性
     that.checkSingleSeedEffective = function () {
         var self = this;
         self.effectiveStatusString('执行中..');
         self.checkTimeString('执行中..');
-        sendPostRequest('/webapi/crawlToolResource/refreshSeedEffectiveStatus', self, {templateId: self.templateId}, refreshSingleSeedHandler, refreshSingleSeedErrorHandler);
+        sendPostRequest('/webapi/crawlToolService/refreshSeedEffectiveStatus', self, {templateId: self.templateId}, refreshSingleSeedHandler, refreshSingleSeedErrorHandler);
     };
     //显示提示
     that.showSeedEffectiveInfo = function () {
@@ -46,7 +46,7 @@ var crawlStatusVM = function (mainViewModel, urlData) {
     that.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
     //刷新所有的爬取状态
     that.refreshCrawStatus = function () {
-        fillPageList('crawlStatusModelList', '/webapi/crawlToolResource/getCrawlStatusList', mainViewModel, false, initCrawlStatusList);
+        fillPageList('crawlStatusModelList', '/webapi/crawlToolService/getCrawlStatusList', mainViewModel, false, initCrawlStatusList);
     };
     //停止爬虫
     that.stopCrawl = function () {
@@ -55,8 +55,8 @@ var crawlStatusVM = function (mainViewModel, urlData) {
         self.checkTimeString('执行中..');
         var isDeploy = $('#btn_toggle_schema').prop('checked');
         var isNormal = $('#btn_toggle_index').prop('checked');
-        sendPostRequest('/webapi/crawlToolResource/stopCrawl', self, {folderName: self.url, isDeploy: isDeploy, isNormal: isNormal}, function (data, dataModel) {
-            var json = JSON.parse(data);
+        sendPostRequest('/webapi/crawlToolService/stopCrawl', self, {folderName: self.url, isDeploy: isDeploy, isNormal: isNormal}, function (data, dataModel) {
+            var json = data;//JSON.parse(data);
             if (json.success) {
                 var crawlStatusModel = json.data;
                 dataModel.crawlStatusString(crawlStatusModel.crawlStatus);
@@ -70,14 +70,14 @@ var crawlStatusVM = function (mainViewModel, urlData) {
         var self = this;
         var isDeploy = $('#btn_toggle_schema').prop('checked');
         var isNormal = $('#btn_toggle_index').prop('checked');
-        sendAjax2PostRequest('/webapi/crawlToolResource/reParse', self, {folderName: self.url, isDeploy: isDeploy, isNormal: isNormal}, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
+        sendAjax2PostRequest('/webapi/crawlToolService/reParse', self, {folderName: self.url, isDeploy: isDeploy, isNormal: isNormal}, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
     };
     //重爬
     that.crawl = function () {
         var self = this;
         var isDeploy = $('#btn_toggle_schema').prop('checked');
         var isNormal = $('#btn_toggle_index').prop('checked');
-        sendAjax2PostRequest('/webapi/crawlToolResource/crawl', self, {folderName: self.url, isDeploy: isDeploy, isNormal: isNormal}, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
+        sendAjax2PostRequest('/webapi/crawlToolService/crawl', self, {folderName: self.url, isDeploy: isDeploy, isNormal: isNormal}, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
     };
 };
 
@@ -94,7 +94,7 @@ function crawlStatusSuccessHandler(data, dataModel) {
     if (data.responseText) {
         modalBody.text("错误信息:" + data.responseText);
     } else {
-        var result = JSON.parse(data);
+        var result = data;//JSON.parse(data);
         if (result.success) {
             modalBody.text(result.data);
         } else {
@@ -124,12 +124,12 @@ var crawlDataVM = function (mainViewModel, urlData) {
     //按照域统计
     that.refreshCrawlData = function () {
         that.typeName('域名');
-        fillPageList('crawlDataModelList', '/webapi/crawlToolResource/getCrawlDataList', mainViewModel, false, initCrawlDataList);
+        fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataList', mainViewModel, false, initCrawlDataList);
     };
     //按分类查询统计
     that.queryByDataSource = function () {
         that.typeName('分类名称');
-        fillPageList('crawlDataModelList', '/webapi/crawlToolResource/getCrawlDataListByDataSource', mainViewModel, false, initCrawlDataList);
+        fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataListByDataSource', mainViewModel, false, initCrawlDataList);
     };
     //刷新单条抓取数据
     that.refreshSingleData = function () {
@@ -145,7 +145,7 @@ var crawlDataVM = function (mainViewModel, urlData) {
             postData.typeName = '2';
             postData.dataSource = self.dataSource;
         }
-        sendPostRequest('/webapi/crawlToolResource/refreshCrawlData', self, postData, refreshSingleDataHandler, refreshSingleDataErrorHandler);
+        sendPostRequest('/webapi/crawlToolService/refreshCrawlData', self, postData, refreshSingleDataHandler, refreshSingleDataErrorHandler);
     };
 };
 
@@ -168,7 +168,7 @@ var masterVM = function (urlData) {
  * @param {Object} dataModel
  * */
 function refreshSingleSeedHandler(data, dataModel) {
-    var json = JSON.parse(data);
+    var json = data;//JSON.parse(data);
     if (json.success) {
         var seedsEffective = json.data;
         dataModel.effectiveStatusString(seedsEffective.effectiveStatus);
@@ -191,7 +191,7 @@ function refreshSingleSeedErrorHandler(error) {
  * @param {Object} dataModel
  * */
 function refreshSingleDataHandler(data, dataModel) {
-    var json = JSON.parse(data);
+    var json = data;//JSON.parse(data);
     if (json.success) {
         var crawlDataModel = json.data;
         dataModel.indexCountsString(crawlDataModel.indexCounts);
@@ -268,7 +268,7 @@ function fillPageList(listType, url, mainViewModel, isPageLoad, callback) {
         url: virtualWebPath + url,
         type: 'GET',
         success: function (data) {
-            var json = JSON.parse(data);
+            var json = data;//JSON.parse(data);
             if (json.success) {
                 switch (listType) {
                     case 'seedsEffectiveStatusList'://种子有效性列表
@@ -339,13 +339,13 @@ $(function () {
     ko.applyBindings(mainViewModel);
 
     //初始化种子有效性列表测试数据
-    fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolResource/getSeedsEffectiveStatusCache', mainViewModel, true, initSeedsEffectiveList);
+    fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolService/getSeedsEffectiveStatusCache', mainViewModel, true, initSeedsEffectiveList);
     //初始化爬取状态列表
-    //fillPageList('crawlStatusModelList', '/webapi/crawlToolResource/getCrawlStatusCache', mainViewModel, true, initCrawlStatusList);
-    fillPageList('crawlStatusModelList', '/webapi/crawlToolResource/getCrawlStatusList', mainViewModel, true, initCrawlStatusList);
+    //fillPageList('crawlStatusModelList', '/webapi/crawlToolService/getCrawlStatusCache', mainViewModel, true, initCrawlStatusList);
+    fillPageList('crawlStatusModelList', '/webapi/crawlToolService/getCrawlStatusList', mainViewModel, true, initCrawlStatusList);
     //初始化爬取数据列表
-    //fillPageList('crawlDataModelList', '/webapi/crawlToolResource/getCrawlDataCache', mainViewModel, true, initCrawlDataList);
-    fillPageList('crawlDataModelList', '/webapi/crawlToolResource/getCrawlDataList', mainViewModel, true, initCrawlDataList);
+    //fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataCache', mainViewModel, true, initCrawlDataList);
+    fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataList', mainViewModel, true, initCrawlDataList);
 
     //注册Tab显示事件
     registerTabShownEvent(mainViewModel);
@@ -360,14 +360,14 @@ function registerTabShownEvent(mainViewModel) {
         var target = e.target.hash; // newly activated tab
         if (target == "#seeds_effective") {
             //初始化种子有效性列表测试数据
-            fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolResource/getSeedsEffectiveStatusCache', mainViewModel, true, initSeedsEffectiveList);
+            fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolService/getSeedsEffectiveStatusCache', mainViewModel, true, initSeedsEffectiveList);
         }
         else if (target == '#crawl_status') {
             //初始化爬取状态列表
-            fillPageList('crawlStatusModelList', '/webapi/crawlToolResource/getCrawlStatusList', mainViewModel, true, initCrawlStatusList);
+            fillPageList('crawlStatusModelList', '/webapi/crawlToolService/getCrawlStatusList', mainViewModel, true, initCrawlStatusList);
         } else if (target == '#crawl_data') {
             //初始化爬取数据列表
-            fillPageList('crawlDataModelList', '/webapi/crawlToolResource/getCrawlDataList', mainViewModel, true, initCrawlDataList);
+            fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataList', mainViewModel, true, initCrawlDataList);
         }
     });
 }

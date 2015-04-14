@@ -10,10 +10,10 @@ $(function () {
     //锁定页面元素
     //pageLocker();
     $.ajax2({
-        url: virtualWebPath + '/webapi/crawlToolResource/getTemplateList',
+        url: virtualWebPath + '/webapi/crawlToolService/getTemplateList',
         type: 'GET',
         success: function (data) {
-            var json = JSON.parse(data);
+            var json =data;// JSON.parse(data);
             if (json.success) {
                 if (json.data.templateList != null) {
                     pageInit(json.data.templateList);
@@ -80,13 +80,13 @@ function btnModalImportConfirmHandler() {
     modalBody.html('<div class=\"text-center\"><img src=\"image/load.gif\"></div>');
     modalFooter.html('');
     $.ajax({
-        url: virtualWebPath + '/webapi/crawlToolResource/importAllTemplates',
+        url: virtualWebPath + '/webapi/crawlToolService/importAllTemplates',
         type: 'POST',
         data: {
             filePath: filePath
         },
         success: function (data) {
-            var json = JSON.parse(data);
+            var json = data;//JSON.parse(data);
             if (json.success) {
                 optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;模板导入操作成功！请刷新该页面！");
             } else {
@@ -120,13 +120,13 @@ function btnModalExportConfirmHandler() {
     modalBody.html('<div class=\"text-center\"><img src=\"image/load.gif\"></div>');
     modalFooter.html('');
     $.ajax({
-        url: virtualWebPath + '/webapi/crawlToolResource/exportAllTemplates',
+        url: virtualWebPath + '/webapi/crawlToolService/exportAllTemplates',
         type: 'POST',
         data: {
             filePath: filePath
         },
         success: function (data) {
-            var json = JSON.parse(data);
+            var json = data;//JSON.parse(data);
             if (json.success) {
                 optionExecuteInfo("操作信息", "&nbsp;&nbsp;&nbsp;&nbsp;导出模板操作成功！");
             } else {
@@ -193,10 +193,10 @@ function templateViewModel(templateList) {
         var informationBody = increaseModel.find('.modal-body');
         informationBody.html('');
         $.ajax2({
-            url: virtualWebPath + '/webapi/crawlToolResource/generateAllIncreaseTemplates',
+            url: virtualWebPath + '/webapi/crawlToolService/generateAllIncreaseTemplates',
             type: 'GET',
             success: function (data) {
-                var json = JSON.parse(data);
+                var json = data;//JSON.parse(data);
                 informationBody.html(json.data);
                 increaseModel.modal('show');
             },
@@ -212,13 +212,13 @@ function templateViewModel(templateList) {
         if (item) {
             var templateUrl = item.basicInfoViewModel.url;
             $.ajax({
-                url: virtualWebPath + '/webapi/crawlToolResource/deleteTemplate',
+                url: virtualWebPath + '/webapi/crawlToolService/deleteTemplate',
                 type: 'POST',
                 data: {
                     templateUrl: templateUrl
                 },
                 success: function (data) {
-                    var json = JSON.parse(data);
+                    var json = data;//JSON.parse(data);
                     if (json.success) {
                         self.paginationUrls.remove(item);
                         self.urls.remove(item);
@@ -249,13 +249,13 @@ function templateViewModel(templateList) {
         var that = this;
         var templateUrl = that.basicInfoViewModel.url;
         $.ajax({
-            url: virtualWebPath + '/webapi/crawlToolResource/getTemplateGuid',
+            url: virtualWebPath + '/webapi/crawlToolService/getTemplateGuid',
             type: 'POST',
             data: {
                 templateUrl: templateUrl
             },
             success: function (data) {
-                var json = JSON.parse(data);
+                var json = data;//JSON.parse(data);
                 if (json.success) {
                     window.location.href = "pages/template-main.html?templateGuid=" + json.data;
                 } else {
@@ -275,7 +275,7 @@ function templateViewModel(templateList) {
         var name = that.basicInfoViewModel.name;
         that.statusText('执行中...');
         $.ajax({
-            url: virtualWebPath + '/webapi/crawlToolResource/disableTemplate',
+            url: virtualWebPath + '/webapi/crawlToolService/disableTemplate',
             type: 'POST',
             data: {
                 templateUrl: templateUrl,
@@ -299,7 +299,7 @@ function templateViewModel(templateList) {
         var name = that.basicInfoViewModel.name;
         that.statusText('执行中...');
         $.ajax({
-            url: virtualWebPath + '/webapi/crawlToolResource/enableTemplate',
+            url: virtualWebPath + '/webapi/crawlToolService/enableTemplate',
             type: 'POST',
             data: {
                 templateUrl: templateUrl,
@@ -334,13 +334,13 @@ function templateViewModel(templateList) {
  * */
 function searchKeyWords(searchString, self) {
     $.ajax2({
-        url: virtualWebPath + '/webapi/crawlToolResource/searchTemplateList',
+        url: virtualWebPath + '/webapi/crawlToolService/searchTemplateList',
         type: 'POST',
         data: {
             searchString: searchString
         },
         success: function (data) {
-            var json = JSON.parse(data);
+            var json = data;//JSON.parse(data);
             if (json.success) {
                 if (json.data.templateList != null) {
                     var templateLists = json.data.templateList;
