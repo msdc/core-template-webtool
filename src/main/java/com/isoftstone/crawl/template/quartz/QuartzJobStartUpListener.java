@@ -24,10 +24,10 @@ import org.quartz.impl.StdSchedulerFactory;
 
 /**
  * QuartzJobStartUpListener
- * @author danhb
- * @date  2015-3-26
- * @version 1.0
  *
+ * @author danhb
+ * @version 1.0
+ * @date 2015-3-26
  */
 public class QuartzJobStartUpListener implements ServletContextListener {
 
@@ -75,13 +75,13 @@ public class QuartzJobStartUpListener implements ServletContextListener {
             String job_name_checkSeedStatus = "检查种子有效性";
             JobDetail check_seedStatus = JobBuilder
                     .newJob(CheckSeedsStatusJob.class)
-                    .withIdentity(job_name_checkSeedStatus, "Group").build();
+                    .withIdentity(job_name_checkSeedStatus, "TCGroup").build();
             Trigger checkSeedStatusTrigger = TriggerBuilder
                     .newTrigger()
-                    .withIdentity(job_name_checkSeedStatus, "Group")
+                    .withIdentity(job_name_checkSeedStatus, "TCGroup")
                     .withSchedule(
-                        SimpleScheduleBuilder.simpleSchedule().repeatForever()
-                                .withIntervalInHours(INTERVAL_IN_HOUR))
+                            SimpleScheduleBuilder.simpleSchedule().repeatForever()
+                                    .withIntervalInHours(INTERVAL_IN_HOUR))
                     .startAt(new Date()).build();
             sched = sf.getScheduler();
             sched.scheduleJob(check_seedStatus, checkSeedStatusTrigger);

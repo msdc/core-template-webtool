@@ -20,6 +20,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 
 import com.isoftstone.crawl.template.consts.WebtoolConstants;
@@ -61,7 +62,7 @@ import com.isoftstone.crawl.template.utils.TemplateModelComparator;
  * */
 @Path("crawlToolService")
 public class CrawlToolService {
-
+	CrawlToolResource serviceHelper = new CrawlToolResource();
 	/**
 	 * 保存到本地文件
 	 * */
@@ -70,7 +71,7 @@ public class CrawlToolService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String saveToLocalFile(@DefaultValue("") @FormParam("data") String data) {
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		PageModel pageModel = serviceHelper.getPageModelByJsonString(data);
 		String domain = pageModel.getScheduleDispatchViewModel().getDomain();
 		// String period = pageModel.getScheduleDispatchViewModel().getPeriod();
@@ -138,7 +139,7 @@ public class CrawlToolService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String verifyNewContent(@DefaultValue("") @FormParam("data") String data) {
 		ResponseJSONProvider<ParseResult> jsonProvider = new ResponseJSONProvider<ParseResult>();
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		PageModel pageModel = serviceHelper.getPageModelByJsonString(data);
 		ParseResult parseResult = serviceHelper.saveParseResult(pageModel);
 		if (parseResult == null) {
@@ -200,7 +201,7 @@ public class CrawlToolService {
 	@Path("/verifyListContent")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String verifyListContent(@DefaultValue("") @FormParam("data") String data) {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		PageModel pageModel = serviceHelper.getPageModelByJsonString(data);
 		ResponseJSONProvider<ParseResult> jsonProvider = new ResponseJSONProvider<ParseResult>();
 		ParseResult parseResult = serviceHelper.saveParseResult(pageModel);
@@ -222,7 +223,7 @@ public class CrawlToolService {
 	@Path("/getJSONString")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getJSONString(@DefaultValue("") @FormParam("data") String data) {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		PageModel pageModel = serviceHelper.getPageModelByJsonString(data);
 		ResponseJSONProvider<TemplateResult> jsonProvider = new ResponseJSONProvider<TemplateResult>();
 		TemplateResult templateResult = serviceHelper.getTemplateResult(pageModel);
@@ -239,7 +240,7 @@ public class CrawlToolService {
 	@Path("/saveTemplate")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String saveTemplate(@DefaultValue("") @FormParam("data") String data) {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		PageModel pageModel = serviceHelper.getPageModelByJsonString(data);
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		// 保存常规模板
@@ -270,7 +271,7 @@ public class CrawlToolService {
 	@Path("/saveIncreaseTemplate")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String saveIncreaseTemplate(@DefaultValue("") @FormParam("data") String data) {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		PageModel pageModel = serviceHelper.getPageModelByJsonString(data);
 		ResponseJSONProvider<String> jsonProvider = serviceHelper.saveIncreaseTemplateResult(pageModel);
 		return jsonProvider.toJSON();
@@ -309,7 +310,7 @@ public class CrawlToolService {
 	@Path("/deleteTemplate")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String deleteTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl) {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		String templateGuid = MD5Utils.MD5(templateUrl);
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		jsonProvider.setSuccess(true);
@@ -380,7 +381,7 @@ public class CrawlToolService {
 	@Path("/getTemplateList")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getTemplateList() {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<TemplateList> jsonProvider = new ResponseJSONProvider<TemplateList>();
 		jsonProvider.setSuccess(true);
 		TemplateList templateList = new TemplateList();
@@ -415,7 +416,7 @@ public class CrawlToolService {
 	@Path("/searchTemplateList")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String searchTemplateList(@DefaultValue("") @FormParam("searchString") String searchString) {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<TemplateList> jsonProvider = new ResponseJSONProvider<TemplateList>();
 		jsonProvider.setSuccess(true);
 		if (searchString.equals("启用")) {
@@ -474,7 +475,7 @@ public class CrawlToolService {
 	@Path("/disableTemplate")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String disableTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl, @DefaultValue("") @FormParam("name") String name) {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 
 		String templateGuid = MD5Utils.MD5(templateUrl);
@@ -499,7 +500,7 @@ public class CrawlToolService {
 	@Path("/enableTemplate")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String enableTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl, @DefaultValue("") @FormParam("name") String name) {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 
 		String templateGuid = MD5Utils.MD5(templateUrl);
@@ -539,7 +540,7 @@ public class CrawlToolService {
 	@Path("/exportAllTemplates")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String exportAllTemplates(@DefaultValue("") @FormParam("filePath") String filePath) {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("导出模板操作成功！");
@@ -599,7 +600,7 @@ public class CrawlToolService {
 	@Path("/importAllTemplates")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String importAllTemplates(@DefaultValue("") @FormParam("filePath") String dirPath) {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("导入模板操作成功！");
@@ -648,7 +649,7 @@ public class CrawlToolService {
 	@Path("/bulkSearchTemplates")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String bulkSearchTemplates(@DefaultValue("") @FormParam("data") String data) {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		StringBuilder sbString = new StringBuilder();
 		int failedTemplateCount = 0;
@@ -758,7 +759,7 @@ public class CrawlToolService {
 			saveToLocalFile(pageModel.toJSON());
 			// 同时生成增量模板
 			String templateModelJSONString = RedisOperator.getFromDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
-			TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateModelJSONString);
+			TemplateModel templateModel =  serviceHelper.getTemplateModelByJSONString(templateModelJSONString);
 			ResponseJSONProvider<String> saveResult = serviceHelper.saveIncreaseTemplateResult(templateModel, "../");
 			if (saveResult.getErrorMsg() != null) {
 				failedTemplateCount++;
@@ -786,7 +787,7 @@ public class CrawlToolService {
 	@Path("/generateAllIncreaseTemplates")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String generateAllIncreaseTemplates() {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
 		jsonProvider.setSuccess(true);
 		StringBuilder sbString = new StringBuilder();
@@ -834,7 +835,7 @@ public class CrawlToolService {
 	@Path("/getSeedsEffectiveStatusList")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getSeedsEffectiveStatusList() {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();
 
 		SeedsEffectiveStatusList seedsEffectiveStatusList = new SeedsEffectiveStatusList();
@@ -917,7 +918,7 @@ public class CrawlToolService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getSeedsEffectiveStatusCache() {
 		ResponseJSONProvider<SeedsEffectiveStatusList> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusList>();
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		jsonProvider.setSuccess(true);
 		SeedsEffectiveStatusList seedsEffectiveStatusList = new SeedsEffectiveStatusList();
 		String json = RedisOperator.getFromCacheDB(WebtoolConstants.SEEDS_EFFECTIVE_STATUS);
@@ -954,7 +955,7 @@ public class CrawlToolService {
 	public String refreshSeedEffectiveStatus(@DefaultValue("") @FormParam("templateId") String templateId) {
 		ResponseJSONProvider<SeedsEffectiveStatusModel> jsonProvider = new ResponseJSONProvider<SeedsEffectiveStatusModel>();
 		jsonProvider.setSuccess(true);
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		// 先取之前的模板列表JSON字符串
 		String singleTemplateListModel = RedisOperator.getFromDefaultDB(templateId + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
 		TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(singleTemplateListModel);
@@ -997,7 +998,7 @@ public class CrawlToolService {
 	 * */
 	@GET
 	@Path("/getCrawlStatusList")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public String getCrawlStatusList() {
 		ResponseJSONProvider<CrawlStatusModelList> jsonProvider = new ResponseJSONProvider<CrawlStatusModelList>();
 
@@ -1172,19 +1173,20 @@ public class CrawlToolService {
 	@Path("/getCrawlDataListByDataSource")
 	@Produces(MediaType.APPLICATION_JSON )
 	public String getCrawlDataListByDataSource() {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<CrawlDataModelList> jsonProvider = new ResponseJSONProvider<CrawlDataModelList>();
 
 		CrawlDataModelList crawlDataModelList = new CrawlDataModelList();
 		List<CrawlDataModel> crawlDataModelArrayList = new ArrayList<CrawlDataModel>();
 
+		// 搜索引擎
 		CrawlDataModel searchEngineCrawlDataModel = new CrawlDataModel();
 		searchEngineCrawlDataModel.setDataSource("2");
-		// 搜索引擎
-		serviceHelper.fillCrawlDataModelArrayList(searchEngineCrawlDataModel, crawlDataModelArrayList, "tags", "datasource=2", "搜索引擎");
-		CrawlDataModel normalCrawlDataModel = new CrawlDataModel();
 		// 常规引擎
+		CrawlDataModel normalCrawlDataModel = new CrawlDataModel();
 		normalCrawlDataModel.setDataSource("1");
+
+		serviceHelper.fillCrawlDataModelArrayList(searchEngineCrawlDataModel, crawlDataModelArrayList, "tags", "datasource=2", "搜索引擎");
 		serviceHelper.fillCrawlDataModelArrayList(normalCrawlDataModel, crawlDataModelArrayList, "tags", "datasource=1", "定向站点");
 
 		// 列表按名称排序
@@ -1205,7 +1207,7 @@ public class CrawlToolService {
 	@Path("/getCrawlDataList")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getCrawlDataList() {
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		ResponseJSONProvider<CrawlDataModelList> jsonProvider = new ResponseJSONProvider<CrawlDataModelList>();
 
 		CrawlDataModelList crawlDataModelList = new CrawlDataModelList();
@@ -1292,7 +1294,7 @@ public class CrawlToolService {
 	public String refreshCrawlData(@DefaultValue("") @FormParam("domain") String domain, @DefaultValue("") @FormParam("typeName") String typeName,
 			@DefaultValue("") @FormParam("dataSource") String dataSource) {
 		ResponseJSONProvider<CrawlDataModel> jsonProvider = new ResponseJSONProvider<CrawlDataModel>();
-		CrawlToolResource serviceHelper = new CrawlToolResource();
+		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		SolrSerach search = new SolrSerach();
 		CrawlDataModel crawlDataModel = new CrawlDataModel();
 
