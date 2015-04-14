@@ -55,7 +55,11 @@ var crawlStatusVM = function (mainViewModel, urlData) {
         self.checkTimeString('执行中..');
         var isDeploy = $('#btn_toggle_schema').prop('checked');
         var isNormal = $('#btn_toggle_index').prop('checked');
-        sendPostRequest('/webapi/crawlToolService/stopCrawl', self, {folderName: self.url, isDeploy: isDeploy, isNormal: isNormal}, function (data, dataModel) {
+        sendPostRequest('/webapi/crawlToolService/stopCrawl', self, {
+            folderName: self.url,
+            isDeploy: isDeploy,
+            isNormal: isNormal
+        }, function (data, dataModel) {
             var json = data;//JSON.parse(data);
             if (json.success) {
                 var crawlStatusModel = json.data;
@@ -70,14 +74,22 @@ var crawlStatusVM = function (mainViewModel, urlData) {
         var self = this;
         var isDeploy = $('#btn_toggle_schema').prop('checked');
         var isNormal = $('#btn_toggle_index').prop('checked');
-        sendAjax2PostRequest('/webapi/crawlToolService/reParse', self, {folderName: self.url, isDeploy: isDeploy, isNormal: isNormal}, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
+        sendAjax2PostRequest('/webapi/crawlToolService/reParse', self, {
+            folderName: self.url,
+            isDeploy: isDeploy,
+            isNormal: isNormal
+        }, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
     };
     //重爬
     that.crawl = function () {
         var self = this;
         var isDeploy = $('#btn_toggle_schema').prop('checked');
         var isNormal = $('#btn_toggle_index').prop('checked');
-        sendAjax2PostRequest('/webapi/crawlToolService/crawl', self, {folderName: self.url, isDeploy: isDeploy, isNormal: isNormal}, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
+        sendAjax2PostRequest('/webapi/crawlToolService/crawl', self, {
+            folderName: self.url,
+            isDeploy: isDeploy,
+            isNormal: isNormal
+        }, null, crawlStatusSuccessHandler, crawlStatusErrorHandler);
     };
 };
 
@@ -147,6 +159,37 @@ var crawlDataVM = function (mainViewModel, urlData) {
         }
         sendPostRequest('/webapi/crawlToolService/refreshCrawlData', self, postData, refreshSingleDataHandler, refreshSingleDataErrorHandler);
     };
+
+    that.sort = function (args, event) {
+        var self = this;
+        var sk = event.target.attributes["sortkey"].value;
+        if (sk) {
+            switch (sk) {
+                case "totalIndex":
+                {
+                    args.urls().sort(function (a, b) {
+                        return a.indexCountsString() < b.indexCountsString() ? 1 : a.indexCountsString() > b.indexCountsString() ? -1 : a.indexCountsString() == b.indexCountsString() ? 0 : 0;
+                    });
+                    break;
+                }
+                case "todayIndex":
+                {
+                    args.urls().sort(function (a, b) {
+                        return a.todayIndexCountsString() < b.todayIndexCountsString() ? 1 : a.todayIndexCountsString() > b.todayIndexCountsString() ? -1 : a.todayIndexCountsString() == b.todayIndexCountsString() ? 0 : 0;
+                    });
+                    break;
+                }
+                case "todayPublish":
+                {
+                    args.urls().sort(function (a, b) {
+                        return a.todayPublishCountsString() < b.todayPublishCountsString() ? 1 : a.todayPublishCountsString() > b.todayPublishCountsString() ? -1 : a.todayPublishCountsString() == b.todayPublishCountsString() ? 0 : 0;
+                    });
+                    break;
+                }
+            }
+            args.paginationUrls(args.urls().slice(0, paginationItemCounts));
+        }
+    }
 };
 
 /**
@@ -466,6 +509,9 @@ function updateInitCrawlData(initData) {
             model.checkTimeString = ko.observable(model.checkTime);
             //今日索引
             model.todayIndexCountsString = ko.observable(model.todayIndexCounts);
+
+            model.todayPublishCountsString = ko.observable(model.todayPublishTimeCounts);
+
             crawlDataList.push(model);
         }
     }
@@ -522,8 +568,18 @@ function crawlStatusSampleData() {
  * */
 function crawlDataSampleData() {
     var sampleData = [
-        {name: '上海证券报-信托研究', url: 'http://caifu.cnstock.com/list/xingtuo_yanjiu', indexCounts: '2890', todayIndexCounts: '289'},
-        {name: '上海证券报-信托调查', url: 'http://caifu.cnstock.com/list/xingtuo_diaocha', indexCounts: '2234', todayIndexCounts: '123'}
+        {
+            name: '上海证券报-信托研究',
+            url: 'http://caifu.cnstock.com/list/xingtuo_yanjiu',
+            indexCounts: '2890',
+            todayIndexCounts: '289'
+        },
+        {
+            name: '上海证券报-信托调查',
+            url: 'http://caifu.cnstock.com/list/xingtuo_diaocha',
+            indexCounts: '2234',
+            todayIndexCounts: '123'
+        }
     ];
     return sampleData;
 }
