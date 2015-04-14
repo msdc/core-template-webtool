@@ -1818,7 +1818,7 @@ public class CrawlToolResource {
 		long searchEngineCount = search.getQueryResultCount(filter, value);
 		// 查询今日索引
 		long todayIndexCount = search.getQueryResultCount(filter, value, WebtoolConstants.CRAWL_DATA_QUERY_FIELD, getTimeOfZero(), new Date());
-		long todayPublishCount=search.getQueryResultCount(filter,value,WebtoolConstants.CRAWL_DATA_PUBSHI_TIME_QUERY_FIELD,getTimeOfZero(),new Date());
+		long todayPublishCount=search.getQueryResultCount(filter,value,WebtoolConstants.CRAWL_DATA_PUBLISH_TIME_QUERY_FIELD,getTimeOfZero(),new Date());
 
 		crawlDataModel.setUrl(typeName);
 		// 今日索引
