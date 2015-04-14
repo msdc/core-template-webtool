@@ -154,7 +154,9 @@ public class ShellUtils {
 			LOG.error(e.getMessage(), e);
 		} finally {
 			try {
-				reader.close();
+			    if(reader != null) {
+			        reader.close();
+			    }
 			} catch (IOException e) {
 				LOG.error(e.getMessage(), e);
 			}
