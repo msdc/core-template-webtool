@@ -22,6 +22,8 @@ import javax.ws.rs.core.MediaType;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.isoftstone.crawl.template.consts.WebtoolConstants;
 import com.isoftstone.crawl.template.crawlstate.CrawlState;
@@ -62,6 +64,9 @@ import com.isoftstone.crawl.template.utils.TemplateModelComparator;
  * */
 @Path("crawlToolService")
 public class CrawlToolService {
+    
+    private static final Log LOG = LogFactory.getLog(CrawlToolService.class);
+
 	CrawlToolResource serviceHelper = new CrawlToolResource();
 	/**
 	 * 保存到本地文件
@@ -794,6 +799,7 @@ public class CrawlToolService {
 		Set<String> templateListKeys = RedisOperator.searchKeysFromDefaultDB("*" + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
 		int failedTemplateCount = 0;
 		for (String listKey : templateListKeys) {
+		    try{
 			String templateModelJSONString = RedisOperator.getFromDefaultDB(listKey);
 			TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateModelJSONString);
 			TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateModel.getTemplateId());
@@ -811,6 +817,9 @@ public class CrawlToolService {
 				// sbString.append("<div class=\"alert alert-danger\" role=\"alert\"><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span><span class=\"sr-only\">Error:</span>"
 				// + saveResult.getErrorMsg() + "</div>");
 			}
+		    }catch (Exception e) {
+		        LOG.info(e.getMessage(), e);
+		    }
 		}
 		if (failedTemplateCount > 0) {
 			// sbString.append("<div class=\"bg-success\">&nbsp;&nbsp;&nbsp;汇总结果：共"
