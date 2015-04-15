@@ -33,13 +33,13 @@ function md5EncryptBtnHandler(){
     }
 
     $.ajax({
-        url: virtualWebPath + '/webapi/crawlToolResource/getTemplateGuid',
+        url: virtualWebPath + '/webapi/crawlToolService/getTemplateGuid',
         type: 'POST',
         data: {
             templateUrl: md5_template_url
         },
         success: function (data) {
-            var json=JSON.parse(data);
+            var json=data;//JSON.parse(data);
             if(json.success){
                 md5_textAreaControl.val(json.data);
             }else{

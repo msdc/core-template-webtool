@@ -190,6 +190,28 @@ var crawlDataVM = function (mainViewModel, urlData) {
             args.paginationUrls(args.urls().slice(0, paginationItemCounts));
         }
     }
+
+    that.totalIndexSum=ko.computed(function(){
+        var tpTotal=0;
+        for(var i=0;i<that.urls().length;i++){
+            tpTotal=tpTotal+parseInt(that.urls()[i].indexCounts);
+        }
+        return tpTotal;
+    });
+    that.totalTodayIndexSum=ko.computed(function(){
+        var tpTotal=0;
+        for(var i=0;i<that.urls().length;i++){
+            tpTotal=tpTotal+parseInt(that.urls()[i].todayIndexCounts);
+        }
+        return tpTotal;
+    });
+    that.totalPublishTimeSum=ko.computed(function(){
+        var tpTotal=0;
+        for(var i=0;i<that.urls().length;i++){
+            tpTotal=tpTotal+parseInt(that.urls()[i].todayPublishTimeCounts);
+        }
+        return tpTotal;
+    });
 };
 
 /**
