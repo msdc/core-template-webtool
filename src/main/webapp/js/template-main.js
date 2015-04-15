@@ -147,7 +147,7 @@ function basicInfoViewModel() {
         $('#modalHtmlTitle').text('Html内容');
         $('#modal-viewHtml').modal('show');
         $.ajax({
-            url: virtualWebPath + '/webapi/crawlToolResource/viewHtmlContent',
+            url: virtualWebPath + '/webapi/crawlToolService/viewHtmlContent',
             type: 'POST',
             data: {
                 webUrl: url
@@ -155,7 +155,7 @@ function basicInfoViewModel() {
             success: function (result) {
                 var modalBody = $('#modal-viewHtml-body');
                 modalBody.text('');//清空
-                var json = JSON.parse(result);
+                var json =result; // JSON.parse(result);
                 if (json.success) {
                     modalBody.text(json.data);
                 } else {
@@ -361,13 +361,13 @@ $(function () {
     //执行的是update操作
     if (templateGuid != undefined && templateGuid != '' && templateGuid != null) {
         $.ajax2({
-            url: virtualWebPath + '/webapi/crawlToolResource/updateTemplate',
+            url: virtualWebPath + '/webapi/crawlToolService/updateTemplate',
             type: 'POST',
             data: {
                 templateGuid: templateGuid
             },
             success: function (data) {
-                var json = JSON.parse(data);
+                var json =data; // JSON.parse(result);
                 if (json.success) {
                     loadPageContext(json.data);
                 } else {
@@ -469,49 +469,49 @@ function loadPageContext(initData) {
                         this.verifyNewContent = function () {
                             $('#lbl_result_title').text('内容页验证结果');
                             $('#txt_testResult').val('程序正在执行,请稍后...').css({color: 'red', fontSize: '20px'});
-                            ajaxLoadingPostRequest(virtualWebPath + '/webapi/crawlToolResource/verifyNewContent', this, showResultInTextArea, showErrorsInTextArea);
+                            ajaxLoadingPostRequest(virtualWebPath + '/webapi/crawlToolService/verifyNewContent', this, showResultInTextArea, showErrorsInTextArea);
                         };
 
                         //验证列表页
                         this.verifyListContent = function () {
                             $('#lbl_result_title').text('列表页验证结果');
                             $('#txt_testResult').val('程序正在执行,请稍后...').css({color: 'red', fontSize: '20px'});
-                            ajaxLoadingPostRequest(virtualWebPath + '/webapi/crawlToolResource/verifyListContent', this, showResultInTextArea, showErrorsInTextArea);
+                            ajaxLoadingPostRequest(virtualWebPath + '/webapi/crawlToolService/verifyListContent', this, showResultInTextArea, showErrorsInTextArea);
                         };
 
                         /*查看模板JSON*/
                         this.templateTest = function () {
                             $('#lbl_result_title').text('查看模板JSON');
                             $('#txt_testResult').val('程序正在执行,请稍后...').css({color: 'red'});
-                            ajaxLoadingPostRequest(virtualWebPath + '/webapi/crawlToolResource/getJSONString', this, showResultInTextArea, showErrorsInTextArea);
+                            ajaxLoadingPostRequest(virtualWebPath + '/webapi/crawlToolService/getJSONString', this, showResultInTextArea, showErrorsInTextArea);
                         }.bind(this);
 
                         /*保存模板配置*/
                         this.saveTemplate = function () {
                             $('#modalHtmlTitle').text('保存结果');
                             $('#modal-viewHtml').modal('show');
-                            ajaxPostRequest(virtualWebPath + '/webapi/crawlToolResource/saveTemplate', this, showResultInModal, showResultInModal);
+                            ajaxPostRequest(virtualWebPath + '/webapi/crawlToolService/saveTemplate', this, showResultInModal, showResultInModal);
                         }.bind(this);
 
                         /*保存增量模板*/
                         this.saveIncreaseTemplate = function () {
                             $('#modalHtmlTitle').text('保存结果');
                             $('#modal-viewHtml').modal('show');
-                            ajaxPostRequest(virtualWebPath + '/webapi/crawlToolResource/saveIncreaseTemplate', this, showResultInModal, showResultInModal);
+                            ajaxPostRequest(virtualWebPath + '/webapi/crawlToolService/saveIncreaseTemplate', this, showResultInModal, showResultInModal);
                         }.bind(this);
 
                         /*保存到本地文件*/
                         this.saveToLocalFile = function () {
                             $('#modalHtmlTitle').text('保存结果');
                             $('#modal-viewHtml').modal('show');
-                            ajaxPostRequest(virtualWebPath + '/webapi/crawlToolResource/saveToLocalFile', this, showResultInModal, showResultInModal);
+                            ajaxPostRequest(virtualWebPath + '/webapi/crawlToolService/saveToLocalFile', this, showResultInModal, showResultInModal);
                         }.bind(this);
 
                         /*批量生成搜索引擎模板*/
                         this.bulkSearchTemplates = function () {
                             var infoTitle = '生成搜索引擎模板结果';
                             var infoErrorMsg = '批量生成生成搜索引擎模板失败！';
-                            ajax2PostRequest(virtualWebPath + '/webapi/crawlToolResource/bulkSearchTemplates', this, infoTitle, infoErrorMsg);
+                            ajax2PostRequest(virtualWebPath + '/webapi/crawlToolService/bulkSearchTemplates', this, infoTitle, infoErrorMsg);
                         }.bind(this);
 
                         /*根据模板类型显示相应按钮*/
@@ -620,13 +620,13 @@ function testAddNewTemplate(pageViewModel) {
 function updateTemplate(initData, pageViewModel) {
     var templateGuid = initData.templateGuid;
     $.ajax({
-        url: virtualWebPath + '/webapi/crawlToolResource/getSingleTemplateModel',
+        url: virtualWebPath + '/webapi/crawlToolService/getSingleTemplateModel',
         type: 'POST',
         data: {
             templateGuid: templateGuid
         },
         success: function (data) {
-            var json = JSON.parse(data);
+            var json =data; // JSON.parse(result);
             updateTemplateDataInit(initData, pageViewModel, json.data);
         },
         error: function (error) {
@@ -1004,7 +1004,7 @@ function setViewModelFormatter(viewModel, viewModelFormatter) {
 function showResultInTextArea(data) {
     //$('#modal_body_showError').html('');
     //$('#btn_showErrorMessage').hide();
-    var result = JSON.parse(data);
+    var result =data; // JSON.parse(result);
     if (result.success) {
         $('#txt_testResult').val(JSON.stringify(result.data, null, 4)).css({color: '#000000', fontSize: '14px'});
     } else {
@@ -1032,7 +1032,7 @@ function showResultInModal(data) {
     if (data.responseText) {
         modalBody.text("错误信息:" + data.responseText);
     } else {
-        var result = JSON.parse(data);
+        var result =data; // JSON.parse(result);
         if (result.success) {
             modalBody.text(result.data);
         } else {
@@ -1051,7 +1051,7 @@ function showResultInModalWithHtml(data) {
     if (data.responseText) {
         modalBody.text("错误信息:" + data.responseText);
     } else {
-        var result = JSON.parse(data);
+        var result =data; // JSON.parse(result);
         if (result.success) {
             modalBody.html(result.data);
         } else {
@@ -1103,7 +1103,7 @@ function ajax2PostRequest(url, data, title, errMsg) {
             data: getJSONString(data)
         },
         success: function (data) {
-            var json = JSON.parse(data);
+            var json =data; // JSON.parse(result);
             modalBody.html(json.data);
             htmlModal.modal('show');
         },
