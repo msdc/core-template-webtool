@@ -28,13 +28,20 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="panel panel-primary">
-                            <div class="panel-heading"><mark>时间过滤器</mark>常用表达式</div>
+                            <div class="panel-heading">
+                                <mark>时间过滤器</mark>
+                                常用表达式
+                            </div>
                             <div class="panel-body">
                                 <dl class="dl-horizontal">
                                     <dt>年月日时分秒</dt>
-                                    <dd>(20\d{2}[-|/|年](?:0?[1-9]|1[012])[-|/|月](?:0?[1-9]|[12][0-9]|3[01])日?\s+\d{1,2}:\d{1,2}:\d{1,2})</dd>
+                                    <dd>
+                                        (20\d{2}[-|/|年](?:0?[1-9]|1[012])[-|/|月](?:0?[1-9]|[12][0-9]|3[01])日?\s+\d{1,2}:\d{1,2}:\d{1,2})
+                                    </dd>
                                     <dt>年月日时分</dt>
-                                    <dd>(20\d{2}[-|/|年](?:0?[1-9]|1[012])[-|/|月](?:0?[1-9]|[12][0-9]|3[01])日?\s+\d{1,2}:\d{1,2})</dd>
+                                    <dd>
+                                        (20\d{2}[-|/|年](?:0?[1-9]|1[012])[-|/|月](?:0?[1-9]|[12][0-9]|3[01])日?\s+\d{1,2}:\d{1,2})
+                                    </dd>
                                     <dt> 年月日</dt>
                                     <dd>(20\d{2}[-|/|年](?:0?[1-9]|1[012])[-|/|月](?:0?[1-9]|[12][0-9]|3[01])日?)</dd>
                                 </dl>
@@ -46,7 +53,10 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="panel panel-primary">
-                            <div class="panel-heading"><mark>时间格式化器</mark>常用表达式</div>
+                            <div class="panel-heading">
+                                <mark>时间格式化器</mark>
+                                常用表达式
+                            </div>
                             <div class="panel-body">
                                 <dl class="dl-horizontal">
                                     <dt>年-月-日</dt>
@@ -64,7 +74,10 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="panel panel-primary">
-                            <div class="panel-heading"><mark>列表分页过滤器</mark>常用表达式</div>
+                            <div class="panel-heading">
+                                <mark>列表分页过滤器</mark>
+                                常用表达式
+                            </div>
                             <div class="panel-body">
                                 <dl class="dl-horizontal">
                                     <dt>分页末尾页数</dt>
@@ -108,7 +121,8 @@
 </div>
 
 <!--显示错误信息-->
-<div class="modal fade bs-example-modal-lg" id="modal_showErrorMessage" tabindex="-1" role="dialog" aria-labelledby="modal_showErrorTitle" aria-hidden="true">
+<div class="modal fade bs-example-modal-lg" id="modal_showErrorMessage" tabindex="-1" role="dialog"
+     aria-labelledby="modal_showErrorTitle" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -138,7 +152,9 @@
     <!--和搜索引擎相关按钮-->
     <div class="row">
         <div class="col-md-12">
-            <button type="button" data-bind="click: bulkSearchTemplates, visible: showSearchTemplateBtn" class="btn btn-primary">由关键字批量生成模板及增量模板</button>
+            <button type="button" data-bind="click: bulkSearchTemplates, visible: showSearchTemplateBtn"
+                    class="btn btn-primary">由关键字批量生成模板及增量模板
+            </button>
         </div>
     </div>
 
@@ -158,7 +174,8 @@
                                         <label>模板类别</label>
                                     </div>
                                     <div class="col-md-6">
-                                        <select class="form-control" data-bind="options: templateTypes, value:templateTypesSelected"></select>
+                                        <select class="form-control"
+                                                data-bind="options: templateTypes, value:templateTypesSelected"></select>
                                     </div>
                                     <div class="col-md-6"></div>
                                 </div>
@@ -171,11 +188,15 @@
                                         <label for="txt_url">模板URL</label>
                                     </div>
                                     <div class="col-md-6">
-                                        <input type="text" class="form-control" data-bind="value: url" id="txt_url" placeholder="页面URL">
+                                        <input type="text" class="form-control" data-bind="value: url" id="txt_url"
+                                               placeholder="页面URL">
                                     </div>
                                     <div class="col-md-6">
-                                        <button type="button" data-bind="click: viewHtmlContent" class="btn btn-primary">查看</button>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;<a href="http://try.jsoup.org/">jsoup验证</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.regexworld.com/">java正则验证</a>
+                                        <button type="button" data-bind="click: viewHtmlContent"
+                                                class="btn btn-primary">查看
+                                        </button>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<a href="http://try.jsoup.org/">jsoup验证</a>&nbsp;&nbsp;&nbsp;&nbsp;<a
+                                            href="http://www.regexworld.com/">java正则验证</a>
                                     </div>
                                 </div>
                             </div>
@@ -185,7 +206,8 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label>模板URL查询关键字</label>
-                                        <input type="text" data-bind="value: currentString" class="form-control" placeholder="模板URL动态变化内容">
+                                        <input type="text" data-bind="value: currentString" class="form-control"
+                                               placeholder="模板URL动态变化内容">
                                     </div>
                                     <div class="col-md-6"></div>
                                 </div>
@@ -198,10 +220,12 @@
                                         <label for="txt_webName">名称</label>
                                     </div>
                                     <div class="col-md-6">
-                                        <input type="text" data-bind="value: name" class="form-control" id="txt_webName" placeholder="页面描述">
+                                        <input type="text" data-bind="value: name" class="form-control" id="txt_webName"
+                                               placeholder="页面描述">
                                     </div>
                                     <div class="col-md-6">
-                                        &nbsp;&nbsp;&nbsp;&nbsp;<a href="../index.html">返回列表页</a>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <a href="../index.html">返回列表页</a>
                                     </div>
                                 </div>
                             </div>
@@ -218,17 +242,17 @@
             <div role="tabpanel">
                 <!-- Nav tabs --> <!--nav nav-tabs nav-stacked-->
                 <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active"><a href="#list_tab" aria-controls="list_tab"
-                                                              role="tab"
-                                                              data-toggle="tab">列表页属性配置</a></li>
-                    <li role="presentation"><a href="#news_tab" aria-controls="news_tab" role="tab"
-                                               data-toggle="tab">内容页属性配置</a>
+                    <li role="presentation" class="active">
+                        <a href="#list_tab" aria-controls="list_tab" role="tab" data-toggle="tab">列表页属性配置</a>
                     </li>
-                    <li role="presentation"><a href="#schedule_tab" aria-controls="schedule_tab" role="tab"
-                                               data-toggle="tab">爬取调度配置</a>
+                    <li role="presentation">
+                        <a href="#news_tab" aria-controls="news_tab" role="tab" data-toggle="tab">内容页属性配置</a>
                     </li>
-                    <li role="presentation"><a href="#templateTag_tab" aria-controls="templateTag_tab" role="tab"
-                                               data-toggle="tab">模板静态属性配置(Tags)</a>
+                    <li role="presentation">
+                        <a href="#schedule_tab" aria-controls="schedule_tab" role="tab" data-toggle="tab">爬取调度配置</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#templateTag_tab" aria-controls="templateTag_tab" role="tab" data-toggle="tab">模板静态属性配置(Tags)</a>
                     </li>
                 </ul>
 
@@ -251,8 +275,10 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label id="lbl_result_title">验证及测试结果</label>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<a href="../index.html">返回列表页</a> &nbsp;&nbsp;&nbsp;&nbsp;
-                        <button  id="btn_showErrorMessage" data-target="#modal_showErrorMessage" data-toggle="modal" class="btn btn-warning btn-xs" style="display: none">错误信息格式化显示</button >
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="../index.html">返回列表页</a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <button id="btn_showErrorMessage" data-target="#modal_showErrorMessage" data-toggle="modal" class="btn btn-warning btn-xs" style="display: none">错误信息格式化显示</button>
                         <div id="test_validate_result">
                             <textarea id="txt_testResult" class="form-control" rows="15"></textarea>
                         </div>
