@@ -1299,27 +1299,30 @@ public class CrawlToolResource {
         if (pageModel.getListOutLinkViewModel().getSelector().equals("")) {
             responseJSONProvider.setErrorMsg("列表页中的列表外链接选择器不能为空！");
             return responseJSONProvider;
-        }
+        }    
+        
 
         // 普通模板校验
-        if (pageModel.getBasicInfoViewModel().getTemplateType().equals(WebtoolConstants.NORMAL_TEMPLATE_NAME)) {
-            // if (pageModel.getNewsTitleViewModel().getSelector().equals("")) {
-            // responseJSONProvider.setErrorMsg("内容页中的标题选择器不能为空！");
-            // return responseJSONProvider;
-            // }
-            //
-            // if
-            // (pageModel.getNewsPublishTimeViewModel().getSelector().equals(""))
-            // {
-            // responseJSONProvider.setErrorMsg("内容页中的发布时间选择器不能为空！");
-            // return responseJSONProvider;
-            // }
-            //
-            // if (pageModel.getNewsSourceViewModel().getSelector().equals(""))
-            // {
-            // responseJSONProvider.setErrorMsg("内容页中的来源选择器不能为空！");
-            // return responseJSONProvider;
-            // }
+        if (pageModel.getBasicInfoViewModel().getTemplateType().equals(WebtoolConstants.NORMAL_TEMPLATE_NAME)) {        	
+        	//检查列表页的自定义属性
+            List<CustomerAttrModel> listCustomerAttr=pageModel.getListCustomerAttrViewModel();
+            if(listCustomerAttr!=null){
+            	if(!ContainsAttr(listCustomerAttr, "title")){
+            		if (pageModel.getNewsTitleViewModel().getSelector().equals("")) {
+                        responseJSONProvider.setErrorMsg("内容页中的标题选择器不能为空！");
+                        return responseJSONProvider;
+                    }
+            	}
+            	
+            	if(!ContainsAttr(listCustomerAttr, "tstamp")){
+            		if(pageModel.getNewsPublishTimeViewModel().getSelector().equals("")){
+            			responseJSONProvider.setErrorMsg("内容页中的发布时间选择器不能为空！");
+            			return responseJSONProvider;
+                    }
+            	}
+            	
+            } 
+            
         } else {// 搜索引擎模板
             if (pageModel.getBasicInfoViewModel().getCurrentString().equals("")) {
                 responseJSONProvider.setErrorMsg("基本信息中的模板URL查询关键字不能为空！");
@@ -1426,6 +1429,23 @@ public class CrawlToolResource {
         responseJSONProvider.setData("模板保存成功！");
         return responseJSONProvider;
     }
+    
+    
+    /**
+     * 
+     * 判断是否包含特定属性
+     * */
+    private boolean ContainsAttr(List<CustomerAttrModel> attributeList,String attr){
+    	boolean isContains=false;
+    	for (CustomerAttrModel customerAttrModel : attributeList) {
+			if(customerAttrModel.getTarget().equals(attr)){
+				isContains=true;
+				break;
+			}
+		}
+    	
+    	return isContains;
+    } 
 
     /**
      * 将TemplateResult对象转换为PageModel对象
