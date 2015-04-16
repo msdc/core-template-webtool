@@ -79,9 +79,7 @@ public class QuartzJobStartUpListener implements ServletContextListener {
             Trigger checkSeedStatusTrigger = TriggerBuilder
                     .newTrigger()
                     .withIdentity(job_name_checkSeedStatus, "TCGroup")
-                    .withSchedule(
-                            SimpleScheduleBuilder.simpleSchedule().repeatForever()
-                                    .withIntervalInHours(INTERVAL_IN_HOUR))
+                    .withSchedule(SimpleScheduleBuilder.simpleSchedule().repeatForever().withIntervalInHours(12))
                     .startAt(new Date()).build();
             sched = sf.getScheduler();
             sched.scheduleJob(check_seedStatus, checkSeedStatusTrigger);
