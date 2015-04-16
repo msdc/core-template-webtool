@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.isoftstone.crawl.template.model.TemplateModel;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -104,6 +105,25 @@ public class RedisOperator {
 			RedisUtils.returnResource(pool, jedis);
 		}
 		return "";
+	}
+	public static List<TemplateModel> getFromDefaultDB(List<String> keys){
+		JedisPool pool = null;
+		Jedis jedis = null;
+		List<TemplateModel> result=new ArrayList<TemplateModel>();
+		try {
+			pool = RedisUtils.getPool();
+			jedis = pool.getResource();
+			jedis.select(Constants.DEFAULT_REDIS_DBINDEX);
+			List<String> values = jedis.mget(keys.toArray(new String[0]));
+			for(String va:values)
+				result.add(JSON.parseObject(va,TemplateModel.class));
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			e.printStackTrace();
+		} finally {
+			RedisUtils.returnResource(pool, jedis);
+		}
+		return result;
 	}
 
 	/**
@@ -213,7 +233,6 @@ public class RedisOperator {
 			RedisUtils.returnResource(pool, jedis);
 		}
 		return listKeys;
-
 	}
 
 	/**
