@@ -1007,7 +1007,7 @@ public class CrawlToolService {
 	 * */
 	@GET
 	@Path("/getCrawlStatusList")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getCrawlStatusList() {
 		ResponseJSONProvider<CrawlStatusModelList> jsonProvider = new ResponseJSONProvider<CrawlStatusModelList>();
 
@@ -1127,17 +1127,15 @@ public class CrawlToolService {
 			ex.printStackTrace();
 		}
 
-		if (reParseResult == null) {
+		if (reParseResult.contains("error")) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setData("调用reParse方法异常!");
-			return jsonProvider.toJSON();
+			jsonProvider.setData("操作失败");
+			jsonProvider.setErrorMsg(reParseResult);
 		}
-
-		jsonProvider.setSuccess(true);
-		if (reParseResult.equals("success")) {
+		else {
+			jsonProvider.setSuccess(true);
 			jsonProvider.setData("操作成功！");
-		} else {
-			jsonProvider.setData("操作失败！");
+			jsonProvider.setErrorMsg(reParseResult);
 		}
 		return jsonProvider.toJSON();
 	}
@@ -1159,17 +1157,15 @@ public class CrawlToolService {
 			ex.printStackTrace();
 		}
 
-		if (crawlFullResult == null) {
+		if (crawlFullResult.contains("error")) {
 			jsonProvider.setSuccess(false);
-			jsonProvider.setData("调用crawl方法异常");
-			return jsonProvider.toJSON();
+			jsonProvider.setData("操作失败");
+			jsonProvider.setErrorMsg(crawlFullResult);
 		}
-
-		jsonProvider.setSuccess(true);
-		if (crawlFullResult.equals("success")) {
+		else {
+			jsonProvider.setSuccess(true);
 			jsonProvider.setData("操作成功！");
-		} else {
-			jsonProvider.setData("操作失败！");
+			jsonProvider.setErrorMsg(crawlFullResult);
 		}
 		return jsonProvider.toJSON();
 	}

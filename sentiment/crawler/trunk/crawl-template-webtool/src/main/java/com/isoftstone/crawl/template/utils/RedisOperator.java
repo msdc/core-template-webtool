@@ -1,7 +1,11 @@
 package com.isoftstone.crawl.template.utils;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -272,6 +276,29 @@ public class RedisOperator {
 			RedisUtils.returnResource(pool, jedis);
 		}
 		return null;
+	}
+
+	public  static List<DispatchVo> getDispatchResult(List<String> guid,int dbIndex){
+		JedisPool pool = null;
+		Jedis jedis = null;
+		List<DispatchVo> result= new ArrayList<>();
+
+		try {
+			pool = RedisUtils.getPool();
+			jedis = pool.getResource();
+			jedis.select(dbIndex);
+			List<String> json = jedis.mget(guid.toArray(new String[0]));
+			if (json != null) {
+				for(String js : json)
+					result.add(JSON.parseObject(js, DispatchVo.class));
+			}
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			LOG.error("get dispatch result from redis failed", e);
+		} finally {
+			RedisUtils.returnResource(pool, jedis);
+		}
+		return result;
 	}
 
 	public static void setDispatchResult(DispatchVo dispatchVo, String guid, int dbindex) {

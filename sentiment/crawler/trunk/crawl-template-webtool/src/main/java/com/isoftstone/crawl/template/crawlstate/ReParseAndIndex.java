@@ -8,13 +8,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.isoftstone.crawl.template.vo.RunManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.isoftstone.crawl.template.consts.WebtoolConstants;
 import com.isoftstone.crawl.template.utils.Config;
 import com.isoftstone.crawl.template.utils.ShellUtils;
-import com.isoftstone.crawl.template.vo.Runmanager;
 
 /**
  * Created by Administrator on 2015/1/14.
@@ -125,13 +125,13 @@ public class ReParseAndIndex {
     }
 
     public static void excuteCmdRunmanager(String cmd) {
-        Runmanager runmanager = new Runmanager();
-        runmanager.setHostIp(Config.getValue(WebtoolConstants.KEY_NUTCH_HOST_IP));
-        runmanager.setUsername(Config.getValue(WebtoolConstants.KEY_NUTCH_HOST_USERNAME));
-        runmanager.setPassword(Config.getValue(WebtoolConstants.KEY_NUTCH_HOST_PASSWORD));
-        runmanager.setPort(22);
-        runmanager.setCommand(cmd);
-        ShellUtils.execCmd(runmanager);
+        RunManager runManager = new RunManager();
+        runManager.setHostIp(Config.getValue(WebtoolConstants.KEY_NUTCH_HOST_IP));
+        runManager.setUsername(Config.getValue(WebtoolConstants.KEY_NUTCH_HOST_USERNAME));
+        runManager.setPassword(Config.getValue(WebtoolConstants.KEY_NUTCH_HOST_PASSWORD));
+        runManager.setPort(22);
+        runManager.setCommand(cmd);
+        ShellUtils.execCmd(runManager);
     }
 
     public static void removeDir(File dir) {

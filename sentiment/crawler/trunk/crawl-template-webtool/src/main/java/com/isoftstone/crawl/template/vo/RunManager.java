@@ -2,7 +2,7 @@ package com.isoftstone.crawl.template.vo;
 
 import java.util.Date;
 
-public class Runmanager {
+public class RunManager {
 	/**
 	 * 主键
 	 */

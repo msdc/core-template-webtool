@@ -103,16 +103,8 @@ function crawlStatusSuccessHandler(data, dataModel) {
     $('#modal_showOptionMessageTitle').text('操作结果');
     var modalBody = $('#modal_body_showOptionMessage');
     modalBody.text('');//清空
-    if (data.responseText) {
-        modalBody.text("错误信息:" + data.responseText);
-    } else {
-        var result = data;//JSON.parse(data);
-        if (result.success) {
-            modalBody.text(result.data);
-        } else {
-            modalBody.text(result.errorMsg);
-        }
-    }
+    var result = data;//JSON.parse(data);
+    modalBody.text(result.data+"\n"+result.errorMsg);
     $('#modal_showOptionMessage').modal('show');
 }
 
@@ -121,6 +113,11 @@ function crawlStatusSuccessHandler(data, dataModel) {
  * 爬取状态api调用失败回调函数
  * */
 function crawlStatusErrorHandler(error) {
+    $('#modal_showOptionMessageTitle').text('操作结果');
+    var modalBody = $('#modal_body_showOptionMessage');
+    modalBody.text('');//清空
+    modalBody.text(error);
+    $('#modal_showOptionMessage').modal('show');
 }
 
 /**
@@ -191,24 +188,24 @@ var crawlDataVM = function (mainViewModel, urlData) {
         }
     }
 
-    that.totalIndexSum=ko.computed(function(){
-        var tpTotal=0;
-        for(var i=0;i<that.urls().length;i++){
-            tpTotal=tpTotal+parseInt(that.urls()[i].indexCounts);
+    that.totalIndexSum = ko.computed(function () {
+        var tpTotal = 0;
+        for (var i = 0; i < that.urls().length; i++) {
+            tpTotal = tpTotal + parseInt(that.urls()[i].indexCounts);
         }
         return tpTotal;
     });
-    that.totalTodayIndexSum=ko.computed(function(){
-        var tpTotal=0;
-        for(var i=0;i<that.urls().length;i++){
-            tpTotal=tpTotal+parseInt(that.urls()[i].todayIndexCounts);
+    that.totalTodayIndexSum = ko.computed(function () {
+        var tpTotal = 0;
+        for (var i = 0; i < that.urls().length; i++) {
+            tpTotal = tpTotal + parseInt(that.urls()[i].todayIndexCounts);
         }
         return tpTotal;
     });
-    that.totalPublishTimeSum=ko.computed(function(){
-        var tpTotal=0;
-        for(var i=0;i<that.urls().length;i++){
-            tpTotal=tpTotal+parseInt(that.urls()[i].todayPublishTimeCounts);
+    that.totalPublishTimeSum = ko.computed(function () {
+        var tpTotal = 0;
+        for (var i = 0; i < that.urls().length; i++) {
+            tpTotal = tpTotal + parseInt(that.urls()[i].todayPublishTimeCounts);
         }
         return tpTotal;
     });
