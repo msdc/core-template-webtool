@@ -25,7 +25,6 @@ public class ReParseAndIndex {
     private static final Log LOG = LogFactory.getLog(ReParseAndIndex.class);
     
     public static void main(String[] args) {
-        LOG.info("sdsfasdf");
         String nutch_root = args[0];
         String data_folder = args[1];
         String solr_index = args[2];

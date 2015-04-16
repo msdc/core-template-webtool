@@ -135,9 +135,16 @@ public class CrawlState {
         folderNameData = folderNameData.substring(0, folderNameData.lastIndexOf("_")) + "_" + WebtoolConstants.INCREMENT_FILENAME_SIGN;
         String seedFolder = rootFolder + File.separator + folderNameSeed;
         String command = shDir + " " + seedFolder + " " + crawlDir + folderNameData + "_data" + " " + solrURL + " " + depth;
-        Runmanager runmanager = getRunmanager(command);
+        final Runmanager runmanager = getRunmanager(command);
         LOG.info("增量重爬:" + command);
-        ShellUtils.execCmd(runmanager);
+        CrawlToolResource.putSeedsFolder(folderNameSeed, "local");
+        new Thread(new Runnable() {
+            
+            @Override
+            public void run() {
+                ShellUtils.execCmd(runmanager);
+            }
+        }).start();
         return SUCCESS;
     }
 
@@ -145,25 +152,25 @@ public class CrawlState {
      * 爬虫全量.
      * @param dispatchName
      */
-    public String crawlFull(String folderName, boolean isDeploy) {
+    public String crawlFull(final String folderName, boolean isDeploy) {
         String rootFolder = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
         String shDir;
         String crawlDir = Config.getValue(WebtoolConstants.KEY_NUTCH_CRAWLDIR);
         String solrURL = Config.getValue(WebtoolConstants.KEY_NUTCH_SOLR_URL);
         String depth = "3";
-        String dispatchName = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX_NORMAL;
-        DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName, Constants.DISPATCH_REDIS_DBINDEX);
+        final String dispatchName = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX_NORMAL;
+        final DispatchVo dispatchVo = RedisOperator.getDispatchResult(dispatchName, Constants.DISPATCH_REDIS_DBINDEX);
         boolean userProxy = dispatchVo.isUserProxy();
 
         if (isDeploy) {
-            shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_LOCAL_NORMAL_SHDIR);
-            if (userProxy) {
-                shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_LOCAL_NORMAL_PROXY_SHDIR);
-            }
-        } else {
             shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_SHDIR);
             if (userProxy) {
                 shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_DEPLOY_NORMAL_PROXY_SHDIR);
+            }
+        } else {
+            shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_LOCAL_NORMAL_SHDIR);
+            if (userProxy) {
+                shDir = Config.getValue(WebtoolConstants.KEY_NUTCH_LOCAL_NORMAL_PROXY_SHDIR);
             }
         }
 
@@ -175,7 +182,7 @@ public class CrawlState {
         }
         
         List<Seed> seedList = dispatchVo.getSeed();
-        List<String> seedStrs = new ArrayList<String>();
+        final List<String> seedStrs = new ArrayList<String>();
         for(Iterator<Seed> it = seedList.iterator(); it.hasNext();) {
             Seed seed = it.next();
             if("true".equals(seed.getIsEnabled())) {
@@ -189,12 +196,22 @@ public class CrawlState {
         
         String command = shDir + " " + seedFolder + " " + crawlDir + folderNameData + "_data" + " " + solrURL + " " + depth;
         LOG.info("全量重爬:" + command);
-        Runmanager runmanager = getRunmanager(command);
-        ShellUtils.execCmd(runmanager);
+        CrawlToolResource.putSeedsFolder(folderNameSeed, "local");
+        final Runmanager runmanager = getRunmanager(command);
+        new Thread(new Runnable() {
+            
+            @Override
+            public void run() {
+                LOG.info("重爬开始执行:runmanager.ip" + runmanager.getHostIp());
+                LOG.info("重爬开始执行:runmanager.command" + runmanager.getCommand());
+                ShellUtils.execCmd(runmanager);
+                LOG.info("重爬执行完成：runmanager.command" + runmanager.getCommand());
+                contentToTxt4CrawlerAgain(folderName, seedStrs, "false");
+                dispatchVo.setStatus(WebtoolConstants.DISPATCH_STATIS_COMPLETE);
+                RedisOperator.setDispatchResult(dispatchVo, dispatchName, Constants.DISPATCH_REDIS_DBINDEX);
+            }
+        }).start();
         
-        dispatchVo.setStatus(WebtoolConstants.DISPATCH_STATIS_COMPLETE);
-        RedisOperator.setDispatchResult(dispatchVo, dispatchName, Constants.DISPATCH_REDIS_DBINDEX);
-        contentToTxt4CrawlerAgain(folderName, seedStrs, "false");
         
         return SUCCESS;
     }
@@ -230,7 +247,7 @@ public class CrawlState {
         LOG.info("ParseAndIndex: nutch_root: " + nutch_reparse);
         LOG.info("ParseAndIndex: data_folder: " + data_folder);
         
-        String command = "java -jar /reparseAndIndex.jar " + nutch_reparse + " " +  data_folder + " " + solrURL + " false";
+        String command = "java -jar /reparseAndIndex.jar " + nutch_reparse + " " +  data_folder + " " + solrURL + " true";
         LOG.info("ParseAndIndex: command:" + command);
         Runmanager runmanager = getRunmanager(command);
         ShellUtils.execCmd(runmanager);
