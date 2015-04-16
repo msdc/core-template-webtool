@@ -15,6 +15,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,33 +35,34 @@ import com.isoftstone.crawl.template.utils.RedisOperator;
 import com.isoftstone.crawl.template.utils.RedisUtils;
 import com.isoftstone.crawl.template.utils.ShellUtils;
 import com.isoftstone.crawl.template.vo.DispatchVo;
-import com.isoftstone.crawl.template.vo.Runmanager;
+import com.isoftstone.crawl.template.vo.RunManager;
 import com.isoftstone.crawl.template.vo.Seed;
 import com.isoftstone.crawl.template.webtool.CrawlToolResource;
 
 /**
  * CrawlStateUtil
- * @author danhb
- * @date  2015-3-10
- * @version 1.0
  *
+ * @author danhb
+ * @version 1.0
+ * @date 2015-3-10
  */
 public class CrawlState {
 
     /**
-     * 
+     *
      */
     private static final String ERROR = "error";
 
     /**
-     * 
+     *
      */
     private static final String SUCCESS = "success";
 
     private static final Log LOG = LogFactory.getLog(CrawlState.class);
 
     /**
-     * 获取爬虫状态. 
+     * 获取爬虫状态.
+     *
      * @return 爬虫状态设置.
      */
     public List<CrawlStateBean> getCrawlState() {
@@ -65,7 +70,7 @@ public class CrawlState {
         List<String> normalFolderNameList = getResultList("*_dispatch", Constants.DISPATCH_REDIS_DBINDEX);
         folderNameList.addAll(normalFolderNameList);
         List<CrawlStateBean> crawlStateList = new ArrayList<CrawlStateBean>();
-        for (Iterator<String> it = folderNameList.iterator(); it.hasNext();) {
+        for (Iterator<String> it = folderNameList.iterator(); it.hasNext(); ) {
             String redisKey = it.next();
             DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey, Constants.DISPATCH_REDIS_DBINDEX);
             CrawlStateBean bean = new CrawlStateBean();
@@ -86,9 +91,10 @@ public class CrawlState {
 
     /**
      * 重爬.
+     *
      * @param folderName 文件夹名称.
-     * @param isDeploy 是否是集群.
-     * @param isNomal 是否是全量.
+     * @param isDeploy   是否是集群.
+     * @param isNomal    是否是全量.
      * @return 结果标识.
      */
     public String crawl(String folderName, boolean isDeploy, boolean isNomal) {
@@ -103,6 +109,7 @@ public class CrawlState {
 
     /**
      * 爬虫增量.
+     *
      * @param dispatchName
      */
     public String crawlIncrement(String folderName, boolean isDeploy) {
@@ -135,21 +142,36 @@ public class CrawlState {
         folderNameData = folderNameData.substring(0, folderNameData.lastIndexOf("_")) + "_" + WebtoolConstants.INCREMENT_FILENAME_SIGN;
         String seedFolder = rootFolder + File.separator + folderNameSeed;
         String command = shDir + " " + seedFolder + " " + crawlDir + folderNameData + "_data" + " " + solrURL + " " + depth;
-        final Runmanager runmanager = getRunmanager(command);
+        final RunManager runManager = getRunmanager(command);
         LOG.info("增量重爬:" + command);
         CrawlToolResource.putSeedsFolder(folderNameSeed, "local");
-        new Thread(new Runnable() {
-            
-            @Override
-            public void run() {
-                ShellUtils.execCmd(runmanager);
+
+        String resultMsg = "";
+        ExecutorService es = Executors.newSingleThreadExecutor();
+        Future<String> result = es.submit(new Callable<String>() {
+            public String call() throws Exception {
+                // the other thread
+                return ShellUtils.execCmd(runManager);
             }
-        }).start();
-        return SUCCESS;
+        });
+        try {
+            resultMsg = result.get();
+        } catch (Exception e) {
+            // failed
+        }
+//        new Thread(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                ShellUtils.execCmd(runManager);
+//            }
+//        }).start();
+        return resultMsg;
     }
 
     /**
      * 爬虫全量.
+     *
      * @param dispatchName
      */
     public String crawlFull(final String folderName, boolean isDeploy) {
@@ -180,53 +202,77 @@ public class CrawlState {
         if (isDeploy) {
             seedFolder = Config.getValue(WebtoolConstants.KEY_HDFS_ROOT_PREFIX) + folderNameSeed;
         }
-        
+
         List<Seed> seedList = dispatchVo.getSeed();
         final List<String> seedStrs = new ArrayList<String>();
-        for(Iterator<Seed> it = seedList.iterator(); it.hasNext();) {
+        for (Iterator<Seed> it = seedList.iterator(); it.hasNext(); ) {
             Seed seed = it.next();
-            if("true".equals(seed.getIsEnabled())) {
+            if ("true".equals(seed.getIsEnabled())) {
                 seedStrs.add(seed.getUrl());
             }
         }
         contentToTxt4CrawlerAgain(folderName, seedStrs, "true");
-        
+
         dispatchVo.setStatus(WebtoolConstants.DISPATCH_STATIS_RUNNING);
         RedisOperator.setDispatchResult(dispatchVo, dispatchName, Constants.DISPATCH_REDIS_DBINDEX);
-        
+
         String command = shDir + " " + seedFolder + " " + crawlDir + folderNameData + "_data" + " " + solrURL + " " + depth;
         LOG.info("全量重爬:" + command);
         CrawlToolResource.putSeedsFolder(folderNameSeed, "local");
-        final Runmanager runmanager = getRunmanager(command);
-        new Thread(new Runnable() {
-            
-            @Override
-            public void run() {
-                LOG.info("重爬开始执行:runmanager.ip" + runmanager.getHostIp());
-                LOG.info("重爬开始执行:runmanager.command" + runmanager.getCommand());
-                ShellUtils.execCmd(runmanager);
-                LOG.info("重爬执行完成：runmanager.command" + runmanager.getCommand());
+        final RunManager runManager = getRunmanager(command);
+
+        String resultMsg = "";
+        ExecutorService es = Executors.newSingleThreadExecutor();
+        Future<String> result = es.submit(new Callable<String>() {
+            public String call() throws Exception {
+                // the other thread
+                //return  ShellUtils.execCmd(runManager);
+                String tpResult = "";
+                LOG.info("重爬开始执行:runManager.ip" + runManager.getHostIp());
+                LOG.info("重爬开始执行:runManager.command" + runManager.getCommand());
+                tpResult = ShellUtils.execCmd(runManager);
+                LOG.info("重爬执行完成：runManager.command" + runManager.getCommand());
                 contentToTxt4CrawlerAgain(folderName, seedStrs, "false");
                 dispatchVo.setStatus(WebtoolConstants.DISPATCH_STATIS_COMPLETE);
                 RedisOperator.setDispatchResult(dispatchVo, dispatchName, Constants.DISPATCH_REDIS_DBINDEX);
+                return tpResult;
             }
-        }).start();
-        
-        
-        return SUCCESS;
+        });
+        try {
+            resultMsg = result.get();
+        } catch (Exception e) {
+            // failed
+        }
+
+//        new Thread(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                LOG.info("重爬开始执行:runManager.ip" + runManager.getHostIp());
+//                LOG.info("重爬开始执行:runManager.command" + runManager.getCommand());
+//                ShellUtils.execCmd(runManager);
+//                LOG.info("重爬执行完成：runManager.command" + runManager.getCommand());
+//                contentToTxt4CrawlerAgain(folderName, seedStrs, "false");
+//                dispatchVo.setStatus(WebtoolConstants.DISPATCH_STATIS_COMPLETE);
+//                RedisOperator.setDispatchResult(dispatchVo, dispatchName, Constants.DISPATCH_REDIS_DBINDEX);
+//            }
+//        }).start();
+
+
+        return resultMsg;
     }
 
     /**
-     * 重新索引. 
+     * 重新索引.
+     *
      * @param folderNameSeed
      */
-    public String reParse(String folderNameSeed, boolean isDeploy,
-            boolean isNomal) {
+    public String reParse(String folderNameSeed, boolean isDeploy, boolean isNomal) {
         String nutch_reparse;
         String solrURL = Config.getValue(WebtoolConstants.KEY_NUTCH_SOLR_URL);
         String crawlDir = Config.getValue(WebtoolConstants.KEY_NUTCH_CRAWLDIR);
         String folderNameData = folderNameSeed.substring(0,
-            folderNameSeed.lastIndexOf("_"));
+                folderNameSeed.lastIndexOf("_"));
 
         //-- 判断是否是集群还是单机模式.
         if (isDeploy) {
@@ -237,33 +283,46 @@ public class CrawlState {
 
         //-- 设置data目录.
         if (!isNomal) {
-            folderNameData = folderNameData.substring(0,
-                folderNameData.lastIndexOf("_"))
-                    + "_" + WebtoolConstants.INCREMENT_FILENAME_SIGN;
+            folderNameData = folderNameData.substring(0, folderNameData.lastIndexOf("_")) + "_" + WebtoolConstants.INCREMENT_FILENAME_SIGN;
         }
 
         String data_folder = crawlDir + folderNameData + "_data";
-        
+
         LOG.info("ParseAndIndex: nutch_root: " + nutch_reparse);
         LOG.info("ParseAndIndex: data_folder: " + data_folder);
-        
-        String command = "java -jar /reparseAndIndex.jar " + nutch_reparse + " " +  data_folder + " " + solrURL + " true";
+
+        String command = "java -jar /reparseAndIndex.jar " + nutch_reparse + " " + data_folder + " " + solrURL + " true";
         LOG.info("ParseAndIndex: command:" + command);
-        Runmanager runmanager = getRunmanager(command);
-        ShellUtils.execCmd(runmanager);
-        
-        return SUCCESS;
+        final RunManager runManager = getRunmanager(command);
+
+        String resultMsg = "";
+        ExecutorService es = Executors.newSingleThreadExecutor();
+        Future<String> result = es.submit(new Callable<String>() {
+            public String call() throws Exception {
+                // the other thread
+                return ShellUtils.execCmd(runManager);
+            }
+        });
+        try {
+            resultMsg = result.get();
+        } catch (Exception e) {
+            // failed
+        }
+
+        //ShellUtils.execCmd(runManager);
+
+        return resultMsg;
     }
 
     /**
      * 停止爬虫.(目前只停止增量.)
+     *
      * @param dispatchName
      */
     public String stopCrawl(String folderName, boolean isDeploy, boolean isNomal) {
         // 1.修改redis中种子状态
         String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX_INCREMENT;
-        DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey,
-            Constants.DISPATCH_REDIS_DBINDEX);
+        DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey, Constants.DISPATCH_REDIS_DBINDEX);
         if (dispatchVo == null) {
             return ERROR;
         }
@@ -271,12 +330,11 @@ public class CrawlState {
         if (seedList == null) {
             return ERROR;
         }
-        for (Iterator<Seed> it = seedList.iterator(); it.hasNext();) {
+        for (Iterator<Seed> it = seedList.iterator(); it.hasNext(); ) {
             Seed seed = it.next();
             seed.setIsEnabled("false");
         }
-        RedisOperator.setDispatchResult(dispatchVo, redisKey,
-            Constants.DISPATCH_REDIS_DBINDEX);
+        RedisOperator.setDispatchResult(dispatchVo, redisKey, Constants.DISPATCH_REDIS_DBINDEX);
         // 2.修改文件中 种子状态.
         String[] folderNameArr = folderName.split("_");
         String domain = folderNameArr[0];
@@ -285,8 +343,7 @@ public class CrawlState {
         // 2.1 修改模板种子状态.
         contextToFile(folderName);
         // 2.2 修改增量种子状态.
-        String incrementFolderName = domain + "_" + "1" + period + "_"
-                + WebtoolConstants.INCREMENT_FILENAME_SIGN + "_" + sequence;
+        String incrementFolderName = domain + "_" + "1" + period + "_" + WebtoolConstants.INCREMENT_FILENAME_SIGN + "_" + sequence;
         contextToFile(incrementFolderName);
         return SUCCESS;
     }
@@ -295,23 +352,19 @@ public class CrawlState {
         return SUCCESS;
     }
 
-    private Runmanager getRunmanager(String command) {
-        Runmanager runmanager = new Runmanager();
-        runmanager.setHostIp(Config
-                .getValue(WebtoolConstants.KEY_NUTCH_HOST_IP));
-        runmanager.setUsername(Config
-                .getValue(WebtoolConstants.KEY_NUTCH_HOST_USERNAME));
-        runmanager.setPassword(Config
-                .getValue(WebtoolConstants.KEY_NUTCH_HOST_PASSWORD));
-        runmanager.setPort(22);
-        runmanager.setCommand(command);
-        return runmanager;
+    private RunManager getRunmanager(String command) {
+        RunManager runManager = new RunManager();
+        runManager.setHostIp(Config.getValue(WebtoolConstants.KEY_NUTCH_HOST_IP));
+        runManager.setUsername(Config.getValue(WebtoolConstants.KEY_NUTCH_HOST_USERNAME));
+        runManager.setPassword(Config.getValue(WebtoolConstants.KEY_NUTCH_HOST_PASSWORD));
+        runManager.setPort(22);
+        runManager.setCommand(command);
+        return runManager;
     }
 
     private void contextToFile(String folderName) {
         String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
-        String filePath = folderRoot + File.separator + folderName
-                + File.separator + WebtoolConstants.SEED_FILE_NAME;
+        String filePath = folderRoot + File.separator + folderName + File.separator + WebtoolConstants.SEED_FILE_NAME;
         String str = null; // 原有txt内容
         StringBuffer strBuf = new StringBuffer();// 内容更新
         BufferedReader input = null;
@@ -384,11 +437,10 @@ public class CrawlState {
         }
         return null;
     }
-    
+
     /**
-     * 
      * 保存内容到文件
-     * */
+     */
     private void contentToTxt4CrawlerAgain(String folderName, List<String> seeds, String status) {
         String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
         String filePath = folderRoot + File.separator + folderName + File.separator + WebtoolConstants.SEED_FILE_NAME;
@@ -419,9 +471,8 @@ public class CrawlState {
                         strBuf.append(tempStr + System.getProperty("line.separator"));
                     }
                 }
-
             }
-            for (Iterator<String> it = seeds.iterator(); it.hasNext();) {
+            for (Iterator<String> it = seeds.iterator(); it.hasNext(); ) {
                 String seedStr = it.next();
                 if ("false".equals(status)) {
                     strBuf.append("#");

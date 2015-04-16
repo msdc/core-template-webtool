@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.isoftstone.crawl.template.vo.RunManager;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -85,7 +86,6 @@ import com.isoftstone.crawl.template.utils.RedisUtils;
 import com.isoftstone.crawl.template.utils.ShellUtils;
 import com.isoftstone.crawl.template.utils.SolrSerach;
 import com.isoftstone.crawl.template.vo.DispatchVo;
-import com.isoftstone.crawl.template.vo.Runmanager;
 import com.isoftstone.crawl.template.vo.Seed;
 
 public class CrawlToolResource {
@@ -295,11 +295,11 @@ public class CrawlToolResource {
         String hostIp = Config.getValue(WebtoolConstants.KEY_HOST_IP);
         String userName = Config.getValue(WebtoolConstants.KEY_HOST_USERNAME);
         String password = Config.getValue(WebtoolConstants.KEY_HOST_PASSWORD);
-        Runmanager runmanager = new Runmanager();
-        runmanager.setHostIp(hostIp);
-        runmanager.setUsername(userName);
-        runmanager.setPassword(password);
-        runmanager.setPort(22);
+        RunManager runManager = new RunManager();
+        runManager.setHostIp(hostIp);
+        runManager.setUsername(userName);
+        runManager.setPassword(password);
+        runManager.setPort(22);
         String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
         LOG.info("文件根目录" + folderRoot);
 
@@ -309,27 +309,27 @@ public class CrawlToolResource {
         String command = "";
         if ("local".equals(type)) {
             // String folderPath = folderRoot + "/" + folderName;
-            // new SFTPUtils().copyFile(runmanager, folderPath, folderPath);
+            // new SFTPUtils().copyFile(runManager, folderPath, folderPath);
             // String desCopyRootFolder =
             // Config.getValue(WebtoolConstants.KEY_DES_FOLDER);
             for (int i = 0; i < desCopyRootFolderStr.length; i++) {
                 String desCopyRootFolder = desCopyRootFolderStr[i];
                 command = "scp -r " + folderRoot + File.separator + folderName + " " + desCopyRootFolder;
                 LOG.info("命令：" + command);
-                runmanager.setCommand(command);
-                ShellUtils.execCmd(runmanager);
+                runManager.setCommand(command);
+                ShellUtils.execCmd(runManager);
             }
         }
         // else {
-        // runmanager.setHostIp("192.168.100.26");
-        // runmanager.setUsername("root");
-        // runmanager.setPassword("123456");
+        // runManager.setHostIp("192.168.100.26");
+        // runManager.setUsername("root");
+        // runManager.setPassword("123456");
         // String desHdfsFolderName = Config.getValue("desHdfsFolderName");
         // command = "hadoop fs -put " + folderRoot + File.separator +
         // folderName + " " + desHdfsFolderName;
         // LOG.info("命令：" + command);
-        // runmanager.setCommand(command);
-        // ShellUtils.execCmd(runmanager);
+        // runManager.setCommand(command);
+        // ShellUtils.execCmd(runManager);
         // }
     }
 
