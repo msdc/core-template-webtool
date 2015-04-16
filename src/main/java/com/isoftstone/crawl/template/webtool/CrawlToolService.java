@@ -146,10 +146,12 @@ public class CrawlToolService {
 		ResponseJSONProvider<ParseResult> jsonProvider = new ResponseJSONProvider<ParseResult>();
 		//CrawlToolResource serviceHelper = new CrawlToolResource();
 		PageModel pageModel = serviceHelper.getPageModelByJsonString(data);
+		LOG.info("检查 "+pageModel.getBasicInfoViewModel().getUrl());
 		ParseResult parseResult = serviceHelper.saveParseResult(pageModel);
 		if (parseResult == null) {
 			jsonProvider.setSuccess(false);
 			jsonProvider.setErrorMsg("无法完成页面解析，请检查选择器和过滤器正确性，确认后重新保存模板后，重试！");
+            LOG.error(jsonProvider.getErrorMsg());
 			return jsonProvider.toJSON();
 		}
 		// 获取内容页链接
@@ -157,12 +159,14 @@ public class CrawlToolService {
 		if (contentOutLinkArrayList == null) {
 			jsonProvider.setSuccess(false);
 			jsonProvider.setErrorMsg("列表外链接配置信息不正确！");
+            LOG.error(jsonProvider.getErrorMsg());
 			return jsonProvider.toJSON();
 		}
 
 		if (contentOutLinkArrayList.size() == 0) {
 			jsonProvider.setSuccess(false);
 			jsonProvider.setErrorMsg("列表外链接配置信息不正确！");
+            LOG.error(jsonProvider.getErrorMsg());
 			return jsonProvider.toJSON();
 		}
 
@@ -170,6 +174,7 @@ public class CrawlToolService {
 		if (maxRandomNumber < 0 || maxRandomNumber == 0) {
 			jsonProvider.setSuccess(false);
 			jsonProvider.setErrorMsg("列表外链接配置信息不正确！");
+            LOG.error(jsonProvider.getErrorMsg());
 			return jsonProvider.toJSON();
 		}
 
@@ -182,12 +187,32 @@ public class CrawlToolService {
 			jsonProvider.setSuccess(false);
 			jsonProvider.setErrorMsg("访问内容页链接： [" + contentOutLink + "] 失败，网络访问异常！");
 			e.printStackTrace();
+            LOG.error(jsonProvider.getErrorMsg());
 			return jsonProvider.toJSON();
 		}
 
 		String encoding = CrawlToolResource.sniffCharacterEncoding(input);
 		try {
 			parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, contentOutLink);
+            //添加对关键内容校验
+            if(parseResult!=null)
+            {
+                HashMap tpMap= parseResult.getResult();
+                Iterator iter = tpMap.entrySet().iterator();
+                while (iter.hasNext()) {
+                    Map.Entry entry = (Map.Entry) iter.next();
+                    String key = entry.getKey().toString();
+                    String val = entry.getValue().toString();
+                    if(val == null || val.isEmpty())
+                    {
+                        jsonProvider.setSuccess(false);
+                        jsonProvider.setErrorMsg(key+"为空");
+                        LOG.error(jsonProvider.getErrorMsg());
+                        break;
+                    }
+                }
+            }
+
 			jsonProvider.setSuccess(true);
 			jsonProvider.setData(parseResult);
 		} catch (Exception e) {
@@ -494,6 +519,7 @@ public class CrawlToolService {
 
 		jsonProvider.setSuccess(true);
 		jsonProvider.setData("操作成功！");
+        LOG.info("模板 "+templateUrl+" ID:"+templateGuid+"关闭");
 		return jsonProvider.toJSON();
 	}
 
@@ -866,24 +892,24 @@ public class CrawlToolService {
 					seedsEffectiveStatusModel.setCheckTime(nowDateString);
 					TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateModel.getTemplateId());
 					PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
+
 					// 检查列表页
-					ResponseJSONProvider<ParseResult> listJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyListContent(serviceHelper.getPageModeJSONString(pageModel)));
-					if (listJsonProvider.getSuccess() == false) {
-						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
-						seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
-						// 同时停用该模板
-						// disableTemplate(templateModel.getBasicInfoViewModel().getUrl(),
-						// templateModel.getBasicInfoViewModel().getName());
-						continue;
-					}
+//					ResponseJSONProvider<ParseResult> listJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyListContent(serviceHelper.getPageModeJSONString(pageModel)));
+//					if (listJsonProvider.getSuccess() == false) {
+//						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
+//						seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
+//						// 同时停用该模板
+//						// disableTemplate(templateModel.getBasicInfoViewModel().getUrl(),
+//						// templateModel.getBasicInfoViewModel().getName());
+//						continue;
+//					}
 					// 检查内容页
 					ResponseJSONProvider<ParseResult> newsContentJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyNewContent(serviceHelper.getPageModeJSONString(pageModel)));
 					if (newsContentJsonProvider.getSuccess() == false) {
 						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
 						seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
 						// 同时停用该模板
-						// disableTemplate(templateModel.getBasicInfoViewModel().getUrl(),
-						// templateModel.getBasicInfoViewModel().getName());
+						//disableTemplate(templateModel.getBasicInfoViewModel().getUrl(),templateModel.getBasicInfoViewModel().getName());
 						continue;
 					}
 					// 检查增量
@@ -893,8 +919,7 @@ public class CrawlToolService {
 						seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
 						seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
 						// 同时停用该模板
-						// disableTemplate(templateModel.getBasicInfoViewModel().getUrl(),
-						// templateModel.getBasicInfoViewModel().getName());
+						//disableTemplate(templateModel.getBasicInfoViewModel().getUrl(),templateModel.getBasicInfoViewModel().getName());
 						continue;
 					}
 					seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_VALID_STATUS);
