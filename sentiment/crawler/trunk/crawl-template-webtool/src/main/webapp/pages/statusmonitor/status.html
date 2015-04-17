@@ -17,7 +17,8 @@
 <body>
 
 <!--显示提示信息-->
-<div class="modal fade bs-example-modal-lg" id="modal_showOptionMessage" tabindex="-1" role="dialog" aria-labelledby="modal_showOptionMessageTitle" aria-hidden="true">
+<div class="modal fade bs-example-modal-lg" id="modal_showOptionMessage" tabindex="-1" role="dialog"
+     aria-labelledby="modal_showOptionMessageTitle" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -36,7 +37,8 @@
 </div>
 
 <!--种子有效性提示-->
-<div class="modal fade bs-example-modal-lg" id="modal_seedsEffectiveInfo" tabindex="-1" role="dialog" aria-labelledby="modal_seedsEffectiveInfoTitle" aria-hidden="true">
+<div class="modal fade bs-example-modal-lg" id="modal_seedsEffectiveInfo" tabindex="-1" role="dialog"
+     aria-labelledby="modal_seedsEffectiveInfoTitle" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -64,19 +66,22 @@
     </div>
 
     <div class="row">
+        <div class="col-md-4" style="margin-left: 65%">
+            <div class="input-group">
+                <input type="text" class="form-control" id="txtFilterString" data-bind="value:filterString" placeholder="搜索...名称、描述、数据源地址、状态">
+                  <span class="input-group-btn">
+                    <button class="btn btn-primary" type="button" data-bind="click: filterModel"  id="btnFilter">筛选</button>
+                  </span>
+            </div>
+        </div>
         <div class="col-md-12">
+
             <div role="tabpanel">
                 <!-- Nav tabs --> <!--nav nav-tabs nav-stacked-->
-                <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active"><a href="#seeds_effective" aria-controls="seeds_effective"
-                                                              role="tab"
-                                                              data-toggle="tab">种子有效性</a></li>
-                    <li role="presentation"><a href="#crawl_status" aria-controls="crawl_status" role="tab"
-                                               data-toggle="tab">爬取状态</a>
-                    </li>
-                    <li role="presentation"><a href="#crawl_data" aria-controls="crawl_data" role="tab"
-                                               data-toggle="tab">爬取数据</a>
-                    </li>
+                <ul class="nav nav-tabs" role="tablist" id="statusTab">
+                    <li role="presentation" class="active"><a href="#seeds_effective" aria-controls="seeds_effective" role="tab" data-toggle="tab">种子有效性</a></li>
+                    <li role="presentation"><a href="#crawl_status" aria-controls="crawl_status" role="tab" data-toggle="tab">爬取状态</a></li>
+                    <li role="presentation"><a href="#crawl_data" aria-controls="crawl_data" role="tab" data-toggle="tab">爬取数据</a></li>
                 </ul>
 
                 <!-- Tab panes -->
@@ -89,11 +94,11 @@
 
                                 <!--检查种子有效性按钮-->
                                 <!--<div class="row">-->
-                                    <!--<div class="col-md-12">-->
-                                        <!--<button type="button" class="btn btn-primary"-->
-                                                <!--data-bind="click: showSeedEffectiveInfo">批量检查有效性-->
-                                        <!--</button>-->
-                                    <!--</div>-->
+                                <!--<div class="col-md-12">-->
+                                <!--<button type="button" class="btn btn-primary"-->
+                                <!--data-bind="click: showSeedEffectiveInfo">批量检查有效性-->
+                                <!--</button>-->
+                                <!--</div>-->
                                 <!--</div>-->
                                 <div class="row">
                                     <div class="col-md-12">
@@ -112,12 +117,16 @@
                                             <tr>
                                                 <td data-bind="text: ($index()+1)"></td>
                                                 <td data-bind="text: name"></td>
-                                                <td data-bind="text: url" style="width: 400px;word-break: break-all"></td>
+                                                <td data-bind="text: url"
+                                                    style="width: 400px;word-break: break-all"></td>
                                                 <td data-bind="text: effectiveStatusString, style: { color: $data.effectiveStatusString()=='无效'?'red':'black'}"></td>
                                                 <td data-bind="text: checkTimeString"></td>
                                                 <td>
-                                                    <a role="button" class="btn btn-primary"  data-bind="attr: {href:updateUrl,target:targetWindow}">设置</a>
-                                                    <button type="button" class="btn btn-primary" data-bind="click: $parent.checkSingleSeedEffective">检查</button>
+                                                    <a role="button" class="btn btn-primary"
+                                                       data-bind="attr: {href:updateUrl,target:targetWindow}">设置</a>
+                                                    <button type="button" class="btn btn-primary"
+                                                            data-bind="click: $parent.checkSingleSeedEffective">检查
+                                                    </button>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -142,9 +151,13 @@
 
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <button type="button" class="btn btn-primary" data-bind="click: refreshCrawStatus">刷新爬取状态</button>
-                                        <input type="checkbox" id="btn_toggle_schema" data-toggle="toggle" data-on="集群模式"  data-off="单机模式" data-width="85">
-                                        <input type="checkbox" id="btn_toggle_index" data-toggle="toggle" data-on="全量" checked  data-off="增量" data-width="85">
+                                        <button type="button" class="btn btn-primary"
+                                                data-bind="click: refreshCrawStatus">刷新爬取状态
+                                        </button>
+                                        <input type="checkbox" id="btn_toggle_schema" data-toggle="toggle"
+                                               data-on="集群模式" data-off="单机模式" data-width="85">
+                                        <input type="checkbox" id="btn_toggle_index" data-toggle="toggle" data-on="全量"
+                                               checked data-off="增量" data-width="85">
                                     </div>
                                 </div>
                                 <div class="row addRowTopMargin">
@@ -162,13 +175,17 @@
                                             <tbody data-bind="foreach: paginationUrls">
                                             <tr>
                                                 <td data-bind="text: ($index()+1)"></td>
-                                                <td data-bind="text: url" style="width: 400px;word-break: break-all"></td>
+                                                <td data-bind="text: url"
+                                                    style="width: 400px;word-break: break-all"></td>
                                                 <td data-bind="text: crawlStatusString"></td>
                                                 <td data-bind="text: checkTimeString"></td>
                                                 <td>
-                                                    <a role="button" class="btn btn-primary" data-bind="click: $parent.stopCrawl">停止</a>
-                                                    <a role="button" class="btn btn-primary" data-bind="click: $parent.crawl">重爬</a>
-                                                    <a role="button" class="btn btn-primary" data-bind="click: $parent.reParse">重索引</a>
+                                                    <a role="button" class="btn btn-primary"
+                                                       data-bind="click: $parent.stopCrawl">停止</a>
+                                                    <a role="button" class="btn btn-primary"
+                                                       data-bind="click: $parent.crawl">重爬</a>
+                                                    <a role="button" class="btn btn-primary"
+                                                       data-bind="click: $parent.reParse">重索引</a>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -193,8 +210,12 @@
 
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <button type="button" class="btn btn-primary" data-bind="click: refreshCrawlData">按照域统计</button>
-                                        <button type="button" class="btn btn-primary" data-bind="click: queryByDataSource">按照分类统计</button>
+                                        <button type="button" class="btn btn-primary"
+                                                data-bind="click: refreshCrawlData">按照域统计
+                                        </button>
+                                        <button type="button" class="btn btn-primary"
+                                                data-bind="click: queryByDataSource">按照分类统计
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="row addRowTopMargin">
@@ -214,13 +235,16 @@
                                             <tbody data-bind="foreach: paginationUrls">
                                             <tr>
                                                 <td data-bind="text: ($index()+1)"></td>
-                                                <td data-bind="text: url" style="width: 400px;word-break: break-all"></td>
+                                                <td data-bind="text: url"
+                                                    style="width: 400px;word-break: break-all"></td>
                                                 <td data-bind="text: indexCountsString"></td>
                                                 <td data-bind="text: todayIndexCountsString"></td>
                                                 <td data-bind="text: todayPublishTimeCounts"></td>
                                                 <td data-bind="text: checkTimeString"></td>
                                                 <td>
-                                                    <button type="button"  class="btn btn-primary" data-bind="click: $parent.refreshSingleData">刷新</button>
+                                                    <button type="button" class="btn btn-primary"
+                                                            data-bind="click: $parent.refreshSingleData">刷新
+                                                    </button>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -248,8 +272,10 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
+
 </div>
 </body>
 </html>

@@ -6,6 +6,103 @@ var virtualWebPath = "/crawl-template-webtool";
 //列表中每页显示记录数
 var paginationItemCounts = 10;
 
+$(function () {
+
+    var mainViewModel = new masterVM([]);
+
+    ko.applyBindings(mainViewModel);
+
+    //初始化种子有效性列表测试数据
+    fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolService/getSeedsEffectiveStatusCache', mainViewModel, true, initSeedsEffectiveList);
+    //初始化爬取状态列表
+    //fillPageList('crawlStatusModelList', '/webapi/crawlToolService/getCrawlStatusCache', mainViewModel, true, initCrawlStatusList);
+    fillPageList('crawlStatusModelList', '/webapi/crawlToolService/getCrawlStatusList', mainViewModel, true, initCrawlStatusList);
+    //初始化爬取数据列表
+    //fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataCache', mainViewModel, true, initCrawlDataList);
+    fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataList', mainViewModel, true, initCrawlDataList);
+
+    //注册Tab显示事件
+    registerTabShownEvent(mainViewModel);
+});
+
+/**
+ *
+ * @param keyword
+ * @param ViewModel
+ */
+function filterVMByKeyWords(keyword, ViewModel, currentTab) {
+
+    switch (currentTab) {
+        case "seeds_effective":
+        {
+            if (keyword != null && keyword != "" && ViewModel) {
+                //mainViewModel.seedEffectiveVM
+                //filterVMByKeyWords(that.filterString(), that.seedEffectiveVM);
+                var needToUse = [];
+                var totalUrl = ViewModel.seedEffectiveVM.OrgUrls();
+                totalUrl.forEach(function (value, index) {
+                    if (value.name.indexOf(keyword) >= 0 || value.url.indexOf(keyword) >= 0) {
+                        needToUse.push(value);
+                    }
+                });
+                //ViewModel.seedEffectiveVM.urls.removeAll();
+                ViewModel.seedEffectiveVM.urls(needToUse);
+            } else {
+                //ViewModel.seedEffectiveVM.urls.removeAll();
+                ViewModel.seedEffectiveVM.urls(ViewModel.seedEffectiveVM.OrgUrls());
+            }
+            ViewModel.seedEffectiveVM.paginationUrls( ViewModel.seedEffectiveVM.urls().slice(0, paginationItemCounts));
+            loadPaginationComponent('#seeds_effective_pagination', ViewModel.seedEffectiveVM);
+            break;
+        }
+        case "crawl_status":
+        {
+            //mainViewModel.crawlStatusVM
+            //filterVMByKeyWords(that.filterString(), that.crawlStatusVM);
+            if (keyword != null && keyword != "" && ViewModel) {
+                var needToUse = [];
+                var totalUrl = ViewModel.crawlStatusVM.OrgUrls();
+                totalUrl.forEach(function (value, index) {
+                    if (value.name.indexOf(keyword) >= 0 || value.url.indexOf(keyword) >= 0) {
+                        needToUse.push(value);
+                    }
+                });
+                ViewModel.crawlStatusVM.urls(needToUse);
+            } else {
+                //ViewModel.seedEffectiveVM.urls.removeAll();
+                ViewModel.crawlStatusVM.urls(ViewModel.crawlStatusVM.OrgUrls());
+            }
+            ViewModel.crawlStatusVM.paginationUrls( ViewModel.crawlStatusVM.urls().slice(0, paginationItemCounts));
+            loadPaginationComponent('#crawl_status_pagination', ViewModel.crawlStatusVM);
+            break;
+        }
+        case "crawl_data":
+        {
+            //mainViewModel.crawlDataVM
+            //filterVMByKeyWords(that.filterString(), that.crawlDataVM);
+            if (keyword != null && keyword != "" && ViewModel) {
+                var needToUse = [];
+                var totalUrl = ViewModel.crawlDataVM.OrgUrls();
+                totalUrl.forEach(function (value, index) {
+                    if (value.name.indexOf(keyword) >= 0 || value.url.indexOf(keyword) >= 0) {
+                        needToUse.push(value);
+                    }
+                });
+                ViewModel.crawlDataVM.urls(needToUse);
+            } else {
+                //ViewModel.seedEffectiveVM.urls.removeAll();
+                ViewModel.crawlDataVM.urls(ViewModel.crawlDataVM.OrgUrls());
+            }
+            ViewModel.crawlDataVM.paginationUrls( ViewModel.crawlDataVM.urls().slice(0, paginationItemCounts));
+            loadPaginationComponent('#crawl_data_pagination', ViewModel.crawlDataVM);
+            break;
+        }
+        default :
+            break;
+    }
+    //args.paginationUrls(args.urls().slice(0, paginationItemCounts));
+}
+
 /*************************View-Model Definition Start**********************************/
 /**
  *
@@ -15,6 +112,7 @@ var seedEffectiveVM = function (mainViewModel, urlData) {
     var that = this;
     var urlInitData = updateSeedsEffectiveData(urlData);
     that.urls = ko.observableArray(urlInitData);
+    that.OrgUrls = ko.observableArray(urlInitData);
     //分页显示的url列表
     that.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
     //注册modal中确定按钮事件 检查种子有效性
@@ -42,6 +140,8 @@ var seedEffectiveVM = function (mainViewModel, urlData) {
 var crawlStatusVM = function (mainViewModel, urlData) {
     var that = this;
     that.urls = ko.observableArray(urlData);
+
+    that.OrgUrls = ko.observableArray(urlData);
     //分页显示的url列表
     that.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
     //刷新所有的爬取状态
@@ -104,7 +204,7 @@ function crawlStatusSuccessHandler(data, dataModel) {
     var modalBody = $('#modal_body_showOptionMessage');
     modalBody.text('');//清空
     var result = data;//JSON.parse(data);
-    modalBody.text(result.data+"\n"+result.errorMsg);
+    modalBody.text(result.data + "\n" + result.errorMsg);
     $('#modal_showOptionMessage').modal('show');
 }
 
@@ -127,6 +227,7 @@ function crawlStatusErrorHandler(error) {
 var crawlDataVM = function (mainViewModel, urlData) {
     var that = this;
     that.urls = ko.observableArray(urlData);
+    that.OrgUrls = ko.observableArray(urlData);
     that.typeName = ko.observable('域名');
     //分页显示的url列表
     that.paginationUrls = ko.observableArray(urlData.slice(0, paginationItemCounts));
@@ -217,9 +318,17 @@ var crawlDataVM = function (mainViewModel, urlData) {
  * */
 var masterVM = function (urlData) {
     var that = this;
+    that.filterString = ko.observable('');
     that.seedEffectiveVM = new seedEffectiveVM(that, urlData);
     that.crawlStatusVM = new crawlStatusVM(that, urlData);
     that.crawlDataVM = new crawlDataVM(that, urlData);
+
+    this.filterModel = function (args,event) {
+        var currentTabID = $("ul#statusTab li.active>a").attr("aria-controls");
+        if (currentTabID) {
+            filterVMByKeyWords(that.filterString(), args, currentTabID);
+        }
+    };
 };
 /*************************View-Model Definition End**********************************/
 
@@ -396,22 +505,6 @@ function updateSeedsEffectiveData(urlData) {
     return seedsUrlInitData;
 }
 
-$(function () {
-    var mainViewModel = new masterVM([]);
-    ko.applyBindings(mainViewModel);
-
-    //初始化种子有效性列表测试数据
-    fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolService/getSeedsEffectiveStatusCache', mainViewModel, true, initSeedsEffectiveList);
-    //初始化爬取状态列表
-    //fillPageList('crawlStatusModelList', '/webapi/crawlToolService/getCrawlStatusCache', mainViewModel, true, initCrawlStatusList);
-    fillPageList('crawlStatusModelList', '/webapi/crawlToolService/getCrawlStatusList', mainViewModel, true, initCrawlStatusList);
-    //初始化爬取数据列表
-    //fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataCache', mainViewModel, true, initCrawlDataList);
-    fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataList', mainViewModel, true, initCrawlDataList);
-
-    //注册Tab显示事件
-    registerTabShownEvent(mainViewModel);
-});
 
 /**
  *
@@ -444,6 +537,7 @@ function registerTabShownEvent(mainViewModel) {
 function initSeedsEffectiveList(isPageLoad, mainViewModel, initData) {
     var updatedSampleData = updateSeedsEffectiveData(initData);
     mainViewModel.seedEffectiveVM.urls(updatedSampleData);
+    mainViewModel.seedEffectiveVM.OrgUrls(updatedSampleData.concat());
     mainViewModel.seedEffectiveVM.paginationUrls(mainViewModel.seedEffectiveVM.urls().slice(0, paginationItemCounts));
     //加载种子有效性页面分页控件
     loadPaginationComponent('#seeds_effective_pagination', mainViewModel.seedEffectiveVM);
@@ -501,6 +595,7 @@ function updateInitCrawlStatus(initData) {
 function initCrawlStatusList(isPageLoad, mainViewModel, initData) {
     var updatedData = updateInitCrawlStatus(initData);
     mainViewModel.crawlStatusVM.urls(updatedData);
+    mainViewModel.crawlStatusVM.OrgUrls(updatedData.concat());
     mainViewModel.crawlStatusVM.paginationUrls(mainViewModel.crawlStatusVM.urls().slice(0, paginationItemCounts));
     //加载爬取数据页面分页控件
     loadPaginationComponent('#crawl_status_pagination', mainViewModel.crawlStatusVM);
@@ -508,6 +603,7 @@ function initCrawlStatusList(isPageLoad, mainViewModel, initData) {
         //提示
         showOptionModalMessage('操作结果', '爬取状态查询完毕！');
     }
+
 }
 
 /**
@@ -548,6 +644,7 @@ function updateInitCrawlData(initData) {
 function initCrawlDataList(isPageLoad, mainViewModel, initData) {
     var updatedData = updateInitCrawlData(initData);
     mainViewModel.crawlDataVM.urls(updatedData);
+    mainViewModel.crawlDataVM.OrgUrls(updatedData.concat());
     mainViewModel.crawlDataVM.paginationUrls(mainViewModel.crawlDataVM.urls().slice(0, paginationItemCounts));
     //加载爬取状态页面分页控件
     loadPaginationComponent('#crawl_data_pagination', mainViewModel.crawlDataVM);
