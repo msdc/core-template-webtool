@@ -7,10 +7,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -20,7 +23,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -196,7 +198,7 @@ public class CrawlToolService {
             parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, contentOutLink);
             //添加对关键内容校验
             if (parseResult != null) {
-                HashMap tpMap = parseResult.getResult();
+                Map tpMap = parseResult.getResult();
                 Iterator iter = tpMap.entrySet().iterator();
                 while (iter.hasNext()) {
                     Map.Entry entry = (Map.Entry) iter.next();
@@ -237,6 +239,23 @@ public class CrawlToolService {
             jsonProvider.setSuccess(false);
             jsonProvider.setErrorMsg("无法完成页面解析，请检查选择器和过滤器正确性，确认后重新保存模板后，重试！");
         } else {
+          //--整理结果集.
+            Map<String, String> resultTemp = parseResult.getResult();
+            Map<String, String> result = new LinkedHashMap<String, String>();
+            Map<String, String> resultValue = new HashMap<String, String>();
+            for(Iterator<Entry<String, String>> it = resultTemp.entrySet().iterator(); it.hasNext();) {
+                Entry<String, String> entry = it.next();
+                String key = entry.getKey();
+                Pattern p = Pattern.compile(".*\\d+.*");
+                Matcher m = p.matcher(key);
+                if (m.matches()) {
+                    resultValue.put(key, entry.getValue());
+                } else {
+                    result.put(key, entry.getValue());
+                }
+            }
+            result.putAll(resultValue);
+            parseResult.setResult(result);
             jsonProvider.setSuccess(true);
             jsonProvider.setData(parseResult);
         }
