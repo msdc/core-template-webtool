@@ -70,9 +70,15 @@ public class CrawlState {
         List<String> normalFolderNameList = getResultList("*_dispatch", Constants.DISPATCH_REDIS_DBINDEX);
         folderNameList.addAll(normalFolderNameList);
         List<CrawlStateBean> crawlStateList = new ArrayList<CrawlStateBean>();
+        List<String> redisKeys = new ArrayList<String>();
         for (Iterator<String> it = folderNameList.iterator(); it.hasNext(); ) {
             String redisKey = it.next();
-            DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey, Constants.DISPATCH_REDIS_DBINDEX);
+            redisKeys.add(redisKey);
+        }
+        List<DispatchVo> dispatchVos = RedisUtils.getDispatchListResult(redisKeys, Constants.DISPATCH_REDIS_DBINDEX);
+        for(Iterator<DispatchVo> it = dispatchVos.iterator(); it.hasNext();) {
+            DispatchVo dispatchVo = it.next();
+            String redisKey = dispatchVo.getRedisKey();
             CrawlStateBean bean = new CrawlStateBean();
             bean.setDispatchName(redisKey.substring(0, redisKey.lastIndexOf("_")));
             String crawlState = "";
@@ -157,6 +163,7 @@ public class CrawlState {
         try {
             resultMsg = result.get();
         } catch (Exception e) {
+            LOG.info("", e);
             // failed
         }
 //        new Thread(new Runnable() {
