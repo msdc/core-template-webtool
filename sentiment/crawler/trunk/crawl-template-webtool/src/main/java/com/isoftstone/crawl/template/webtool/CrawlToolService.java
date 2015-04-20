@@ -21,9 +21,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -1229,7 +1231,7 @@ public class CrawlToolService {
     @GET
     @Path("/getCrawlDataList")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getCrawlDataList() {
+    public String getCrawlDataList(@QueryParam("startTime") String startTime, @QueryParam("endTime") String endTime) {
         //CrawlToolResource serviceHelper = new CrawlToolResource();
         ResponseJSONProvider<CrawlDataModelList> jsonProvider = new ResponseJSONProvider<CrawlDataModelList>();
 
@@ -1252,11 +1254,16 @@ public class CrawlToolService {
                     Date currentDate = new Date();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String nowDateString = dateFormat.format(currentDate);
+                    
+
+					Date startDate = DateUtils.parseDate(startTime, "yyyy-MM-dd HH:mm");
+					Date endDate = DateUtils.parseDate(endTime, "yyyy-MM-dd HH:mm");
+                    
                     // 查询今日索引
-                    long todayIndexCount = search.getQueryResultCount("host", entry.getKey(), WebtoolConstants.CRAWL_DATA_QUERY_FIELD, serviceHelper.getTimeOfZero(), new Date());
+                    long todayIndexCount = search.getQueryResultCount("host", entry.getKey(), WebtoolConstants.CRAWL_DATA_QUERY_FIELD, startDate, endDate);
 
                     //new add by DonegalChen
-                    long todayPublishTimeCount = search.getQueryResultCount("host", entry.getKey(), WebtoolConstants.CRAWL_DATA_PUBLISH_TIME_QUERY_FIELD, serviceHelper.getTimeOfZero(), new Date());
+                    long todayPublishTimeCount = search.getQueryResultCount("host", entry.getKey(), WebtoolConstants.CRAWL_DATA_PUBLISH_TIME_QUERY_FIELD, startDate, endDate);
 
                     crawlDataModel.setUrl(entry.getKey());
                     // 今日索引
