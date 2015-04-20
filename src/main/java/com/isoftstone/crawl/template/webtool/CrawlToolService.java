@@ -7,14 +7,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -241,23 +237,6 @@ public class CrawlToolService {
             jsonProvider.setSuccess(false);
             jsonProvider.setErrorMsg("无法完成页面解析，请检查选择器和过滤器正确性，确认后重新保存模板后，重试！");
         } else {
-          //--整理结果集.
-            Map<String, String> resultTemp = parseResult.getResult();
-            Map<String, String> result = new LinkedHashMap<String, String>();
-            Map<String, String> resultValue = new HashMap<String, String>();
-            for(Iterator<Entry<String, String>> it = resultTemp.entrySet().iterator(); it.hasNext();) {
-                Entry<String, String> entry = it.next();
-                String key = entry.getKey();
-                Pattern p = Pattern.compile(".*\\d+.*");
-                Matcher m = p.matcher(key);
-                if (m.matches()) {
-                    resultValue.put(key, entry.getValue());
-                } else {
-                    result.put(key, entry.getValue());
-                }
-            }
-            result.putAll(resultValue);
-            parseResult.setResult(result);
             jsonProvider.setSuccess(true);
             jsonProvider.setData(parseResult);
         }
@@ -916,7 +895,7 @@ public class CrawlToolService {
                     seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
                     seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
                     // 同时停用该模板
-                    disableTemplate(templateModel.getBasicInfoViewModel().getUrl(),templateModel.getBasicInfoViewModel().getName());
+                    disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
                     continue;
                 }
                 // 检查增量
@@ -926,7 +905,7 @@ public class CrawlToolService {
                     seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
                     seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
                     // 同时停用该模板
-                    disableTemplate(templateModel.getBasicInfoViewModel().getUrl(),templateModel.getBasicInfoViewModel().getName());
+                    disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
                     continue;
                 }
                 seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_VALID_STATUS);
@@ -1239,6 +1218,21 @@ public class CrawlToolService {
         List<CrawlDataModel> crawlDataModelArrayList = new ArrayList<CrawlDataModel>();
         // 需要查询的Domain列表
         List<String> domainList = new ArrayList<String>();
+        Date currentDate = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String nowDateString = dateFormat.format(currentDate);
+
+        if(startTime==null||startTime=="")
+        {
+            startTime=currentDate.toString();
+        }
+        if(endTime==null||endTime=="")
+        {
+            endTime=currentDate.toString();
+        }
+
+        Date startDate = new Date(startTime);
+        Date endDate = new Date(endTime);
 
         try {
             Set<String> listKeys = RedisOperator.searchKeysFromDefaultDB("*" + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
@@ -1251,25 +1245,18 @@ public class CrawlToolService {
                 while (it.hasNext()) {
                     Map.Entry<String, Long> entry = (Map.Entry<String, Long>) it.next();
                     CrawlDataModel crawlDataModel = new CrawlDataModel();
-                    Date currentDate = new Date();
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    String nowDateString = dateFormat.format(currentDate);
-                    
 
-					Date startDate = DateUtils.parseDate(startTime, "yyyy-MM-dd HH:mm");
-					Date endDate = DateUtils.parseDate(endTime, "yyyy-MM-dd HH:mm");
-                    
                     // 查询今日索引
                     long todayIndexCount = search.getQueryResultCount("host", entry.getKey(), WebtoolConstants.CRAWL_DATA_QUERY_FIELD, startDate, endDate);
 
-                    //new add by DonegalChen
+                    //new add by Donegal Chen
                     long todayPublishTimeCount = search.getQueryResultCount("host", entry.getKey(), WebtoolConstants.CRAWL_DATA_PUBLISH_TIME_QUERY_FIELD, startDate, endDate);
 
                     crawlDataModel.setUrl(entry.getKey());
                     // 今日索引
                     crawlDataModel.setTodayIndexCounts(todayIndexCount);
 
-                    //new add by DonegalChen
+                    //new add by Donegal Chen
                     crawlDataModel.setTodayPublishTimeCounts(todayPublishTimeCount);
 
                     crawlDataModel.setIndexCounts(entry.getValue());
