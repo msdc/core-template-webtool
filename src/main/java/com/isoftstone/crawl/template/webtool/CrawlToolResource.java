@@ -125,6 +125,7 @@ public class CrawlToolResource {
         normalSeedList.add(normalSeed);
         normalDispatchVo.setSeed(normalSeedList);
         normalDispatchVo.setUserProxy(userProxy);
+        normalDispatchVo.setRedisKey(normalRedisKey);
         RedisOperator.setDispatchResult(normalDispatchVo, normalRedisKey, Constants.DISPATCH_REDIS_DBINDEX);
 
         //-- 2.2 保存增量调度数据到redis中.
@@ -153,6 +154,7 @@ public class CrawlToolResource {
             seedList.add(seed);
         }
         dispatchVo.setSeed(seedList);
+        dispatchVo.setRedisKey(incrementRedisKey);
         RedisOperator.setDispatchResult(dispatchVo, incrementRedisKey, Constants.DISPATCH_REDIS_DBINDEX);
     }
 
