@@ -1177,30 +1177,49 @@ public class CrawlToolService {
     @GET
     @Path("/getCrawlDataListByDataSource")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getCrawlDataListByDataSource() {
+    public String getCrawlDataListByDataSource(@QueryParam("startTime") String startTime, @QueryParam("endTime") String endTime) {
         //CrawlToolResource serviceHelper = new CrawlToolResource();
         ResponseJSONProvider<CrawlDataModelList> jsonProvider = new ResponseJSONProvider<CrawlDataModelList>();
 
-        CrawlDataModelList crawlDataModelList = new CrawlDataModelList();
-        List<CrawlDataModel> crawlDataModelArrayList = new ArrayList<CrawlDataModel>();
+        Date currentDate = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String nowDateString = dateFormat.format(currentDate);
 
-        // 搜索引擎
-        CrawlDataModel searchEngineCrawlDataModel = new CrawlDataModel();
-        searchEngineCrawlDataModel.setDataSource("2");
-        // 常规引擎
-        CrawlDataModel normalCrawlDataModel = new CrawlDataModel();
-        normalCrawlDataModel.setDataSource("1");
+        try {
+            if (startTime == null || startTime == "") {
+                startTime = currentDate.toString();
+            }
+            if (endTime == null || endTime == "") {
+                endTime = currentDate.toString();
+            }
 
-        serviceHelper.fillCrawlDataModelArrayList(searchEngineCrawlDataModel, crawlDataModelArrayList, "tags", "datasource=2", "搜索引擎");
-        serviceHelper.fillCrawlDataModelArrayList(normalCrawlDataModel, crawlDataModelArrayList, "tags", "datasource=1", "定向站点");
+            Date startDate = DateUtils.parseDate(startTime, "yyyy-MM-dd HH:mm:ss");
+            Date endDate = DateUtils.parseDate(endTime, "yyyy-MM-dd HH:mm:ss");
 
-        // 列表按名称排序
-        Collections.sort(crawlDataModelArrayList, new CrawlDataModelComparator());
-        crawlDataModelList.setCrawlDataModelList(crawlDataModelArrayList);
-        // 添加到缓存
-        StatusMonitorCache.setCrawlDataModelListCache(crawlDataModelList);
-        jsonProvider.setSuccess(true);
-        jsonProvider.setData(crawlDataModelList);
+            CrawlDataModelList crawlDataModelList = new CrawlDataModelList();
+            List<CrawlDataModel> crawlDataModelArrayList = new ArrayList<CrawlDataModel>();
+
+            // 搜索引擎
+            CrawlDataModel searchEngineCrawlDataModel = new CrawlDataModel();
+            searchEngineCrawlDataModel.setDataSource("2");
+            // 常规引擎
+            CrawlDataModel normalCrawlDataModel = new CrawlDataModel();
+            normalCrawlDataModel.setDataSource("1");
+
+            serviceHelper.fillCrawlDataModelArrayList(searchEngineCrawlDataModel, crawlDataModelArrayList, "tags", "datasource=2", "搜索引擎", startTime, endTime);
+            serviceHelper.fillCrawlDataModelArrayList(normalCrawlDataModel, crawlDataModelArrayList, "tags", "datasource=1", "定向站点", startTime, endTime);
+
+            // 列表按名称排序
+            Collections.sort(crawlDataModelArrayList, new CrawlDataModelComparator());
+            crawlDataModelList.setCrawlDataModelList(crawlDataModelArrayList);
+            // 添加到缓存
+            StatusMonitorCache.setCrawlDataModelListCache(crawlDataModelList);
+            jsonProvider.setSuccess(true);
+            jsonProvider.setData(crawlDataModelList);
+        } catch (Exception ex) {
+            jsonProvider.setSuccess(false);
+            jsonProvider.setErrorMsg(ex.getMessage());
+        }
         return jsonProvider.toJSON();
     }
 
@@ -1222,19 +1241,18 @@ public class CrawlToolService {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String nowDateString = dateFormat.format(currentDate);
 
-        if(startTime==null||startTime=="")
-        {
-            startTime=currentDate.toString();
-        }
-        if(endTime==null||endTime=="")
-        {
-            endTime=currentDate.toString();
-        }
-
-        Date startDate = new Date(startTime);
-        Date endDate = new Date(endTime);
-
         try {
+            if (startTime == null || startTime == "") {
+                startTime = currentDate.toString();
+            }
+            if (endTime == null || endTime == "") {
+                endTime = currentDate.toString();
+            }
+
+            Date startDate = DateUtils.parseDate(startTime, "yyyy-MM-dd HH:mm:ss");
+            Date endDate = DateUtils.parseDate(endTime, "yyyy-MM-dd HH:mm:ss");
+
+
             Set<String> listKeys = RedisOperator.searchKeysFromDefaultDB("*" + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
             // 产生Domain列表
             serviceHelper.fillDomainList(listKeys, domainList);

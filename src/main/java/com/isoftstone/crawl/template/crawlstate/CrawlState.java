@@ -80,8 +80,11 @@ public class CrawlState {
             //DispatchVo dispatchVo = it.next();
             String redisKey = dispatchVo.getRedisKey();
             CrawlStateBean bean = new CrawlStateBean();
-            if (redisKey != null)
+            if (redisKey != null) {
                 bean.setDispatchName(redisKey.substring(0, redisKey.lastIndexOf("_")));
+            } else {
+                continue;
+            }
             String crawlState = "";
             if ("running".equals(dispatchVo.getStatus())) {
                 crawlState = "爬取中";
@@ -323,9 +326,10 @@ public class CrawlState {
     }
 
     /**
-     * 停止爬虫.(目前只停止增量.)
-     *
-     * @param dispatchName
+     * @param folderName
+     * @param isDeploy
+     * @param isNomal
+     * @return
      */
     public String stopCrawl(String folderName, boolean isDeploy, boolean isNomal) {
         // 1.修改redis中种子状态
