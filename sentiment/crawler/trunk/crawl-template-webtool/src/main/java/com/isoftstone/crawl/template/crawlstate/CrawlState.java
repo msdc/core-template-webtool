@@ -76,11 +76,12 @@ public class CrawlState {
             redisKeys.add(redisKey);
         }
         List<DispatchVo> dispatchVos = RedisUtils.getDispatchListResult(redisKeys, Constants.DISPATCH_REDIS_DBINDEX);
-        for(Iterator<DispatchVo> it = dispatchVos.iterator(); it.hasNext();) {
-            DispatchVo dispatchVo = it.next();
+        for (DispatchVo dispatchVo : dispatchVos) {
+            //DispatchVo dispatchVo = it.next();
             String redisKey = dispatchVo.getRedisKey();
             CrawlStateBean bean = new CrawlStateBean();
-            bean.setDispatchName(redisKey.substring(0, redisKey.lastIndexOf("_")));
+            if (redisKey != null)
+                bean.setDispatchName(redisKey.substring(0, redisKey.lastIndexOf("_")));
             String crawlState = "";
             if ("running".equals(dispatchVo.getStatus())) {
                 crawlState = "爬取中";

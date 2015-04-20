@@ -1798,8 +1798,12 @@ public class CrawlToolResource {
     }
 
     /**
-     * @param serviceHelper
+     *
+     * @param crawlDataModel
      * @param crawlDataModelArrayList
+     * @param filter
+     * @param value
+     * @param typeName
      */
     public void fillCrawlDataModelArrayList(CrawlDataModel crawlDataModel, List<CrawlDataModel> crawlDataModelArrayList, String filter, String value, String typeName) {
         SolrSerach search = new SolrSerach();
@@ -1971,9 +1975,11 @@ public class CrawlToolResource {
      */
     public void fillDomainList(Set<String> listKeys, List<String> domainList) {
         if (listKeys != null) {
-            for (String key : listKeys) {
-                String templateString = RedisOperator.getFromDefaultDB(key);
-                TemplateModel templateModel = getTemplateModelByJSONString(templateString);
+            List<String> keys = new ArrayList<String>(listKeys);
+            List<TemplateModel> templates = RedisOperator.getFromDefaultDB(keys);
+            for (TemplateModel templateModel : templates) {
+                //String templateString = RedisOperator.getFromDefaultDB(key);
+                //TemplateModel templateModel = getTemplateModelByJSONString(templateString);
                 String domainName = getDomainName(templateModel.getBasicInfoViewModel().getUrl());
                 if (domainName != null) {
                     if (!domainList.contains(domainName)) {
@@ -1982,5 +1988,11 @@ public class CrawlToolResource {
                 }
             }
         }
+//        SolrSerach sos = new SolrSerach();
+//        List<String> solrHost = sos.getHostList();
+//        for (String ho : solrHost) {
+//            if (!domainList.contains(ho))
+//                domainList.add(ho);
+//        }
     }
 }

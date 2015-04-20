@@ -72,9 +72,11 @@
     <div class="row">
         <div class="col-md-4" style="margin-left: 65%">
             <div class="input-group">
-                <input type="text" class="form-control" id="txtFilterString" data-bind="value:filterString" placeholder="搜索...名称、描述、数据源地址、状态">
+                <input type="text" class="form-control" id="txtFilterString" data-bind="value:filterString"
+                       placeholder="搜索...名称、描述、数据源地址、状态">
                   <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" data-bind="click: filterModel"  id="btnFilter">筛选</button>
+                    <button class="btn btn-primary" type="button" data-bind="click: filterModel" id="btnFilter">筛选
+                    </button>
                   </span>
             </div>
         </div>
@@ -83,11 +85,14 @@
             <div role="tabpanel">
                 <!-- Nav tabs --> <!--nav nav-tabs nav-stacked-->
                 <ul class="nav nav-tabs" role="tablist" id="statusTab">
-                    <li role="presentation" class="active"><a href="#seeds_effective" aria-controls="seeds_effective" role="tab" data-toggle="tab">种子有效性</a></li>
-                    <li role="presentation"><a href="#crawl_status" aria-controls="crawl_status" role="tab" data-toggle="tab">爬取状态</a></li>
-                    <li role="presentation"><a href="#crawl_data" aria-controls="crawl_data" role="tab" data-toggle="tab">爬取数据</a></li>
+                    <li role="presentation" class="active"><a href="#seeds_effective" aria-controls="seeds_effective"
+                                                              role="tab" data-toggle="tab">种子有效性</a></li>
+                    <li role="presentation"><a href="#crawl_status" aria-controls="crawl_status" role="tab"
+                                               data-toggle="tab">爬取状态</a></li>
+                    <li role="presentation"><a href="#crawl_data" aria-controls="crawl_data" role="tab"
+                                               data-toggle="tab">爬取数据</a></li>
                 </ul>
-				
+
                 <!-- Tab panes -->
                 <div class="tab-content">
 
@@ -213,15 +218,17 @@
                             <div class="col-md-12">
 
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-4">
                                         <button type="button" class="btn btn-primary"
                                                 data-bind="click: refreshCrawlData">按照域统计
                                         </button>
                                         <button type="button" class="btn btn-primary"
                                                 data-bind="click: queryByDataSource">按照分类统计
                                         </button>
-                                        <input type="text" id="startTime" class="form-control" style="width:160px" /> - 
-                                        <input type="text" id="endTime" class="form-control" style="width:160px" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="col-md-3">起始时间 <input type="text" id="startTime" class="form-control" style="width:160px"/></div>
+                                        <div class="col-md-3">结束时间 <input type="text" id="endTime" class="form-control" style="width:160px"/></div>
                                     </div>
                                 </div>
                                 <div class="row addRowTopMargin">
