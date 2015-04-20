@@ -118,4 +118,10 @@ public class WebtoolConstants {
 
     //自定义选择器属性
     public static final String CUSTOMER_SELECTOR_ATTRIBUTE = "其他";
+
+    public static final String[] DATE_PATTEN = new String[]{"yyyy-MM", "yyyyMM", "yyyy/MM",
+            "yyyyMMdd", "yyyy-MM-dd", "yyyy/MM/dd",
+            "yyyyMMddHHmmss",
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy/MM/dd HH:mm:ss"};
 }

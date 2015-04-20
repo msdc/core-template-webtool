@@ -40,6 +40,7 @@ import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonGenerationException;
@@ -1807,7 +1808,9 @@ public class CrawlToolResource {
      * @param value
      * @param typeName
      */
-    public void fillCrawlDataModelArrayList(CrawlDataModel crawlDataModel, List<CrawlDataModel> crawlDataModelArrayList, String filter, String value, String typeName) {
+    public void fillCrawlDataModelArrayList(CrawlDataModel crawlDataModel, List<CrawlDataModel> crawlDataModelArrayList, String filter, String value, String typeName,String startTime,String endTime) {
+        try
+        {
         SolrSerach search = new SolrSerach();
         Date currentDate = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -1815,8 +1818,8 @@ public class CrawlToolResource {
 
         long searchEngineCount = search.getQueryResultCount(filter, value);
         // 查询今日索引
-        long todayIndexCount = search.getQueryResultCount(filter, value, WebtoolConstants.CRAWL_DATA_QUERY_FIELD, getTimeOfZero(), new Date());
-        long todayPublishCount = search.getQueryResultCount(filter, value, WebtoolConstants.CRAWL_DATA_PUBLISH_TIME_QUERY_FIELD, getTimeOfZero(), new Date());
+        long todayIndexCount = search.getQueryResultCount(filter, value, WebtoolConstants.CRAWL_DATA_QUERY_FIELD, DateUtils.parseDate(startTime,"yyyy-MM-dd HH:mm:ss"), DateUtils.parseDate(endTime,"yyyy-MM-dd HH:mm:ss"));
+        long todayPublishCount = search.getQueryResultCount(filter, value, WebtoolConstants.CRAWL_DATA_PUBLISH_TIME_QUERY_FIELD, DateUtils.parseDate(startTime,"yyyy-MM-dd HH:mm:ss"), DateUtils.parseDate(endTime,"yyyy-MM-dd HH:mm:ss"));
 
         crawlDataModel.setUrl(typeName);
         // 今日索引
@@ -1824,7 +1827,8 @@ public class CrawlToolResource {
         crawlDataModel.setTodayPublishTimeCounts(todayPublishCount);
         crawlDataModel.setIndexCounts(searchEngineCount);
         crawlDataModel.setCheckTime(nowDateString);
-        crawlDataModelArrayList.add(crawlDataModel);
+        crawlDataModelArrayList.add(crawlDataModel);}
+            catch(Exception ex){LOG.error(ex.getMessage());}
     }
 
     /**
@@ -1990,11 +1994,11 @@ public class CrawlToolResource {
                 }
             }
         }
-//        SolrSerach sos = new SolrSerach();
-//        List<String> solrHost = sos.getHostList();
-//        for (String ho : solrHost) {
-//            if (!domainList.contains(ho))
-//                domainList.add(ho);
-//        }
+        SolrSerach sos = new SolrSerach();
+        List<String> solrHost = sos.getHostList();
+        for (String ho : solrHost) {
+            if (!domainList.contains(ho))
+                domainList.add(ho);
+        }
     }
 }

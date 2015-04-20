@@ -6,11 +6,36 @@ var virtualWebPath = "/crawl-template-webtool";
 //列表中每页显示记录数
 var paginationItemCounts = 10;
 
+Date.prototype.Format = function (fmt) { //author: meizz
+    var o = {
+        "M+": this.getMonth() + 1, //月份
+        "d+": this.getDate(), //日
+        "h+": this.getHours(), //小时
+        "m+": this.getMinutes(), //分
+        "s+": this.getSeconds(), //秒
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+        "S": this.getMilliseconds() //毫秒
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
+
 $(function () {
 
     var mainViewModel = new masterVM([]);
 
     ko.applyBindings(mainViewModel);
+
+    $('#startTime').datetimepicker({format: 'yyyy-mm-dd hh:ii:ss'});
+    $('#endTime').datetimepicker({format: 'yyyy-mm-dd hh:ii:ss'});
+
+    var startTime = new Date().Format('yyyy-mm-dd')+" 00:00:00";
+    var endTime = new Date().Format('yyyy-mm-dd')+" 23:59:59";
+
+    $('#startTime').val(startTime);
+    $('#endTime').val(endTime);
 
     //初始化种子有效性列表测试数据
     fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolService/getSeedsEffectiveStatusCache', mainViewModel, true, initSeedsEffectiveList);
@@ -19,13 +44,12 @@ $(function () {
     fillPageList('crawlStatusModelList', '/webapi/crawlToolService/getCrawlStatusList', mainViewModel, true, initCrawlStatusList);
     //初始化爬取数据列表
     //fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataCache', mainViewModel, true, initCrawlDataList);
-    fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataList', mainViewModel, true, initCrawlDataList);
+    fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataList?startTime=' + startTime + '&endTime=' + endTime, mainViewModel, true, initCrawlDataList);
 
     //注册Tab显示事件
     registerTabShownEvent(mainViewModel);
 
-    $('#startTime').datetimepicker();
-    $('#endTime').datetimepicker();
+
 });
 
 /**
@@ -54,7 +78,7 @@ function filterVMByKeyWords(keyword, ViewModel, currentTab) {
                 //ViewModel.seedEffectiveVM.urls.removeAll();
                 ViewModel.seedEffectiveVM.urls(ViewModel.seedEffectiveVM.OrgUrls());
             }
-            ViewModel.seedEffectiveVM.paginationUrls( ViewModel.seedEffectiveVM.urls().slice(0, paginationItemCounts));
+            ViewModel.seedEffectiveVM.paginationUrls(ViewModel.seedEffectiveVM.urls().slice(0, paginationItemCounts));
             loadPaginationComponent('#seeds_effective_pagination', ViewModel.seedEffectiveVM);
             break;
         }
@@ -75,7 +99,7 @@ function filterVMByKeyWords(keyword, ViewModel, currentTab) {
                 //ViewModel.seedEffectiveVM.urls.removeAll();
                 ViewModel.crawlStatusVM.urls(ViewModel.crawlStatusVM.OrgUrls());
             }
-            ViewModel.crawlStatusVM.paginationUrls( ViewModel.crawlStatusVM.urls().slice(0, paginationItemCounts));
+            ViewModel.crawlStatusVM.paginationUrls(ViewModel.crawlStatusVM.urls().slice(0, paginationItemCounts));
             loadPaginationComponent('#crawl_status_pagination', ViewModel.crawlStatusVM);
             break;
         }
@@ -96,7 +120,7 @@ function filterVMByKeyWords(keyword, ViewModel, currentTab) {
                 //ViewModel.seedEffectiveVM.urls.removeAll();
                 ViewModel.crawlDataVM.urls(ViewModel.crawlDataVM.OrgUrls());
             }
-            ViewModel.crawlDataVM.paginationUrls( ViewModel.crawlDataVM.urls().slice(0, paginationItemCounts));
+            ViewModel.crawlDataVM.paginationUrls(ViewModel.crawlDataVM.urls().slice(0, paginationItemCounts));
             loadPaginationComponent('#crawl_data_pagination', ViewModel.crawlDataVM);
             break;
         }
@@ -237,12 +261,16 @@ var crawlDataVM = function (mainViewModel, urlData) {
     //按照域统计
     that.refreshCrawlData = function () {
         that.typeName('域名');
-        fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataList', mainViewModel, false, initCrawlDataList);
+        var startTime = $("#startTime").val();
+        var endTime = $("#endTime").val();
+        fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataList?startTime=' + startTime + '&endTime=' + endTime, mainViewModel, false, initCrawlDataList);
     };
     //按分类查询统计
     that.queryByDataSource = function () {
         that.typeName('分类名称');
-        fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataListByDataSource', mainViewModel, false, initCrawlDataList);
+        var startTime = $("#startTime").val();
+        var endTime = $("#endTime").val();
+        fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataListByDataSource?startTime=' + startTime + '&endTime=' + endTime, mainViewModel, false, initCrawlDataList);
     };
     //刷新单条抓取数据
     that.refreshSingleData = function () {
@@ -326,7 +354,7 @@ var masterVM = function (urlData) {
     that.crawlStatusVM = new crawlStatusVM(that, urlData);
     that.crawlDataVM = new crawlDataVM(that, urlData);
 
-    this.filterModel = function (args,event) {
+    this.filterModel = function (args, event) {
         var currentTabID = $("ul#statusTab li.active>a").attr("aria-controls");
         if (currentTabID) {
             filterVMByKeyWords(that.filterString(), args, currentTabID);
@@ -439,7 +467,7 @@ function sendAjax2PostRequest(url, dataModel, data, targetElement, successHandle
  * */
 function fillPageList(listType, url, mainViewModel, isPageLoad, callback) {
     $.ajax2({
-        url: virtualWebPath + url,
+        url: encodeURI( virtualWebPath + url),
         type: 'GET',
         success: function (data) {
             var json = data;//JSON.parse(data);
@@ -524,10 +552,10 @@ function registerTabShownEvent(mainViewModel) {
             //初始化爬取状态列表
             fillPageList('crawlStatusModelList', '/webapi/crawlToolService/getCrawlStatusList', mainViewModel, true, initCrawlStatusList);
         } else if (target == '#crawl_data') {
-        	var startTime = $("#startTime").val();
-        	var endTime = $("#endTime").val();
+            var startTime = $("#startTime").val();
+            var endTime = $("#endTime").val();
             //初始化爬取数据列表
-            fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataList?startTime='+startTime+'&endTime='+endTime, mainViewModel, true, initCrawlDataList);
+            fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataList?startTime=' + startTime + '&endTime=' + endTime, mainViewModel, true, initCrawlDataList);
         }
     });
 }
