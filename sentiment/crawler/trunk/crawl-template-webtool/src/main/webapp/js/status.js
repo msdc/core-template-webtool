@@ -23,6 +23,9 @@ $(function () {
 
     //注册Tab显示事件
     registerTabShownEvent(mainViewModel);
+
+    $('#startTime').datetimepicker();
+    $('#endTime').datetimepicker();
 });
 
 /**
@@ -521,8 +524,10 @@ function registerTabShownEvent(mainViewModel) {
             //初始化爬取状态列表
             fillPageList('crawlStatusModelList', '/webapi/crawlToolService/getCrawlStatusList', mainViewModel, true, initCrawlStatusList);
         } else if (target == '#crawl_data') {
+        	var startTime = $("#startTime").val();
+        	var endTime = $("#endTime").val();
             //初始化爬取数据列表
-            fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataList', mainViewModel, true, initCrawlDataList);
+            fillPageList('crawlDataModelList', '/webapi/crawlToolService/getCrawlDataList?startTime='+startTime+'&endTime='+endTime, mainViewModel, true, initCrawlDataList);
         }
     });
 }
