@@ -6,12 +6,16 @@
     <link rel="stylesheet" href="../../css/bootstrap-toggle.min.css" type="text/css"/>
     <link rel="stylesheet" href="../../css/main.css" type="text/css"/>
     <link rel="stylesheet" href="../../css/simplePagination.css" type="text/css"/>
+    <link rel="stylesheet" href="../../css/jquery-ui.css" type="text/css"/>
     <script src="../../js/jQuery.js" type="text/javascript"></script>
     <script src="../../js/bootstrap.min.js" type="text/javascript"></script>
     <script src="../../js/bootstrap-toggle.min.js" type="text/javascript"></script>
     <script src="../../js/knockout.js" type="text/javascript"></script>
     <script src="../../js/jquery.simplePagination.js" type="text/javascript"></script>
     <script src="../../js/status.js" type="application/javascript"></script>
+    <script src="../../js/jquery-ui.js" type="application/javascript"></script>
+    <script src="../../js/jquery-ui-slide.min.js" type="application/javascript"></script>
+    <script src="../../js/jquery-ui-timepicker-addon.js" type="application/javascript"></script>
     <title>爬取运行监控</title>
 </head>
 <body>
@@ -83,7 +87,7 @@
                     <li role="presentation"><a href="#crawl_status" aria-controls="crawl_status" role="tab" data-toggle="tab">爬取状态</a></li>
                     <li role="presentation"><a href="#crawl_data" aria-controls="crawl_data" role="tab" data-toggle="tab">爬取数据</a></li>
                 </ul>
-
+				
                 <!-- Tab panes -->
                 <div class="tab-content">
 
@@ -216,6 +220,8 @@
                                         <button type="button" class="btn btn-primary"
                                                 data-bind="click: queryByDataSource">按照分类统计
                                         </button>
+                                        <input type="text" id="startTime" class="form-control" style="width:160px" /> - 
+                                        <input type="text" id="endTime" class="form-control" style="width:160px" />
                                     </div>
                                 </div>
                                 <div class="row addRowTopMargin">
