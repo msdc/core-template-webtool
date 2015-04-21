@@ -126,8 +126,11 @@ public class CrawlToolService {
                 seeds.add(seedsTemp.get(i));
             }
         }
+        String paginationUrl = pageModel.getListPaginationViewModel().getPaginationUrl();
+        String currentString = pageModel.getListPaginationViewModel().getCurrentString();
+        String start = pageModel.getListPaginationViewModel().getStart();
 
-        serviceHelper.saveSeedsValueToFile(folderName, incrementFolderName, templateUrl, seeds, status, userProxy);
+        serviceHelper.saveSeedsValueToFile(folderName, incrementFolderName, templateUrl, seeds, status, userProxy, paginationUrl, currentString, start);
         jsonProvider.setSuccess(true);
         jsonProvider.setData("文件保存成功!");
         return jsonProvider.toJSON();
@@ -804,11 +807,17 @@ public class CrawlToolService {
         jsonProvider.setSuccess(true);
         StringBuilder sbString = new StringBuilder();
         Set<String> templateListKeys = RedisOperator.searchKeysFromDefaultDB("*" + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
+        List<String> keys = new ArrayList<String>(templateListKeys);
+        List<TemplateModel> templates = RedisOperator.getFromDefaultDB(keys);
         int failedTemplateCount = 0;
-        for (String listKey : templateListKeys) {
+        //for (String listKey : templateListKeys) {
+        for (TemplateModel templateModel : templates) {
+            if (templateModel.getStatus() == "false")
+                continue;
+            ;
             try {
-                String templateModelJSONString = RedisOperator.getFromDefaultDB(listKey);
-                TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateModelJSONString);
+                //String templateModelJSONString = RedisOperator.getFromDefaultDB(listKey);
+                //TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateModelJSONString);
                 TemplateResult templateResult = RedisOperator.getTemplateResultFromDefaultDB(templateModel.getTemplateId());
                 PageModel pageModel = serviceHelper.convertTemplateResultToPageModel(templateModel, templateResult);
                 // 注释原因：经过和东辉讨论后，移除此处的【保存增量模板】的操作。
@@ -817,12 +826,6 @@ public class CrawlToolService {
                 // ResponseJSONProvider<String> saveResult =
                 // serviceHelper.saveIncreaseTemplateResult(templateModel, "");
 
-                String status = templateModel.getStatus();
-                
-                if (WebtoolConstants.URL_STATUS_FALSE.equals(status)) {
-                    continue;
-                }
-                
                 // 导出到文件
                 ResponseJSONProvider<String> saveResult = serviceHelper.getResponseJSONProvider(saveToLocalFile(pageModel.toJSON()));
                 if (saveResult.getErrorMsg() != null) {
@@ -869,7 +872,11 @@ public class CrawlToolService {
             //String templateString = RedisOperator.getFromDefaultDB(key);
             //TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateString);
             List<TemplateModel> templates = RedisOperator.getFromDefaultDB(keys);
+
+
             for (TemplateModel templateModel : templates) {
+                if (templateModel.getStatus() == "false")
+                    continue;
                 Date currentDate = new Date();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String nowDateString = dateFormat.format(currentDate);
