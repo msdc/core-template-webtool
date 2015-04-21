@@ -126,11 +126,8 @@ public class CrawlToolService {
                 seeds.add(seedsTemp.get(i));
             }
         }
-        String paginationUrl = pageModel.getListPaginationViewModel().getPaginationUrl();
-        String currentString = pageModel.getListPaginationViewModel().getCurrentString();
-        String start = pageModel.getListPaginationViewModel().getStart();
 
-        serviceHelper.saveSeedsValueToFile(folderName, incrementFolderName, templateUrl, seeds, status, userProxy, paginationUrl, currentString, start);
+        serviceHelper.saveSeedsValueToFile(folderName, incrementFolderName, templateUrl, seeds, status, userProxy);
         jsonProvider.setSuccess(true);
         jsonProvider.setData("文件保存成功!");
         return jsonProvider.toJSON();
@@ -820,6 +817,12 @@ public class CrawlToolService {
                 // ResponseJSONProvider<String> saveResult =
                 // serviceHelper.saveIncreaseTemplateResult(templateModel, "");
 
+                String status = templateModel.getStatus();
+                
+                if (WebtoolConstants.URL_STATUS_FALSE.equals(status)) {
+                    continue;
+                }
+                
                 // 导出到文件
                 ResponseJSONProvider<String> saveResult = serviceHelper.getResponseJSONProvider(saveToLocalFile(pageModel.toJSON()));
                 if (saveResult.getErrorMsg() != null) {
