@@ -1801,34 +1801,34 @@ public class CrawlToolResource {
     }
 
     /**
-     *
      * @param crawlDataModel
      * @param crawlDataModelArrayList
      * @param filter
      * @param value
      * @param typeName
      */
-    public void fillCrawlDataModelArrayList(CrawlDataModel crawlDataModel, List<CrawlDataModel> crawlDataModelArrayList, String filter, String value, String typeName,String startTime,String endTime) {
-        try
-        {
-        SolrSerach search = new SolrSerach();
-        Date currentDate = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String nowDateString = dateFormat.format(currentDate);
+    public void fillCrawlDataModelArrayList(CrawlDataModel crawlDataModel, List<CrawlDataModel> crawlDataModelArrayList, String filter, String value, String typeName, String startTime, String endTime) {
+        try {
+            SolrSerach search = new SolrSerach();
+            Date currentDate = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String nowDateString = dateFormat.format(currentDate);
 
-        long searchEngineCount = search.getQueryResultCount(filter, value);
-        // 查询今日索引
-        long todayIndexCount = search.getQueryResultCount(filter, value, WebtoolConstants.CRAWL_DATA_QUERY_FIELD, DateUtils.parseDate(startTime,"yyyy-MM-dd HH:mm:ss"), DateUtils.parseDate(endTime,"yyyy-MM-dd HH:mm:ss"));
-        long todayPublishCount = search.getQueryResultCount(filter, value, WebtoolConstants.CRAWL_DATA_PUBLISH_TIME_QUERY_FIELD, DateUtils.parseDate(startTime,"yyyy-MM-dd HH:mm:ss"), DateUtils.parseDate(endTime,"yyyy-MM-dd HH:mm:ss"));
+            long searchEngineCount = search.getQueryResultCount(filter, value);
+            // 查询今日索引
+            long todayIndexCount = search.getQueryResultCount(filter, value, WebtoolConstants.CRAWL_DATA_QUERY_FIELD, DateUtils.parseDate(startTime, "yyyy-MM-dd HH:mm:ss"), DateUtils.parseDate(endTime, "yyyy-MM-dd HH:mm:ss"));
+            long todayPublishCount = search.getQueryResultCount(filter, value, WebtoolConstants.CRAWL_DATA_PUBLISH_TIME_QUERY_FIELD, DateUtils.parseDate(startTime, "yyyy-MM-dd HH:mm:ss"), DateUtils.parseDate(endTime, "yyyy-MM-dd HH:mm:ss"));
 
-        crawlDataModel.setUrl(typeName);
-        // 今日索引
-        crawlDataModel.setTodayIndexCounts(todayIndexCount);
-        crawlDataModel.setTodayPublishTimeCounts(todayPublishCount);
-        crawlDataModel.setIndexCounts(searchEngineCount);
-        crawlDataModel.setCheckTime(nowDateString);
-        crawlDataModelArrayList.add(crawlDataModel);}
-            catch(Exception ex){LOG.error(ex.getMessage());}
+            crawlDataModel.setUrl(typeName);
+            // 今日索引
+            crawlDataModel.setTodayIndexCounts(todayIndexCount);
+            crawlDataModel.setTodayPublishTimeCounts(todayPublishCount);
+            crawlDataModel.setIndexCounts(searchEngineCount);
+            crawlDataModel.setCheckTime(nowDateString);
+            crawlDataModelArrayList.add(crawlDataModel);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage());
+        }
     }
 
     /**

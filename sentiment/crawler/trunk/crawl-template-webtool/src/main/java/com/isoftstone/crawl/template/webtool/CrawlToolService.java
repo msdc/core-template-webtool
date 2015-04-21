@@ -1207,7 +1207,7 @@ public class CrawlToolService {
             normalCrawlDataModel.setDataSource("1");
 
             serviceHelper.fillCrawlDataModelArrayList(searchEngineCrawlDataModel, crawlDataModelArrayList, "tags", "datasource=2", "搜索引擎", startTime, endTime);
-            serviceHelper.fillCrawlDataModelArrayList(normalCrawlDataModel, crawlDataModelArrayList, "tags", "datasource=1", "定向站点", startTime, endTime);
+            serviceHelper.fillCrawlDataModelArrayList(normalCrawlDataModel, crawlDataModelArrayList, "-tags", "datasource=2", "定向站点", startTime, endTime);
 
             // 列表按名称排序
             Collections.sort(crawlDataModelArrayList, new CrawlDataModelComparator());
