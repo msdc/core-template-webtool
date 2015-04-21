@@ -5,7 +5,7 @@
 
 	<groupId>com.isoftstone.crawl.template.webtool</groupId>
 	<artifactId>crawl-template-webtool</artifactId>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 	<packaging>war</packaging>
 	<name>crawl-template-webtool</name>
 
@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>isoftstone.crawl.template</groupId>
 			<artifactId>core-template</artifactId>
-			<version>1.1.0</version>
+			<version>1.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jsoup</groupId>

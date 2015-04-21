@@ -49,7 +49,6 @@ $(function () {
     //注册Tab显示事件
     registerTabShownEvent(mainViewModel);
 
-
 });
 
 /**
