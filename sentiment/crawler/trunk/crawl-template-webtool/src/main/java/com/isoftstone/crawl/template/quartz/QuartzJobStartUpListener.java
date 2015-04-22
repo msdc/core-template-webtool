@@ -34,7 +34,7 @@ public class QuartzJobStartUpListener implements ServletContextListener {
     private static final Log LOG = LogFactory
             .getLog(QuartzJobStartUpListener.class);
 
-    private static final Integer INTERVAL_IN_HOUR = 6;
+    private static final Integer INTERVAL_IN_HOUR = 12;
 
     /*
      * (non-Javadoc)
@@ -79,7 +79,7 @@ public class QuartzJobStartUpListener implements ServletContextListener {
             Trigger checkSeedStatusTrigger = TriggerBuilder
                     .newTrigger()
                     .withIdentity(job_name_checkSeedStatus, "TCGroup")
-                    .withSchedule(SimpleScheduleBuilder.simpleSchedule().repeatForever().withIntervalInHours(12))
+                    .withSchedule(SimpleScheduleBuilder.simpleSchedule().repeatForever().withIntervalInHours(INTERVAL_IN_HOUR))
                     .startAt(new Date()).build();
             sched = sf.getScheduler();
             sched.scheduleJob(check_seedStatus, checkSeedStatusTrigger);
