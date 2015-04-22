@@ -95,8 +95,7 @@ public class CrawlToolResource {
     /**
      * 保存种子到本地文件. 并将文件夹相关信息存入redis.
      */
-    public void saveSeedsValueToFile(String folderName, String incrementFolderName, String templateUrl, List<String> seeds, String status, boolean userProxy, String paginationUrl,
-                                     String currentString, String start) {
+    public void saveSeedsValueToFile(String folderName, String incrementFolderName, String templateUrl, List<String> seeds, String status, boolean userProxy, String paginationUrl, String currentString, String start) {
         List<String> beforeSeedList = getSeedListResult(templateUrl, Constants.SEEDLIST_REDIS_DEBINDEX);
 
         // --1.1 保存模板url到本地文件.
@@ -848,7 +847,6 @@ public class CrawlToolResource {
                 templateModel.setStatus(status);
             }
         }
-
         return templateModel;
     }
 
@@ -1503,7 +1501,7 @@ public class CrawlToolResource {
                         List<SelectorIndexer> customerAtrrIndexers = customerAtrr.getIndexers();
                         if (customerAtrrIndexers != null) {
                             if (customerAtrrIndexers.size() > 0) {
-                                SelectorIndexer selectorIndexer = listIndexers.get(0);
+                                SelectorIndexer selectorIndexer = customerAtrrIndexers.get(0);
                                 listCustomerAttrModel.setSelector(selectorIndexer.getValue());
                                 if (selectorIndexer.getAttribute().equals(WebtoolConstants.CUSTOMER_SELECTOR_ATTRIBUTE)) {
                                     listCustomerAttrModel.setAttr(WebtoolConstants.CUSTOMER_SELECTOR_ATTRIBUTE);
