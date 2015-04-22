@@ -574,8 +574,11 @@ public class CrawlToolService {
 
         try {
             Set<String> listKeys = RedisOperator.searchKeysFromDefaultDB("*" + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
+            //List<String> keys=new ArrayList<String>(listKeys);
+            //List<TemplateModel> templates=RedisOperator.getFromDefaultDB(keys);
             if (listKeys != null) {
                 for (String key : listKeys) {
+                //for(TemplateModel templateModel:templates){
                     String templateString = RedisOperator.getFromDefaultDB(key);
                     TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateString);
                     String templateGuid = templateModel.getTemplateId();
@@ -873,7 +876,6 @@ public class CrawlToolService {
             //TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateString);
             List<TemplateModel> templates = RedisOperator.getFromDefaultDB(keys);
 
-
             for (TemplateModel templateModel : templates) {
                 if (templateModel.getStatus() == "false")
                     continue;
@@ -899,13 +901,14 @@ public class CrawlToolService {
 //						// templateModel.getBasicInfoViewModel().getName());
 //						continue;
 //					}
+
                 // 检查内容页
                 ResponseJSONProvider<ParseResult> newsContentJsonProvider = serviceHelper.getResponseJSONProviderObj(verifyNewContent(serviceHelper.getPageModeJSONString(pageModel)));
                 if (newsContentJsonProvider.getSuccess() == false) {
                     seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
                     seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
                     // 同时停用该模板
-                    disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
+                    //disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
                     continue;
                 }
                 // 检查增量
@@ -915,7 +918,7 @@ public class CrawlToolService {
                     seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_INVALID_STATUS);
                     seedsEffectiveStatusModelList.add(seedsEffectiveStatusModel);
                     // 同时停用该模板
-                    disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
+                    //disableTemplate(templateModel.getBasicInfoViewModel().getUrl(), templateModel.getBasicInfoViewModel().getName());
                     continue;
                 }
                 seedsEffectiveStatusModel.setEffectiveStatus(WebtoolConstants.TEMPLATE_VALID_STATUS);
@@ -924,7 +927,8 @@ public class CrawlToolService {
         } catch (Exception e) {
             jsonProvider.setSuccess(false);
             jsonProvider.setErrorMsg("Redis操作异常！");
-            e.printStackTrace();
+            LOG.error(e.getMessage());
+            return jsonProvider.toJSON();
         }
         // 列表按名称排序
         Collections.sort(seedsEffectiveStatusModelList, new SeedsEffectiveModelComparator());
