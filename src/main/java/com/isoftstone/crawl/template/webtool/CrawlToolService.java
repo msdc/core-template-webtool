@@ -815,9 +815,9 @@ public class CrawlToolService {
         int failedTemplateCount = 0;
         //for (String listKey : templateListKeys) {
         for (TemplateModel templateModel : templates) {
-            if (templateModel.getStatus() == "false")
+            if (templateModel.getStatus().equals("false"))
                 continue;
-            ;
+
             try {
                 //String templateModelJSONString = RedisOperator.getFromDefaultDB(listKey);
                 //TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateModelJSONString);
@@ -877,7 +877,7 @@ public class CrawlToolService {
             List<TemplateModel> templates = RedisOperator.getFromDefaultDB(keys);
 
             for (TemplateModel templateModel : templates) {
-                if (templateModel.getStatus() == "false")
+                if (templateModel.getStatus().equals("false"))
                     continue;
                 Date currentDate = new Date();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
