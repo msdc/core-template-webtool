@@ -561,6 +561,7 @@ public class CrawlToolResource {
             TemplateResult templateResult = getTemplateResult(pageModel);
             String templateGuid = MD5Utils.MD5(templateUrl);
             RedisOperator.saveTemplateToDefaultDB(templateResult, templateGuid);
+            RedisOperator.saveTemplateToIncreaseDB(templateResult,templateGuid);
             // 保存数据源列表所需要的key值 模板默认为启用状态
             saveTemplateToList(pageModel, "true");
         }
@@ -582,7 +583,7 @@ public class CrawlToolResource {
         byte[] input = DownloadHtml.getHtml(templateUrl);
         String encoding = sniffCharacterEncoding(input);
         try {
-            parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
+            parseResult = RedisOperator.getParseResultFromIncreaseDB(input, encoding, templateUrl);
         } catch (Exception e) {
             parseResult = null;
             e.printStackTrace();
@@ -693,7 +694,7 @@ public class CrawlToolResource {
         }
 
         try {
-            parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
+            parseResult = RedisOperator.getParseResultFromIncreaseDB(input, encoding, templateUrl);
         } catch (Exception e) {
             parseResult = null;
             e.printStackTrace();
