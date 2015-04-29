@@ -488,9 +488,19 @@ function loadPageContext(initData) {
 
                         /*保存模板配置*/
                         this.saveTemplate = function () {
-                            $('#modalHtmlTitle').text('保存结果');
-                            $('#modal-viewHtml').modal('show');
-                            ajaxPostRequest(virtualWebPath + '/webapi/crawlToolService/saveTemplate', this, showResultInModal, showResultInModal);
+                        	var isHave = true;
+                            $("input[name^='attributeName']").each(function(i, o){
+							    if($(o).val() == "" || $(o).val() == "undifine") {
+							    	alert("自定义属性名称标识为必填项，请检查");
+							    	isHave = false;
+							    	return false;
+							    }
+                            });
+                            if(isHave) {
+                            	$('#modalHtmlTitle').text('保存结果');
+                                $('#modal-viewHtml').modal('show');
+                                ajaxPostRequest(virtualWebPath + '/webapi/crawlToolService/saveTemplate', this, showResultInModal, showResultInModal);
+                            }
                         }.bind(this);
 
                         /*保存增量模板*/
