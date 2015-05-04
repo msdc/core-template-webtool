@@ -25,17 +25,18 @@ Date.prototype.Format = function (fmt) { //author: meizz
 $(function () {
 
     var mainViewModel = new masterVM([]);
+    var startTime = new Date().Format('yyyy-MM-dd')+" 00:00:00";
+    var endTime = new Date().Format('yyyy-MM-dd')+" 23:59:59";
+
+    $('#startTime').val(startTime);
+    $('#endTime').val(endTime);
 
     ko.applyBindings(mainViewModel);
 
     $('#startTime').datetimepicker({format: 'yyyy-mm-dd hh:ii:ss'});
     $('#endTime').datetimepicker({format: 'yyyy-mm-dd hh:ii:ss'});
 
-    var startTime = new Date().Format('yyyy-mm-dd')+" 00:00:00";
-    var endTime = new Date().Format('yyyy-mm-dd')+" 23:59:59";
 
-    $('#startTime').val(startTime);
-    $('#endTime').val(endTime);
 
     //初始化种子有效性列表测试数据
     fillPageList('seedsEffectiveStatusList', '/webapi/crawlToolService/getSeedsEffectiveStatusCache', mainViewModel, true, initSeedsEffectiveList);
