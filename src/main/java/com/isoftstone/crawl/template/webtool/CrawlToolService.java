@@ -7,10 +7,14 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -126,11 +130,8 @@ public class CrawlToolService {
                 seeds.add(seedsTemp.get(i));
             }
         }
-        String paginationUrl = pageModel.getListPaginationViewModel().getPaginationUrl();
-        String currentString = pageModel.getListPaginationViewModel().getCurrentString();
-        String start = pageModel.getListPaginationViewModel().getStart();
 
-        serviceHelper.saveSeedsValueToFile(folderName, incrementFolderName, templateUrl, seeds, status, userProxy, paginationUrl, currentString, start);
+        serviceHelper.saveSeedsValueToFile(folderName, incrementFolderName, templateUrl, seeds, status, userProxy);
         jsonProvider.setSuccess(true);
         jsonProvider.setData("文件保存成功!");
         return jsonProvider.toJSON();
@@ -237,6 +238,23 @@ public class CrawlToolService {
             jsonProvider.setSuccess(false);
             jsonProvider.setErrorMsg("无法完成页面解析，请检查选择器和过滤器正确性，确认后重新保存模板后，重试！");
         } else {
+            //--整理结果集.
+            Map<String, String> resultTemp = parseResult.getResult();
+            Map<String, String> result = new LinkedHashMap<String, String>();
+            Map<String, String> resultValue = new HashMap<String, String>();
+            for(Iterator<Entry<String, String>> it = resultTemp.entrySet().iterator(); it.hasNext();) {
+                Entry<String, String> entry = it.next();
+                String key = entry.getKey();
+                Pattern p = Pattern.compile(".*\\d+.*");
+                Matcher m = p.matcher(key);
+                if (m.matches()) {
+                    resultValue.put(key, entry.getValue());
+                } else {
+                    result.put(key, entry.getValue());
+                }
+            }
+            result.putAll(resultValue);
+            parseResult.setResult(result);
             jsonProvider.setSuccess(true);
             jsonProvider.setData(parseResult);
         }
@@ -332,38 +350,41 @@ public class CrawlToolService {
     @POST
     @Path("/deleteTemplate")
     @Produces(MediaType.APPLICATION_JSON)
-    public String deleteTemplate(@DefaultValue("") @FormParam("templateUrl") String templateUrl) {
+    public String deleteTemplate(@DefaultValue("") @FormParam("data") String data) {
+        System.out.println(data);
+        String templateUrl = "";
         //CrawlToolResource serviceHelper = new CrawlToolResource();
         String templateGuid = MD5Utils.MD5(templateUrl);
-        ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
-        jsonProvider.setSuccess(true);
-        jsonProvider.setData("删除成功！");
-        long effectCounts = -1;
-
-        // 先删除增量模板
-        String jsonString = RedisOperator.getFromDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
-        TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(jsonString);
-        List<String> increaseTemplateIdList = templateModel.getTemplateIncreaseIdList();
-        if (increaseTemplateIdList != null) {
-            for (String increaseTemplateId : increaseTemplateIdList) {
-                effectCounts = RedisOperator.delFromIncreaseDB(increaseTemplateId);
-                if (effectCounts < 0) {
-                    jsonProvider.setSuccess(false);
-                    jsonProvider.setErrorMsg("删除模板失败");
-                    jsonProvider.setData(null);
-                }
-            }
-        }
-
-        // 最后删除模板列表
-        effectCounts = RedisOperator.delFromDefaultDB((templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN), templateGuid);
-        if (effectCounts < 0) {
-            jsonProvider.setSuccess(false);
-            jsonProvider.setErrorMsg("删除模板失败");
-            jsonProvider.setData("");
-        }
-
-        return jsonProvider.toJSON();
+//        ResponseJSONProvider<String> jsonProvider = new ResponseJSONProvider<String>();
+//        jsonProvider.setSuccess(true);
+//        jsonProvider.setData("删除成功！");
+//        long effectCounts = -1;
+//
+//        // 先删除增量模板
+//        String jsonString = RedisOperator.getFromDefaultDB(templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN);
+//        TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(jsonString);
+//        List<String> increaseTemplateIdList = templateModel.getTemplateIncreaseIdList();
+//        if (increaseTemplateIdList != null) {
+//            for (String increaseTemplateId : increaseTemplateIdList) {
+//                effectCounts = RedisOperator.delFromIncreaseDB(increaseTemplateId);
+//                if (effectCounts < 0) {
+//                    jsonProvider.setSuccess(false);
+//                    jsonProvider.setErrorMsg("删除模板失败");
+//                    jsonProvider.setData(null);
+//                }
+//            }
+//        }
+//
+//        // 最后删除模板列表
+//        effectCounts = RedisOperator.delFromDefaultDB((templateGuid + WebtoolConstants.TEMPLATE_LIST_KEY_PARTERN), templateGuid);
+//        if (effectCounts < 0) {
+//            jsonProvider.setSuccess(false);
+//            jsonProvider.setErrorMsg("删除模板失败");
+//            jsonProvider.setData("");
+//        }
+//
+//        return jsonProvider.toJSON();
+        return "success";
     }
 
     /**
@@ -608,7 +629,7 @@ public class CrawlToolService {
             jsonProvider.setSuccess(false);
             jsonProvider.setErrorMsg("导出模板操作失败！");
             jsonProvider.setData(null);
-            e.printStackTrace();
+            LOG.error("导出模板操作失败！", e);
         }
         return jsonProvider.toJSON();
     }
@@ -817,7 +838,6 @@ public class CrawlToolService {
         for (TemplateModel templateModel : templates) {
             if (templateModel.getStatus().equals("false"))
                 continue;
-
             try {
                 //String templateModelJSONString = RedisOperator.getFromDefaultDB(listKey);
                 //TemplateModel templateModel = serviceHelper.getTemplateModelByJSONString(templateModelJSONString);

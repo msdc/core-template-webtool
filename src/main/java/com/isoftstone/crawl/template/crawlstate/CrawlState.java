@@ -28,7 +28,10 @@ import redis.clients.jedis.JedisPool;
 
 import com.isoftstone.crawl.template.consts.WebtoolConstants;
 import com.isoftstone.crawl.template.global.Constants;
+import com.isoftstone.crawl.template.impl.ParseResult;
+import com.isoftstone.crawl.template.impl.TemplateFactory;
 import com.isoftstone.crawl.template.model.CrawlStateBean;
+import com.isoftstone.crawl.template.model.PageModel;
 import com.isoftstone.crawl.template.utils.Config;
 import com.isoftstone.crawl.template.utils.HdfsCommon;
 import com.isoftstone.crawl.template.utils.RedisOperator;
@@ -38,6 +41,7 @@ import com.isoftstone.crawl.template.vo.DispatchVo;
 import com.isoftstone.crawl.template.vo.RunManager;
 import com.isoftstone.crawl.template.vo.Seed;
 import com.isoftstone.crawl.template.webtool.CrawlToolResource;
+import com.isoftstone.crawl.template.webtool.CrawlToolService;
 
 /**
  * CrawlStateUtil
@@ -360,7 +364,104 @@ public class CrawlState {
         return SUCCESS;
     }
 
-    public String deleteCrawlerSeed(String pageModelData) {
+    /**
+     * 删除爬虫种子.
+     * @param pageModel
+     * @return
+     */
+    public String deleteCrawlerSeed(PageModel pageModel) {
+        CrawlToolResource serviceHelper = new CrawlToolResource();
+        ParseResult parseResult = serviceHelper.getParseResult(pageModel);
+        String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+
+        ArrayList<String> templateUrlList = new ArrayList<String>();
+        templateUrlList.add(templateUrl);
+        
+        String pageSort = pageModel.getTemplateIncreaseViewModel().getPageSort();
+        ArrayList<String> seedsTemp = TemplateFactory.getPaginationOutlink(parseResult);
+        ArrayList<String> seeds = new ArrayList<String>();
+        seeds.add(templateUrl);
+        String incrementPageCountStr = pageModel.getTemplateIncreaseViewModel().getPageCounts();
+        int incrementPageCount = Integer.valueOf(incrementPageCountStr);
+        if (incrementPageCount > 0) {
+            incrementPageCount = incrementPageCount - 1;
+        }
+        if ("升序".equals(pageSort)) {
+            for (int i = 0; i < incrementPageCount && i < seedsTemp.size(); i++) {
+                seeds.add(seedsTemp.get(i));
+            }
+        } else {
+            for (int i = seedsTemp.size() - 1; i >= 0 && incrementPageCount > 0; i--, incrementPageCount--) {
+                seeds.add(seedsTemp.get(i));
+            }
+        }
+        
+        String domain = pageModel.getScheduleDispatchViewModel().getDomain();
+        String period = pageModel.getTemplateIncreaseViewModel().getPeriod();
+        String sequence = pageModel.getScheduleDispatchViewModel().getSequence();
+        
+        String folderName = domain + "_" + "1" + period + "_" + sequence;
+        String incrementFolderName = domain + "_" + "1" + period + "_" + WebtoolConstants.INCREMENT_FILENAME_SIGN + "_" + sequence;
+        
+        //-- 1.1 删除全量种子.
+        serviceHelper.deleteSeeds(folderName, templateUrlList);
+        //-- 1.2 删除增量种子.
+        serviceHelper.deleteSeeds(incrementFolderName, seeds);
+        //-- 1.3 删除redis中的增量种子中间状态.
+        List<String> beforeSeedList = serviceHelper.getSeedListResult(templateUrl, Constants.SEEDLIST_REDIS_DEBINDEX);
+        beforeSeedList.removeAll(seeds);
+        serviceHelper.setSeedListResult(beforeSeedList, templateUrl, Constants.SEEDLIST_REDIS_DEBINDEX);
+        
+        // --2.保存到redis中.
+        // --2.1 保存全量调度数据到redis中.
+        String normalRedisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX_NORMAL;
+        DispatchVo normalDispatchVo = RedisOperator.getDispatchResult(normalRedisKey, Constants.DISPATCH_REDIS_DBINDEX);
+        if (normalDispatchVo == null) {
+            LOG.info("未发现全量调度，返回" + normalRedisKey);
+            return "未发现全量调度，返回";
+        }
+        List<Seed> normalSeedList = normalDispatchVo.getSeed();
+        if (normalSeedList == null) {
+            LOG.info("未发现全量调度中有种子，返回" + normalRedisKey);
+            return "未发现全量调度中有种子，返回";
+        }
+        Seed normalSeed = new Seed(templateUrl, "false", WebtoolConstants.DISPATCH_STATIS_START);
+        //--删除之前旧状态的全量种子.
+        normalSeedList.remove(normalSeed);
+        if(normalSeedList.isEmpty()) {
+            // -- 如果删除后种子列表为空，则删除key.
+            RedisOperator.delFromDispatchDB(normalRedisKey);
+        } else {
+            normalDispatchVo.setSeed(normalSeedList);
+            RedisOperator.setDispatchResult(normalDispatchVo, normalRedisKey, Constants.DISPATCH_REDIS_DBINDEX);
+        }
+
+        //-- 2.2 保存增量调度数据到redis中.
+        String incrementRedisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX_INCREMENT;
+
+        DispatchVo dispatchVo = RedisOperator.getDispatchResult(incrementRedisKey, Constants.DISPATCH_REDIS_DBINDEX);
+        if (dispatchVo == null) {
+            LOG.info("未发现增量调度，返回." + incrementRedisKey);
+            return "未发现增量调度，返回";
+        }
+        List<Seed> seedList = dispatchVo.getSeed();
+        if (seedList == null) {
+            LOG.info("未发现增量调度中有种子，返回" + normalRedisKey);
+            return "未发现增量调度中有种子，返回";
+        } 
+        for (Iterator<String> it = seeds.iterator(); it.hasNext(); ) {
+            String seedStr = it.next();
+            Seed seed = new Seed(seedStr, "false");
+            seedList.remove(seed);
+        }
+        
+        if(seedList.isEmpty()) {
+            // -- 如果删除后种子列表为空，则删除key.
+            RedisOperator.delFromDispatchDB(incrementRedisKey);
+        } else {
+            dispatchVo.setSeed(seedList);
+            RedisOperator.setDispatchResult(dispatchVo, incrementRedisKey, Constants.DISPATCH_REDIS_DBINDEX);
+        }
         return SUCCESS;
     }
 

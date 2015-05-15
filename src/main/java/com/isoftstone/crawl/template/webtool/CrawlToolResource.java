@@ -95,15 +95,15 @@ public class CrawlToolResource {
     /**
      * 保存种子到本地文件. 并将文件夹相关信息存入redis.
      */
-    public void saveSeedsValueToFile(String folderName, String incrementFolderName, String templateUrl, List<String> seeds, String status, boolean userProxy, String paginationUrl, String currentString, String start) {
+    public void saveSeedsValueToFile(String folderName, String incrementFolderName, String templateUrl, List<String> seeds, String status, boolean userProxy) {
         List<String> beforeSeedList = getSeedListResult(templateUrl, Constants.SEEDLIST_REDIS_DEBINDEX);
 
         // --1.1 保存模板url到本地文件.
         List<String> templateList = new ArrayList<String>();
         templateList.add(templateUrl);
-        contentToTxt(folderName, templateList, status, paginationUrl, currentString, start, templateList);
+        contentToTxt(folderName, templateList, status, templateList);
         // --1.2 保存增量种子到本地文件.
-        contentToTxt(incrementFolderName, seeds, status, paginationUrl, currentString, start, beforeSeedList);
+        contentToTxt(incrementFolderName, seeds, status, beforeSeedList);
 
         // --1.3将增量种子列表，保存到redis中，key为模板url.
         setSeedListResult(seeds, templateUrl, Constants.SEEDLIST_REDIS_DEBINDEX);
@@ -192,7 +192,8 @@ public class CrawlToolResource {
         } finally {
             RedisUtils.returnResource(pool, jedis);
         }
-        return null;
+        //--TODO: json如果没有guid，是否会返回null.
+        return new ArrayList<String>();
     }
 
     public TemplateModel getTemplateModel(String guid) {
@@ -217,7 +218,7 @@ public class CrawlToolResource {
     /**
      * 保存内容到文件
      */
-    private void contentToTxt(String folderName, List<String> seeds, String status, String paginationUrl, String currentString, String start, List<String> removeSeedList) {
+    private void contentToTxt(String folderName, List<String> seeds, String status, List<String> removeSeedList) {
         String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
         String filePath = folderRoot + File.separator + folderName + File.separator + WebtoolConstants.SEED_FILE_NAME;
         String str = null; // 原有txt内容
@@ -279,6 +280,67 @@ public class CrawlToolResource {
             // putSeedsFolder(folderName, "deploy");
         } catch (Exception e) {
             LOG.error("生成文件错误.", e);
+        } finally {
+            try {
+                if (input != null) {
+                    input.close();
+                }
+                if (output != null) {
+                    output.close();
+                }
+            } catch (IOException e) {
+                LOG.error("关闭流异常.", e);
+            }
+        }
+    }
+    
+    /**
+     * 删除种子.
+     * @param folderName
+     * @param seeds
+     */
+    public void deleteSeeds(String folderName, List<String> seeds) {
+        String folderRoot = Config.getValue(WebtoolConstants.FOLDER_NAME_ROOT);
+        String filePath = folderRoot + File.separator + folderName + File.separator + WebtoolConstants.SEED_FILE_NAME;
+        String str = null; // 原有txt内容
+        StringBuffer strBuf = new StringBuffer();// 内容更新
+        BufferedReader input = null;
+        BufferedWriter output = null;
+        try {
+            File f = new File(filePath);
+            if (f.exists()){
+                input = new BufferedReader(new FileReader(f));
+                List<String> fileSeedList = new ArrayList<String>();
+                while ((str = input.readLine()) != null) {
+                    fileSeedList.add(str);
+                }
+                input.close();
+
+                // --写入未包含到本次种子中的历史数据.
+                for (int i = 0; i < fileSeedList.size(); i++) {
+                    String tempStr = fileSeedList.get(i);
+                    String temp = tempStr;
+                    if (tempStr.startsWith("#")) {
+                        temp = tempStr.substring(1, tempStr.length());
+                    }
+                    if (!seeds.contains(temp)) {
+                        strBuf.append(tempStr + System.getProperty("line.separator"));
+                    }
+                }
+
+            } else {
+                return;
+            }
+            output = new BufferedWriter(new FileWriter(f));
+            output.write(strBuf.toString());
+            output.close();
+            String isCopy = Config.getValue(WebtoolConstants.KEY_IS_COPYFOLDER);
+            if ("true".equals(isCopy)) {
+                putSeedsFolder(folderName, "local");
+            }
+            HdfsCommon.upFileToHdfs(filePath);
+        } catch (Exception e) {
+            LOG.error("删除种子，生成文件错误.", e);
         } finally {
             try {
                 if (input != null) {
@@ -528,6 +590,30 @@ public class CrawlToolResource {
         } catch (Exception e) {
             parseResult = null;
             e.printStackTrace();
+        }
+
+        return parseResult;
+    }
+    
+    /**
+     * 获取parseResult.
+     * @param pageModel
+     * @return
+     */
+    public ParseResult getParseResult(PageModel pageModel) {
+        String templateUrl = pageModel.getBasicInfoViewModel().getUrl();
+        ParseResult parseResult = null;
+        ResponseJSONProvider<String> jsonProvider = validPageModelBeforeSave(pageModel);
+        if (jsonProvider.getSuccess() == false) {
+            return parseResult;
+        }
+        byte[] input = DownloadHtml.getHtml(templateUrl);
+        String encoding = sniffCharacterEncoding(input);
+        try {
+            parseResult = RedisOperator.getParseResultFromDefaultDB(input, encoding, templateUrl);
+        } catch (Exception e) {
+            parseResult = null;
+            LOG.error("获取parseResult异常.", e);
         }
 
         return parseResult;

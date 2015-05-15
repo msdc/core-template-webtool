@@ -23,7 +23,7 @@ import com.isoftstone.crawl.template.utils.ShellUtils;
 public class ReParseAndIndex {
 
     private static final Log LOG = LogFactory.getLog(ReParseAndIndex.class);
-    
+
     public static void main(String[] args) {
         String nutch_root = args[0];
         String data_folder = args[1];
@@ -32,8 +32,7 @@ public class ReParseAndIndex {
         reParseAndIndex(nutch_root, data_folder, solr_index, filter);
     }
 
-    public static void reParseAndIndex(String nutch_root, String data_folder,
-            String solr_index, boolean filter) {
+    public static void reParseAndIndex(String nutch_root, String data_folder, String solr_index, boolean filter) {
         List<String> segParseList = new ArrayList<String>();
         List<String> segIndexList = new ArrayList<String>();
 
@@ -50,21 +49,21 @@ public class ReParseAndIndex {
                     for (File thirdtpFile : thirdFile) {
                         segParseList.add(thirdtpFile.getPath());
                         File[] finalFile = thirdtpFile.listFiles(new FileFilter() {
-                                    @Override
-                                    public boolean accept(File pathname) {
-                                        if (pathname.isDirectory()) {
-                                            if (pathname.getName().equals(new String("crawl_parse"))
-                                                    || pathname.getName().equals(new String("parse_data"))
-                                                    || pathname.getName().equals(new String("parse_text"))) {
-                                                return true;
-                                            } else {
-                                                return false;
-                                            }
-                                        } else {
-                                            return false;
-                                        }
+                            @Override
+                            public boolean accept(File pathname) {
+                                if (pathname.isDirectory()) {
+                                    if (pathname.getName().equals(new String("crawl_parse"))
+                                            || pathname.getName().equals(new String("parse_data"))
+                                            || pathname.getName().equals(new String("parse_text"))) {
+                                        return true;
+                                    } else {
+                                        return false;
                                     }
-                                });
+                                } else {
+                                    return false;
+                                }
+                            }
+                        });
                         if (filter) {
                             for (int l = 0; l < finalFile.length; l++) {
                                 removeDir(finalFile[l]);
@@ -102,7 +101,7 @@ public class ReParseAndIndex {
             excuteCmd(String.format(tpStrIndex, segs, segs, segs));
         }
     }
-    
+
     public static void excuteCmd(String cmd) {
         try {
             LOG.info("command:" + cmd);
@@ -120,7 +119,7 @@ public class ReParseAndIndex {
             LOG.info("Process exitValue: " + exitVal);
         } catch (Exception e) {
             LOG.info("执行异常.", e);
-        }       
+        }
 
     }
 

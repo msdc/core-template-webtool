@@ -1,12 +1,9 @@
 package com.isoftstone.crawl.template.utils;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.isoftstone.crawl.template.model.TemplateModel;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -14,12 +11,12 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import com.alibaba.fastjson.JSON;
+import com.isoftstone.crawl.template.global.Constants;
 import com.isoftstone.crawl.template.impl.ParseResult;
 import com.isoftstone.crawl.template.impl.TemplateFactory;
 import com.isoftstone.crawl.template.impl.TemplateResult;
+import com.isoftstone.crawl.template.model.TemplateModel;
 import com.isoftstone.crawl.template.vo.DispatchVo;
-
-import com.isoftstone.crawl.template.global.Constants;
 
 public class RedisOperator {
 
@@ -211,6 +208,27 @@ public class RedisOperator {
 		}
 		return -1;
 	}
+	
+	/**
+     * 
+     * 从增量板库中删除
+     * */
+    public static long delFromDispatchDB(final String... keys) {
+        JedisPool pool = null;
+        Jedis jedis = null;
+        try {
+            pool = RedisUtils.getPool();
+            jedis = pool.getResource();
+            jedis.select(Constants.DISPATCH_REDIS_DBINDEX);
+            return jedis.del(keys);
+        } catch (Exception e) {
+            pool.returnBrokenResource(jedis);
+            e.printStackTrace();
+        } finally {
+            RedisUtils.returnResource(pool, jedis);
+        }
+        return -1;
+    }
 
 	/**
 	 * 
