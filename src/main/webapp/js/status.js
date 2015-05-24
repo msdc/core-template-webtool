@@ -90,7 +90,7 @@ function filterVMByKeyWords(keyword, ViewModel, currentTab) {
                 var needToUse = [];
                 var totalUrl = ViewModel.crawlStatusVM.OrgUrls();
                 totalUrl.forEach(function (value, index) {
-                    if (value.name.indexOf(keyword) >= 0 || value.url.indexOf(keyword) >= 0) {
+                    if (value.name.indexOf(keyword) >= 0 || value.url.indexOf(keyword) >= 0||value.crawlStatus.indexOf(keyword)>=0) {
                         needToUse.push(value);
                     }
                 });

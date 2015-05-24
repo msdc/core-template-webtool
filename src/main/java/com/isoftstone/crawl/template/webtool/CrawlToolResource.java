@@ -293,9 +293,10 @@ public class CrawlToolResource {
             }
         }
     }
-    
+
     /**
      * 删除种子.
+     *
      * @param folderName
      * @param seeds
      */
@@ -308,7 +309,7 @@ public class CrawlToolResource {
         BufferedWriter output = null;
         try {
             File f = new File(filePath);
-            if (f.exists()){
+            if (f.exists()) {
                 input = new BufferedReader(new FileReader(f));
                 List<String> fileSeedList = new ArrayList<String>();
                 while ((str = input.readLine()) != null) {
@@ -594,9 +595,10 @@ public class CrawlToolResource {
 
         return parseResult;
     }
-    
+
     /**
      * 获取parseResult.
+     *
      * @param pageModel
      * @return
      */
@@ -647,7 +649,7 @@ public class CrawlToolResource {
             TemplateResult templateResult = getTemplateResult(pageModel);
             String templateGuid = MD5Utils.MD5(templateUrl);
             RedisOperator.saveTemplateToDefaultDB(templateResult, templateGuid);
-            RedisOperator.saveTemplateToIncreaseDB(templateResult,templateGuid);
+            RedisOperator.saveTemplateToIncreaseDB(templateResult, templateGuid);
             // 保存数据源列表所需要的key值 模板默认为启用状态
             saveTemplateToList(pageModel, "true");
         }
@@ -2081,9 +2083,11 @@ public class CrawlToolResource {
         }
         SolrSerach sos = new SolrSerach();
         List<String> solrHost = sos.getHostList();
-        for (String ho : solrHost) {
-            if (!domainList.contains(ho))
-                domainList.add(ho);
+        if (solrHost != null) {
+            for (String ho : solrHost) {
+                if (!domainList.contains(ho))
+                    domainList.add(ho);
+            }
         }
     }
 }

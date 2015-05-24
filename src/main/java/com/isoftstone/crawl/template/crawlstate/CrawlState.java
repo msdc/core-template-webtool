@@ -337,7 +337,12 @@ public class CrawlState {
      */
     public String stopCrawl(String folderName, boolean isDeploy, boolean isNomal) {
         // 1.修改redis中种子状态
-        String redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX_INCREMENT;
+        String redisKey = "";
+        if (isNomal == true) {
+            redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX_NORMAL;
+        } else {
+            redisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX_INCREMENT;
+        }
         DispatchVo dispatchVo = RedisOperator.getDispatchResult(redisKey, Constants.DISPATCH_REDIS_DBINDEX);
         if (dispatchVo == null) {
             return ERROR;
@@ -350,6 +355,8 @@ public class CrawlState {
             Seed seed = it.next();
             seed.setIsEnabled("false");
         }
+        //todo disable to reset the status
+        dispatchVo.setStatus(WebtoolConstants.DISPATCH_STATIS_START);
         RedisOperator.setDispatchResult(dispatchVo, redisKey, Constants.DISPATCH_REDIS_DBINDEX);
         // 2.修改文件中 种子状态.
         String[] folderNameArr = folderName.split("_");
@@ -366,6 +373,7 @@ public class CrawlState {
 
     /**
      * 删除爬虫种子.
+     *
      * @param pageModel
      * @return
      */
@@ -376,7 +384,7 @@ public class CrawlState {
 
         ArrayList<String> templateUrlList = new ArrayList<String>();
         templateUrlList.add(templateUrl);
-        
+
         String pageSort = pageModel.getTemplateIncreaseViewModel().getPageSort();
         ArrayList<String> seedsTemp = TemplateFactory.getPaginationOutlink(parseResult);
         ArrayList<String> seeds = new ArrayList<String>();
@@ -395,14 +403,14 @@ public class CrawlState {
                 seeds.add(seedsTemp.get(i));
             }
         }
-        
+
         String domain = pageModel.getScheduleDispatchViewModel().getDomain();
         String period = pageModel.getTemplateIncreaseViewModel().getPeriod();
         String sequence = pageModel.getScheduleDispatchViewModel().getSequence();
-        
+
         String folderName = domain + "_" + "1" + period + "_" + sequence;
         String incrementFolderName = domain + "_" + "1" + period + "_" + WebtoolConstants.INCREMENT_FILENAME_SIGN + "_" + sequence;
-        
+
         //-- 1.1 删除全量种子.
         serviceHelper.deleteSeeds(folderName, templateUrlList);
         //-- 1.2 删除增量种子.
@@ -411,7 +419,7 @@ public class CrawlState {
         List<String> beforeSeedList = serviceHelper.getSeedListResult(templateUrl, Constants.SEEDLIST_REDIS_DEBINDEX);
         beforeSeedList.removeAll(seeds);
         serviceHelper.setSeedListResult(beforeSeedList, templateUrl, Constants.SEEDLIST_REDIS_DEBINDEX);
-        
+
         // --2.保存到redis中.
         // --2.1 保存全量调度数据到redis中.
         String normalRedisKey = folderName + WebtoolConstants.DISPATCH_REIDIS_POSTFIX_NORMAL;
@@ -428,7 +436,7 @@ public class CrawlState {
         Seed normalSeed = new Seed(templateUrl, "false", WebtoolConstants.DISPATCH_STATIS_START);
         //--删除之前旧状态的全量种子.
         normalSeedList.remove(normalSeed);
-        if(normalSeedList.isEmpty()) {
+        if (normalSeedList.isEmpty()) {
             // -- 如果删除后种子列表为空，则删除key.
             RedisOperator.delFromDispatchDB(normalRedisKey);
         } else {
@@ -448,14 +456,14 @@ public class CrawlState {
         if (seedList == null) {
             LOG.info("未发现增量调度中有种子，返回" + normalRedisKey);
             return "未发现增量调度中有种子，返回";
-        } 
+        }
         for (Iterator<String> it = seeds.iterator(); it.hasNext(); ) {
             String seedStr = it.next();
             Seed seed = new Seed(seedStr, "false");
             seedList.remove(seed);
         }
-        
-        if(seedList.isEmpty()) {
+
+        if (seedList.isEmpty()) {
             // -- 如果删除后种子列表为空，则删除key.
             RedisOperator.delFromDispatchDB(incrementRedisKey);
         } else {
